@@ -1,5 +1,6 @@
 package com.catalis.core.banking.ledger.models.entities.sepa.v1;
 
+import com.catalis.core.banking.ledger.interfaces.enums.sepa.v1.SepaSpanishSchemeEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.sepa.v1.SepaTransactionStatusEnum;
 import com.catalis.core.banking.ledger.models.entities.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -85,5 +86,8 @@ public class TransactionLineSepaTransfer extends BaseEntity {
 
     @Column("sepa_notes")
     private String sepaNotes;
+
+    @Column("sepa_payment_scheme")
+    private SepaSpanishSchemeEnum sepaPaymentScheme;
 }
 

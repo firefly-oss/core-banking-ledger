@@ -65,4 +65,7 @@ public class TransactionLineCard extends BaseEntity {
 
     @Column("card_installment_plan")
     private String cardInstallmentPlan;
+
+    @Column("card_merchant_cif")
+    private String cardMerchantCif;
 }

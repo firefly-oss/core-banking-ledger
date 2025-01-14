@@ -85,4 +85,7 @@ public class TransactionLineStandingOrder extends BaseEntity {
 
     @Column("standing_order_update_timestamp")
     private LocalDateTime standingOrderUpdateTimestamp;
+
+    @Column("standing_order_spanish_tax_flag")
+    private Boolean standingOrderSpanishTaxFlag;
 }

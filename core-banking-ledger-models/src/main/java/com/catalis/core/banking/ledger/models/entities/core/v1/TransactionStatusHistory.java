@@ -35,4 +35,7 @@ public class TransactionStatusHistory extends BaseEntity {
 
     @Column("reason")
     private String reason;
+
+    @Column("regulated_reporting_flag")
+    private Boolean regulatedReportingFlag;
 }

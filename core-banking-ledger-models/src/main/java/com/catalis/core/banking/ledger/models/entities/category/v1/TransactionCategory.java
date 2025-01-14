@@ -31,5 +31,8 @@ public class TransactionCategory extends BaseEntity {
 
     @Column("category_type")
     private CategoryTypeEnum categoryType;
+
+    @Column("spanish_tax_code")
+    private String spanishTaxCode;
 }
 

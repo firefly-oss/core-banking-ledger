@@ -55,4 +55,10 @@ public class Transaction extends BaseEntity {
 
     @Column("transaction_category_id")
     private Long transactionCategoryId;
+
+    @Column("branch_office_code")
+    private String branchOfficeCode;
+
+    @Column("nif_initiating_party")
+    private String nifInitiatingParty;
 }

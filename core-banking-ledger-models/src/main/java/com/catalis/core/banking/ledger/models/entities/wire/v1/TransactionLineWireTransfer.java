@@ -78,4 +78,7 @@ public class TransactionLineWireTransfer extends BaseEntity {
 
     @Column("wire_cancelled_flag")
     private Boolean wireCancelledFlag;
+
+    @Column("bank_of_spain_reg_code")
+    private String bankOfSpainRegCode;
 }

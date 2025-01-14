@@ -2,6 +2,7 @@ package com.catalis.core.banking.ledger.models.entities.directdebit.v1;
 
 import com.catalis.core.banking.ledger.interfaces.enums.directdebit.v1.DirectDebitProcessingStatusEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.directdebit.v1.DirectDebitSequenceTypeEnum;
+import com.catalis.core.banking.ledger.interfaces.enums.directdebit.v1.DirectDebitSpanishSchemeEnum;
 import com.catalis.core.banking.ledger.models.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -61,5 +62,8 @@ public class TransactionLineDirectDebit extends BaseEntity {
 
     @Column("direct_debit_revocation_date")
     private LocalDateTime directDebitRevocationDate;
+
+    @Column("direct_debit_spanish_scheme")
+    private DirectDebitSpanishSchemeEnum directDebitSpanishScheme;
 }
 
