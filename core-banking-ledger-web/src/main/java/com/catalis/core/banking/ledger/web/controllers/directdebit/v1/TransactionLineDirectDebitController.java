@@ -1,15 +1,7 @@
 package com.catalis.core.banking.ledger.web.controllers.directdebit.v1;
 
-import com.catalis.common.core.queries.PaginationRequest;
-import com.catalis.common.core.queries.PaginationResponse;
-import com.catalis.common.web.error.models.ErrorResponse;
-import com.catalis.core.banking.ledger.core.services.directdebit.v1.TransactionLineDirectDebitCreateService;
-import com.catalis.core.banking.ledger.core.services.directdebit.v1.TransactionLineDirectDebitDeleteService;
-import com.catalis.core.banking.ledger.core.services.directdebit.v1.TransactionLineDirectDebitGetService;
-import com.catalis.core.banking.ledger.core.services.directdebit.v1.TransactionLineDirectDebitUpdateService;
-import com.catalis.core.banking.ledger.interfaces.dtos.directdebit.v1.TransactionDirectDebitFilterDTO;
+import com.catalis.core.banking.ledger.core.services.directdebit.v1.TransactionLineDirectDebitServiceImpl;
 import com.catalis.core.banking.ledger.interfaces.dtos.directdebit.v1.TransactionLineDirectDebitDTO;
-import com.catalis.core.banking.ledger.interfaces.dtos.directdebit.v1.TransactionSearchRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,106 +9,107 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Transaction Line Direct Debit", description = "APIs for managing direct debit lines associated with a specific transaction")
 @RestController
-@RequestMapping("/api/v1/direct-debits")
-@Tag(name = "Direct Debits", description = "Operations for managing direct debits")
+@RequestMapping("/api/v1/transactions/{transactionId}/line-direct-debit")
 public class TransactionLineDirectDebitController {
 
     @Autowired
-    private TransactionLineDirectDebitCreateService createService;
+    private TransactionLineDirectDebitServiceImpl service;
 
-    @Autowired
-    private TransactionLineDirectDebitUpdateService updateService;
-
-    @Autowired
-    private TransactionLineDirectDebitDeleteService deleteService;
-
-    @Autowired
-    private TransactionLineDirectDebitGetService getService;
-
-    @Operation(summary = "Create direct debit", description = "Creates a new direct debit")
+    @Operation(
+            summary = "Get Direct Debit Line",
+            description = "Retrieve the direct debit line record associated with the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Direct debit created successfully",
-                    content = @Content(schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the direct debit line",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Direct debit line not found for this transaction",
+                    content = @Content)
     })
-    @PostMapping
-    public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> createDirectDebit(
-            @RequestBody @Valid TransactionLineDirectDebitDTO directDebitDTO) {
-        return createService.createTransactionLineDirectDebit(directDebitDTO)
-                .map(created -> ResponseEntity.status(201).body(created));
-    }
-
-    @Operation(summary = "Get direct debit details", description = "Retrieves details of a specific direct debit")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Direct debit found",
-                    content = @Content(schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Direct debit not found")
-    })
-    @GetMapping("/details/{directDebitId}")
-    public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> getDirectDebit(
-            @Parameter(description = "ID of the direct debit", required = true)
-            @PathVariable Long directDebitId) {
-        return getService.getDirectDebit(directDebitId)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> getDirectDebitLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId
+    ) {
+        return service.getDirectDebitLine(transactionId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Update direct debit", description = "Updates an existing direct debit")
+    @Operation(
+            summary = "Create Direct Debit Line",
+            description = "Create a new direct debit line record associated with the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Direct debit updated successfully",
-                    content = @Content(schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Direct debit not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Direct debit line created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid direct debit line data provided",
+                    content = @Content)
     })
-    @PutMapping("/{directDebitId}")
-    public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> updateDirectDebit(
-            @Parameter(description = "ID of the direct debit to update", required = true)
-            @PathVariable Long directDebitId,
-            @RequestBody @Valid TransactionLineDirectDebitDTO directDebitDTO) {
-        return updateService.updateTransactionLineDirectDebit(directDebitId, directDebitDTO)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> createDirectDebitLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Data for the new direct debit line record", required = true,
+                    schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))
+            @RequestBody TransactionLineDirectDebitDTO directDebitDTO
+    ) {
+        return service.createDirectDebitLine(transactionId, directDebitDTO)
+                .map(createdDebitLine -> ResponseEntity.status(201).body(createdDebitLine))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @Operation(
+            summary = "Update Direct Debit Line",
+            description = "Update an existing direct debit line record associated with the specified transaction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Direct debit line updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Direct debit line not found for this transaction",
+                    content = @Content)
+    })
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> updateDirectDebitLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Updated data for the direct debit line record", required = true,
+                    schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))
+            @RequestBody TransactionLineDirectDebitDTO directDebitDTO
+    ) {
+        return service.updateDirectDebitLine(transactionId, directDebitDTO)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Delete direct debit", description = "Deletes a direct debit")
+    @Operation(
+            summary = "Delete Direct Debit Line",
+            description = "Remove an existing direct debit line record from the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Direct debit deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Direct debit not found")
+            @ApiResponse(responseCode = "204", description = "Direct debit line record deleted successfully",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Direct debit line record not found for this transaction",
+                    content = @Content)
     })
-    @DeleteMapping("/{directDebitId}")
-    public Mono<ResponseEntity<Void>> deleteDirectDebit(
-            @Parameter(description = "ID of the direct debit to delete", required = true)
-            @PathVariable Long directDebitId) {
-        return deleteService.deleteTransactionLineDirectDebit(directDebitId)
-                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    @DeleteMapping
+    public Mono<ResponseEntity<Void>> deleteDirectDebitLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable("transactionId") Long transactionId
+    ) {
+        return service.deleteDirectDebitLine(transactionId)
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
-
-    @Operation(summary = "Search direct debits", description = "Search direct debits based on various criteria")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search completed successfully",
-                    content = @Content(schema = @Schema(implementation = PaginationResponse.class)))
-    })
-    @PostMapping("/search")
-    public Mono<PaginationResponse<TransactionLineDirectDebitDTO>> searchDirectDebits(
-            @Parameter(description = "Search criteria and pagination options", required = true)
-            @RequestBody @Valid TransactionSearchRequest searchRequest) {
-
-        TransactionDirectDebitFilterDTO filter = searchRequest.getTransactionFilter();
-        PaginationRequest pagination = searchRequest.getPagination();
-
-        return getService.searchDirectDebits(filter, pagination);
-    }
-
 }

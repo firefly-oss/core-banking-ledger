@@ -1,15 +1,9 @@
 package com.catalis.core.banking.ledger.web.controllers.core.v1;
 
-import com.catalis.common.core.queries.PaginationRequest;
+import com.catalis.common.core.filters.FilterRequest;
 import com.catalis.common.core.queries.PaginationResponse;
-import com.catalis.common.web.error.models.ErrorResponse;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionCreateService;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionDeleteService;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionGetService;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionUpdateService;
+import com.catalis.core.banking.ledger.core.services.core.v1.TransactionServiceImpl;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
-import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionFilterDTO;
-import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionSearchRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,131 +11,126 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Tag(name = "Transactions", description = "APIs for managing transaction records in the ledger system")
 @RestController
 @RequestMapping("/api/v1/transactions")
-@Tag(name = "Transaction Management", description = "Operations for managing transactions in the Core Banking system")
 public class TransactionController {
 
     @Autowired
-    private TransactionCreateService createService;
+    private TransactionServiceImpl service;
 
-    @Autowired
-    private TransactionGetService getService;
-
-    @Autowired
-    private TransactionUpdateService updateService;
-
-    @Autowired
-    private TransactionDeleteService deleteService;
-
-    @Operation(summary = "Create a new transaction", description = "Creates a new transaction with the provided details")
+    @Operation(
+            summary = "Create Transaction",
+            description = "Create a new transaction record in the ledger."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Transaction successfully created",
-                    content = @Content(schema = @Schema(implementation = TransactionDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Transaction created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid transaction data provided",
+                    content = @Content)
     })
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionDTO>> createTransaction(
-            @RequestBody @Valid TransactionDTO requestTransactionDTO) {
-        return createService.createTransaction(requestTransactionDTO)
-                .map(created -> ResponseEntity.status(201).body(created));
+            @Parameter(description = "Transaction data to be created", required = true,
+                    schema = @Schema(implementation = TransactionDTO.class))
+            @RequestBody TransactionDTO transactionDTO
+    ) {
+        return service.createTransaction(transactionDTO)
+                .map(createdTxn -> ResponseEntity.status(201).body(createdTxn))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
-    @Operation(summary = "Retrieve a transaction by ID", description = "Fetches a transaction using its unique identifier (ID)")
+    @Operation(
+            summary = "Filter Transactions",
+            description = "Apply custom filters to retrieve a paginated list of transactions from the ledger."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transaction successfully found",
-                    content = @Content(schema = @Schema(implementation = TransactionDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered transactions",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PaginationResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No filtered results found",
+                    content = @Content)
     })
-    @GetMapping("/details/{transactionId}")
-    public Mono<ResponseEntity<TransactionDTO>> getTransaction(
-            @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable("transactionId") Long transactionId) {
-        return getService.getTransaction(transactionId)
+    @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<PaginationResponse<TransactionDTO>>> filterProducts(
+            @ParameterObject
+            @ModelAttribute FilterRequest<TransactionDTO> filterRequest
+    ) {
+        return service.filterTransactions(filterRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Search for transactions", description = "Search transactions based on filters and pagination options")
+    @Operation(
+            summary = "Get Transaction by ID",
+            description = "Retrieve a specific transaction record by its unique identifier."
+    )
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Search executed successfully",
-                    content = @Content(schema = @Schema(implementation = PaginationResponse.class))
-            )
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the transaction",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Transaction not found",
+                    content = @Content)
     })
-    @PostMapping("/search")
-    public Mono<PaginationResponse<TransactionDTO>> searchTransactions(
-            @Parameter(description = "Filters and pagination options for searching transactions", required = true)
-            @RequestBody @Valid TransactionSearchRequest searchRequest) {
-
-        // Extract both filter and pagination objects from the wrapper
-        TransactionFilterDTO filter = searchRequest.getTransactionFilter();
-        PaginationRequest pagination = searchRequest.getPagination();
-
-        return getService.searchTransactions(filter, pagination);
+    @GetMapping(value = "/{transactionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionDTO>> getTransaction(
+            @Parameter(description = "Unique identifier of the transaction to retrieve", required = true)
+            @PathVariable Long transactionId
+    ) {
+        return service.getTransaction(transactionId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Update an existing transaction", description = "Updates the details of a transaction identified by its ID")
+    @Operation(
+            summary = "Update Transaction",
+            description = "Update an existing transaction record by its unique identifier."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transaction successfully updated",
-                    content = @Content(schema = @Schema(implementation = TransactionDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
+            @ApiResponse(responseCode = "200", description = "Transaction updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Transaction not found",
+                    content = @Content)
     })
-    @PutMapping("/{transactionId}")
+    @PutMapping(value = "/{transactionId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionDTO>> updateTransaction(
             @Parameter(description = "Unique identifier of the transaction to update", required = true)
-            @PathVariable("transactionId") Long transactionId,
+            @PathVariable Long transactionId,
 
-            @Parameter(
-                    description = "Updated transaction details",
-                    required = true,
-                    schema = @Schema(implementation = TransactionDTO.class)
-            )
-            @RequestBody @Valid TransactionDTO requestTransactionDTO) {
-        return updateService.updateTransaction(transactionId, requestTransactionDTO)
+            @Parameter(description = "Updated transaction data", required = true,
+                    schema = @Schema(implementation = TransactionDTO.class))
+            @RequestBody TransactionDTO transactionDTO
+    ) {
+        return service.updateTransaction(transactionId, transactionDTO)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Delete a transaction", description = "Deletes a transaction identified by its unique ID")
+    @Operation(
+            summary = "Delete Transaction",
+            description = "Remove an existing transaction record from the ledger by its unique identifier."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Transaction successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
+            @ApiResponse(responseCode = "204", description = "Transaction deleted successfully",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Transaction not found",
+                    content = @Content)
     })
-    @DeleteMapping("/{transactionId}")
+    @DeleteMapping(value = "/{transactionId}")
     public Mono<ResponseEntity<Void>> deleteTransaction(
             @Parameter(description = "Unique identifier of the transaction to delete", required = true)
-            @PathVariable("transactionId") Long transactionId) {
-        return deleteService.deleteTransaction(transactionId)
-                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Retrieve transactions by account ID", description = "Fetches all transactions associated with a specific account")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transactions successfully retrieved",
-                    content = @Content(schema = @Schema(implementation = PaginationResponse.class)))
-    })
-    @GetMapping("/accounts/{accountId}")
-    public Mono<PaginationResponse<TransactionDTO>> getTransactionsByAccount(
-            @Parameter(description = "Unique identifier of the account", required = true)
-            @PathVariable("accountId") Long accountId,
-
-            @Parameter(
-                    description = "Pagination and sorting options",
-                    required = true,
-                    schema = @Schema(implementation = PaginationRequest.class)
-            )
-            @RequestBody @Valid PaginationRequest paginationRequest) {
-        return getService.getTransactionsByAccount(accountId, paginationRequest);
+            @PathVariable Long transactionId
+    ) {
+        return service.deleteTransaction(transactionId)
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
 }

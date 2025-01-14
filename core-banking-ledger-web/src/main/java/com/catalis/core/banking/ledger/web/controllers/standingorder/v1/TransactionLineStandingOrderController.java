@@ -1,123 +1,115 @@
 package com.catalis.core.banking.ledger.web.controllers.standingorder.v1;
 
-
-import com.catalis.common.core.queries.PaginationRequest;
-import com.catalis.common.core.queries.PaginationResponse;
-import com.catalis.common.web.error.models.ErrorResponse;
-import com.catalis.core.banking.ledger.core.services.standingorder.v1.TransactionLineStandingOrderCreateService;
-import com.catalis.core.banking.ledger.core.services.standingorder.v1.TransactionLineStandingOrderDeleteService;
-import com.catalis.core.banking.ledger.core.services.standingorder.v1.TransactionLineStandingOrderGetService;
-import com.catalis.core.banking.ledger.core.services.standingorder.v1.TransactionLineStandingOrderUpdateService;
+import com.catalis.core.banking.ledger.core.services.standingorder.v1.TransactionLineStandingOrderServiceImpl;
 import com.catalis.core.banking.ledger.interfaces.dtos.standingorder.v1.TransactionLineStandingOrderDTO;
-import com.catalis.core.banking.ledger.interfaces.dtos.standingorder.v1.TransactionSearchRequest;
-import com.catalis.core.banking.ledger.interfaces.dtos.standingorder.v1.TransactionStandingOrderFilterDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Tag(name = "Transaction Line Standing Order", description = "APIs for managing standing order line records associated with a specific transaction")
 @RestController
-@RequestMapping("/api/v1/standing-orders")
-@Tag(name = "Standing Orders", description = "Operations for managing standing orders")
+@RequestMapping("/api/v1/transactions/{transactionId}/line-standing-order")
 public class TransactionLineStandingOrderController {
 
     @Autowired
-    private TransactionLineStandingOrderCreateService createService;
+    private TransactionLineStandingOrderServiceImpl service;
 
-    @Autowired
-    private TransactionLineStandingOrderUpdateService updateService;
-
-    @Autowired
-    private TransactionLineStandingOrderDeleteService deleteService;
-
-    @Autowired
-    private TransactionLineStandingOrderGetService getService;
-
-    @Operation(summary = "Create standing order", description = "Creates a new standing order")
+    @Operation(
+            summary = "Get Standing Order Line",
+            description = "Retrieve the standing order line record associated with the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Standing order created successfully",
-                    content = @Content(schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the standing order line record",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Standing order line not found for this transaction",
+                    content = @Content)
     })
-    @PostMapping
-    public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> createStandingOrder(
-            @RequestBody @Valid TransactionLineStandingOrderDTO standingOrderDTO) {
-        return createService.createTransactionLineStandingOrder(standingOrderDTO)
-                .map(created -> ResponseEntity.status(201).body(created));
-    }
-
-    @Operation(summary = "Get standing order details", description = "Retrieves details of a specific standing order")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Standing order found",
-                    content = @Content(schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Standing order not found")
-    })
-    @GetMapping("/details/{standingOrderId}")
-    public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> getStandingOrder(
-            @Parameter(description = "ID of the standing order", required = true)
-            @PathVariable Long standingOrderId) {
-        return getService.getStandingOrder(standingOrderId)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> getStandingOrderLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId
+    ) {
+        return service.getStandingOrderLine(transactionId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Update standing order", description = "Updates an existing standing order")
+    @Operation(
+            summary = "Create Standing Order Line",
+            description = "Create a new standing order line record associated with the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Standing order updated successfully",
-                    content = @Content(schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Standing order not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Standing order line record created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid standing order line data provided",
+                    content = @Content)
     })
-    @PutMapping("/{standingOrderId}")
-    public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> updateStandingOrder(
-            @Parameter(description = "ID of the standing order to update", required = true)
-            @PathVariable Long standingOrderId,
-            @RequestBody @Valid TransactionLineStandingOrderDTO standingOrderDTO) {
-        return updateService.updateTransactionLineStandingOrder(standingOrderId, standingOrderDTO)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> createStandingOrderLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Data for the new standing order line record", required = true,
+                    schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))
+            @RequestBody TransactionLineStandingOrderDTO standingOrderDTO
+    ) {
+        return service.createStandingOrderLine(transactionId, standingOrderDTO)
+                .map(createdLine -> ResponseEntity.status(201).body(createdLine))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @Operation(
+            summary = "Update Standing Order Line",
+            description = "Update an existing standing order line record associated with the specified transaction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Standing order line updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Standing order line record not found for this transaction",
+                    content = @Content)
+    })
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> updateStandingOrderLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Updated data for the standing order line record", required = true,
+                    schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))
+            @RequestBody TransactionLineStandingOrderDTO standingOrderDTO
+    ) {
+        return service.updateStandingOrderLine(transactionId, standingOrderDTO)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Delete standing order", description = "Deletes a standing order")
+    @Operation(
+            summary = "Delete Standing Order Line",
+            description = "Remove an existing standing order line record from the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Standing order deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Standing order not found")
+            @ApiResponse(responseCode = "204", description = "Standing order line record deleted successfully",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Standing order line record not found for this transaction",
+                    content = @Content)
     })
-    @DeleteMapping("/{standingOrderId}")
-    public Mono<ResponseEntity<Void>> deleteStandingOrder(
-            @Parameter(description = "ID of the standing order to delete", required = true)
-            @PathVariable Long standingOrderId) {
-        return deleteService.deleteTransactionLineStandingOrder(standingOrderId)
-                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    @DeleteMapping
+    public Mono<ResponseEntity<Void>> deleteStandingOrderLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId
+    ) {
+        return service.deleteStandingOrderLine(transactionId)
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
-
-    @Operation(summary = "Search standing orders", description = "Search standing orders based on various criteria")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search completed successfully",
-                    content = @Content(schema = @Schema(implementation = PaginationResponse.class)))
-    })
-    @PostMapping("/search")
-    public Mono<PaginationResponse<TransactionLineStandingOrderDTO>> searchStandingOrders(
-            @Parameter(description = "Search criteria and pagination options", required = true)
-            @RequestBody @Valid TransactionSearchRequest searchRequest) {
-
-        TransactionStandingOrderFilterDTO filter = searchRequest.getTransactionFilter();
-        PaginationRequest pagination = searchRequest.getPagination();
-
-        return getService.searchStandingOrders(filter, pagination);
-    }
-
-
 }

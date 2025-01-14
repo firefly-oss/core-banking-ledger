@@ -1,125 +1,115 @@
 package com.catalis.core.banking.ledger.web.controllers.wire.v1;
 
-import com.catalis.common.core.queries.PaginationRequest;
-import com.catalis.common.core.queries.PaginationResponse;
-import com.catalis.common.web.error.models.ErrorResponse;
-import com.catalis.core.banking.ledger.core.services.wire.v1.TransactionLineWireTransferCreateService;
-import com.catalis.core.banking.ledger.core.services.wire.v1.TransactionLineWireTransferDeleteService;
-import com.catalis.core.banking.ledger.core.services.wire.v1.TransactionLineWireTransferGetService;
-import com.catalis.core.banking.ledger.core.services.wire.v1.TransactionLineWireTransferUpdateService;
+import com.catalis.core.banking.ledger.core.services.wire.v1.TransactionLineWireTransferServiceImpl;
 import com.catalis.core.banking.ledger.interfaces.dtos.wire.v1.TransactionLineWireTransferDTO;
-import com.catalis.core.banking.ledger.interfaces.dtos.wire.v1.TransactionSearchRequest;
-import com.catalis.core.banking.ledger.interfaces.dtos.wire.v1.TransactionWireFilterDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Tag(name = "Transaction Line Wire Transfer", description = "APIs for managing wire transfer lines associated with a specific transaction")
 @RestController
-@RequestMapping("/api/v1/wire-transfers")
-@Tag(name = "Wire Transfers", description = "Operations for managing wire transfers")
+@RequestMapping("/api/v1/transactions/{transactionId}/line-wire-transfer")
 public class TransactionLineWireTransferController {
 
     @Autowired
-    private TransactionLineWireTransferCreateService createService;
+    private TransactionLineWireTransferServiceImpl service;
 
-    @Autowired
-    private TransactionLineWireTransferUpdateService updateService;
-
-    @Autowired
-    private TransactionLineWireTransferDeleteService deleteService;
-
-    @Autowired
-    private TransactionLineWireTransferUpdateService updateStatusService;
-
-    @Autowired
-    private TransactionLineWireTransferGetService getService;
-
-
-    @Operation(summary = "Create wire transfer", description = "Creates a new wire transfer transaction")
+    @Operation(
+            summary = "Get Wire Transfer Line",
+            description = "Retrieve the wire transfer line record associated with the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Wire transfer created successfully",
-                    content = @Content(schema = @Schema(implementation = TransactionLineWireTransferDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the wire transfer line record",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineWireTransferDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Wire transfer line not found for this transaction",
+                    content = @Content)
     })
-    @PostMapping
-    public Mono<ResponseEntity<TransactionLineWireTransferDTO>> createWireTransfer(
-            @RequestBody @Valid TransactionLineWireTransferDTO wireTransferDTO) {
-        return createService.createTransactionLineWireTransfer(wireTransferDTO)
-                .map(created -> ResponseEntity.status(201).body(created));
-    }
-
-    @Operation(summary = "Get wire transfer details", description = "Retrieves details of a specific wire transfer")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Wire transfer found",
-                    content = @Content(schema = @Schema(implementation = TransactionLineWireTransferDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Wire transfer not found")
-    })
-    @GetMapping("/details/{wireTransferId}")
-    public Mono<ResponseEntity<TransactionLineWireTransferDTO>> getWireTransfer(
-            @Parameter(description = "ID of the wire transfer", required = true)
-            @PathVariable Long wireTransferId) {
-        return getService.getWireTransfer(wireTransferId)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineWireTransferDTO>> getWireTransferLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId
+    ) {
+        return service.getWireTransferLine(transactionId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Update wire transfer", description = "Updates an existing wire transfer")
+    @Operation(
+            summary = "Create Wire Transfer Line",
+            description = "Create a new wire transfer line record associated with the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Wire transfer updated successfully",
-                    content = @Content(schema = @Schema(implementation = TransactionLineWireTransferDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Wire transfer not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Wire transfer line record created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineWireTransferDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid wire transfer line data provided",
+                    content = @Content)
     })
-    @PutMapping("/{wireTransferId}")
-    public Mono<ResponseEntity<TransactionLineWireTransferDTO>> updateWireTransfer(
-            @Parameter(description = "ID of the wire transfer to update", required = true)
-            @PathVariable Long wireTransferId,
-            @RequestBody @Valid TransactionLineWireTransferDTO wireTransferDTO) {
-        return updateService.updateTransactionLineWireTransfer(wireTransferId, wireTransferDTO)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineWireTransferDTO>> createWireTransferLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Data for the new wire transfer line record", required = true,
+                    schema = @Schema(implementation = TransactionLineWireTransferDTO.class))
+            @RequestBody TransactionLineWireTransferDTO wireDTO
+    ) {
+        return service.createWireTransferLine(transactionId, wireDTO)
+                .map(createdLine -> ResponseEntity.status(201).body(createdLine))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @Operation(
+            summary = "Update Wire Transfer Line",
+            description = "Update an existing wire transfer line record associated with the specified transaction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Wire transfer line updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionLineWireTransferDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Wire transfer line record not found for this transaction",
+                    content = @Content)
+    })
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionLineWireTransferDTO>> updateWireTransferLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Updated data for the wire transfer line record", required = true,
+                    schema = @Schema(implementation = TransactionLineWireTransferDTO.class))
+            @RequestBody TransactionLineWireTransferDTO wireDTO
+    ) {
+        return service.updateWireTransferLine(transactionId, wireDTO)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Delete wire transfer", description = "Deletes a wire transfer")
+    @Operation(
+            summary = "Delete Wire Transfer Line",
+            description = "Remove an existing wire transfer line record from the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Wire transfer deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Wire transfer not found")
+            @ApiResponse(responseCode = "204", description = "Wire transfer line record deleted successfully",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Wire transfer line record not found for this transaction",
+                    content = @Content)
     })
-    @DeleteMapping("/{wireTransferId}")
-    public Mono<ResponseEntity<Void>> deleteWireTransfer(
-            @Parameter(description = "ID of the wire transfer to delete", required = true)
-            @PathVariable Long wireTransferId) {
-        return deleteService.deleteTransactionLineWireTransfer(wireTransferId)
-                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    @DeleteMapping
+    public Mono<ResponseEntity<Void>> deleteWireTransferLine(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId
+    ) {
+        return service.deleteWireTransferLine(transactionId)
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
-
-    @Operation(summary = "Search wire transfers", description = "Search wire transfers based on various criteria")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search completed successfully",
-                    content = @Content(schema = @Schema(implementation = PaginationResponse.class)))
-    })
-    @PostMapping("/search")
-    public Mono<PaginationResponse<TransactionLineWireTransferDTO>> searchWireTransfers(
-            @Parameter(description = "Search criteria and pagination options", required = true)
-            @RequestBody @Valid TransactionSearchRequest searchRequest) {
-
-        TransactionWireFilterDTO filter = searchRequest.getTransactionFilter();
-        PaginationRequest pagination = searchRequest.getPagination();
-
-        return getService.searchWireTransfers(filter, pagination);
-    }
-
 }

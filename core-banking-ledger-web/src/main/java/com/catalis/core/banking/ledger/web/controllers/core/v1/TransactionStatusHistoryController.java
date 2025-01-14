@@ -2,11 +2,7 @@ package com.catalis.core.banking.ledger.web.controllers.core.v1;
 
 import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
-import com.catalis.common.web.error.models.ErrorResponse;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryCreateService;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryDeleteService;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryGetService;
-import com.catalis.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryUpdateService;
+import com.catalis.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryServiceImpl;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionStatusHistoryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,94 +11,141 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Tag(name = "Transaction Status History", description = "APIs for managing the status history of a specific transaction in the ledger")
 @RestController
 @RequestMapping("/api/v1/transactions/{transactionId}/status-history")
-@Tag(name = "Transaction Status History", description = "Operations for managing transaction status history")
 public class TransactionStatusHistoryController {
 
     @Autowired
-    private TransactionStatusHistoryCreateService createService;
+    private TransactionStatusHistoryServiceImpl service;
 
-    @Autowired
-    private TransactionStatusHistoryGetService getService;
-
-    @Autowired
-    private TransactionStatusHistoryUpdateService updateService;
-
-    @Autowired
-    private TransactionStatusHistoryDeleteService deleteService;
-
-    @Operation(summary = "Get status history", description = "Retrieves the status history for a specific transaction")
+    @Operation(
+            summary = "List Transaction Status History",
+            description = "Retrieve a paginated list of status history records for the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status history retrieved successfully",
-                    content = @Content(schema = @Schema(implementation = PaginationResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Transaction not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved transaction status history records",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PaginationResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No status history records found for the specified transaction",
+                    content = @Content)
     })
-    @GetMapping
-    public Mono<PaginationResponse<TransactionStatusHistoryDTO>> getStatusHistory(
-            @Parameter(description = "ID of the transaction", required = true)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<PaginationResponse<TransactionStatusHistoryDTO>>> getAllStatusHistory(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
             @PathVariable Long transactionId,
-            @Valid PaginationRequest paginationRequest) {
-        return getService.getStatusHistory(transactionId, paginationRequest);
-    }
 
-    @Operation(summary = "Add status history entry", description = "Adds a new status entry to the transaction's history")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Status history entry created",
-                    content = @Content(schema = @Schema(implementation = TransactionStatusHistoryDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Transaction not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PostMapping
-    public Mono<ResponseEntity<TransactionStatusHistoryDTO>> addStatusHistoryEntry(
-            @Parameter(description = "ID of the transaction", required = true)
-            @PathVariable Long transactionId,
-            @RequestBody @Valid TransactionStatusHistoryDTO statusHistoryDTO) {
-        return createService.addStatusHistoryEntry(transactionId, statusHistoryDTO)
-                .map(created -> ResponseEntity.status(201).body(created));
-    }
-
-    @Operation(summary = "Update status history entry", description = "Updates an existing status history entry")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status history entry updated",
-                    content = @Content(schema = @Schema(implementation = TransactionStatusHistoryDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Status history entry not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PutMapping("/{statusHistoryId}")
-    public Mono<ResponseEntity<TransactionStatusHistoryDTO>> updateStatusHistoryEntry(
-            @Parameter(description = "ID of the status history entry", required = true)
-            @PathVariable Long statusHistoryId,
-            @RequestBody @Valid TransactionStatusHistoryDTO statusHistoryDTO) {
-        return updateService.updateStatusHistoryEntry(statusHistoryId, statusHistoryDTO)
+            @ParameterObject
+            @ModelAttribute PaginationRequest paginationRequest
+    ) {
+        return service.listStatusHistory(transactionId, paginationRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Delete status history entry", description = "Deletes a specific status history entry")
+    @Operation(
+            summary = "Create Transaction Status History",
+            description = "Create a new status history record tied to the specified transaction."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Status history entry deleted"),
-            @ApiResponse(responseCode = "404", description = "Status history entry not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Transaction status history record created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionStatusHistoryDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid status history data provided",
+                    content = @Content)
     })
-    @DeleteMapping("/{statusHistoryId}")
-    public Mono<ResponseEntity<Void>> deleteStatusHistoryEntry(
-            @Parameter(description = "ID of the status history entry", required = true)
-            @PathVariable Long statusHistoryId) {
-        return deleteService.deleteStatusHistoryEntry(statusHistoryId)
-                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionStatusHistoryDTO>> createStatusHistory(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Data for the new transaction status history record", required = true,
+                    schema = @Schema(implementation = TransactionStatusHistoryDTO.class))
+            @RequestBody TransactionStatusHistoryDTO historyDTO
+    ) {
+        return service.createStatusHistory(transactionId, historyDTO)
+                .map(createdHistory -> ResponseEntity.status(201).body(createdHistory))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @Operation(
+            summary = "Get Transaction Status History by ID",
+            description = "Retrieve a specific status history record by its unique identifier, ensuring it is tied to the specified transaction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the transaction status history record",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionStatusHistoryDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Transaction status history record not found",
+                    content = @Content)
+    })
+    @GetMapping(value = "/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionStatusHistoryDTO>> getStatusHistory(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Unique identifier of the status history record", required = true)
+            @PathVariable Long historyId
+    ) {
+        return service.getStatusHistory(transactionId, historyId)
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @Operation(
+            summary = "Update Transaction Status History",
+            description = "Update an existing status history record associated with the specified transaction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Transaction status history record updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionStatusHistoryDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Transaction status history record not found",
+                    content = @Content)
+    })
+    @PutMapping(value = "/{historyId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<TransactionStatusHistoryDTO>> updateStatusHistory(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Unique identifier of the status history record to update", required = true)
+            @PathVariable Long historyId,
+
+            @Parameter(description = "Updated status history data", required = true,
+                    schema = @Schema(implementation = TransactionStatusHistoryDTO.class))
+            @RequestBody TransactionStatusHistoryDTO historyDTO
+    ) {
+        return service.updateStatusHistory(transactionId, historyId, historyDTO)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @Operation(
+            summary = "Delete Transaction Status History",
+            description = "Remove an existing status history record by its unique identifier, for the specified transaction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Transaction status history record deleted successfully",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Transaction status history record not found",
+                    content = @Content)
+    })
+    @DeleteMapping(value = "/{historyId}")
+    public Mono<ResponseEntity<Void>> deleteStatusHistory(
+            @Parameter(description = "Unique identifier of the transaction", required = true)
+            @PathVariable Long transactionId,
+
+            @Parameter(description = "Unique identifier of the status history record to delete", required = true)
+            @PathVariable Long historyId
+    ) {
+        return service.deleteStatusHistory(transactionId, historyId)
+                .then(Mono.just(ResponseEntity.noContent().build()));
+    }
 }
