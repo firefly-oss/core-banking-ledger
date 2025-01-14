@@ -1,5 +1,6 @@
 package com.catalis.core.banking.ledger.interfaces.dtos.core.v1;
 
+import com.catalis.common.core.filters.FilterableId;
 import com.catalis.core.banking.ledger.interfaces.dtos.BaseDTO;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionTypeEnum;
@@ -29,6 +30,13 @@ public class TransactionDTO extends BaseDTO {
     private String currency;
     private String description;
     private String initiatingParty;
+
+    @FilterableId
     private Long accountId;
+
+    @FilterableId
     private Long transactionCategoryId;
+
+    private String branchOfficeCode;
+    private String nifInitiatingParty;
 }

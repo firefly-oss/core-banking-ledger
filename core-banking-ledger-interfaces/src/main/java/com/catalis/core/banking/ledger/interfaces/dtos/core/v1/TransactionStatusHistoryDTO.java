@@ -23,4 +23,5 @@ public class TransactionStatusHistoryDTO extends BaseDTO {
     private LocalDateTime statusStartDatetime;
     private LocalDateTime statusEndDatetime;
     private String reason;
+    private Boolean regulatedReportingFlag;
 }

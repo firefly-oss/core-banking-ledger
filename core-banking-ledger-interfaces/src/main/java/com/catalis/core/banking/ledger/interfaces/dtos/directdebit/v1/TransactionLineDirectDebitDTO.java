@@ -3,6 +3,7 @@ package com.catalis.core.banking.ledger.interfaces.dtos.directdebit.v1;
 import com.catalis.core.banking.ledger.interfaces.dtos.BaseDTO;
 import com.catalis.core.banking.ledger.interfaces.enums.directdebit.v1.DirectDebitProcessingStatusEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.directdebit.v1.DirectDebitSequenceTypeEnum;
+import com.catalis.core.banking.ledger.interfaces.enums.directdebit.v1.DirectDebitSpanishSchemeEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +34,6 @@ public class TransactionLineDirectDebitDTO extends BaseDTO {
     private DirectDebitProcessingStatusEnum directDebitProcessingStatus;
     private LocalDateTime directDebitAuthorizationDate;
     private LocalDateTime directDebitRevocationDate;
+    private DirectDebitSpanishSchemeEnum directDebitSpanishScheme;
+
 }

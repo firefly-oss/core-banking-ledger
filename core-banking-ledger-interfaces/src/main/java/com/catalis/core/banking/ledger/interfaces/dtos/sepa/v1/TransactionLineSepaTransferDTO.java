@@ -1,6 +1,7 @@
 package com.catalis.core.banking.ledger.interfaces.dtos.sepa.v1;
 
 import com.catalis.core.banking.ledger.interfaces.dtos.BaseDTO;
+import com.catalis.core.banking.ledger.interfaces.enums.sepa.v1.SepaSpanishSchemeEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.sepa.v1.SepaTransactionStatusEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -41,4 +42,5 @@ public class TransactionLineSepaTransferDTO extends BaseDTO {
     private String sepaRecipientAddress;
     private LocalDateTime sepaProcessingDate;
     private String sepaNotes;
+    private SepaSpanishSchemeEnum sepaPaymentScheme;
 }

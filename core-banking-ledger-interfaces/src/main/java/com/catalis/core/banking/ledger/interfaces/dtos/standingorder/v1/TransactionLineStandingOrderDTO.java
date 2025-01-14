@@ -41,4 +41,5 @@ public class TransactionLineStandingOrderDTO extends BaseDTO {
     private String standingOrderUpdatedBy;
     private LocalDateTime standingOrderCreationTimestamp;
     private LocalDateTime standingOrderUpdateTimestamp;
+    private Boolean standingOrderSpanishTaxFlag;
 }

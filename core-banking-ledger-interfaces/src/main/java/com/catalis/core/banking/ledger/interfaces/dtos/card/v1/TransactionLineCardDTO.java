@@ -33,4 +33,5 @@ public class TransactionLineCardDTO extends BaseDTO {
     private BigDecimal cardFeeAmount;
     private String cardFeeCurrency;
     private String cardInstallmentPlan;
+    private String cardMerchantCif;
 }

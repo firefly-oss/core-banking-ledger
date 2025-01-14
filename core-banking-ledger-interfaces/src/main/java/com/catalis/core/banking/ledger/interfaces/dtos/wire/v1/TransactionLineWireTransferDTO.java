@@ -38,4 +38,5 @@ public class TransactionLineWireTransferDTO extends BaseDTO {
     private String wireReceptionStatus;
     private String wireDeclineReason;
     private Boolean wireCancelledFlag;
+    private String bankOfSpainRegCode;
 }

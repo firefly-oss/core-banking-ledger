@@ -20,4 +20,5 @@ public class TransactionCategoryDTO extends BaseDTO {
     private String categoryName;
     private String categoryDescription;
     private CategoryTypeEnum categoryType;
+    private String spanishTaxCode;
 }
