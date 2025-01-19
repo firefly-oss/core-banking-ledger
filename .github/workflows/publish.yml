@@ -13,3 +13,16 @@ jobs:
       skip-tests: false
     secrets:
       PAT_GITHUB_PACKAGE: ${{ secrets.PAT_GITHUB_PACKAGE }}
+
+  build-and-publish-docker:
+    name: Docker Publish to ACR
+    needs: build-and-publish
+    uses: catalis-vc/cicd/.github/workflows/docker-publish.yaml@main
+    with:
+      dockerfile-path: "./Dockerfile"
+      azure-registry-name: "catalis.azurecr.io"
+      azure-registry-repository: "core-banking-ledger"
+      docker-image-tag: "latest"
+    secrets:
+      AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
+      AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
