@@ -23,6 +23,14 @@
             <groupId>com.catalis</groupId>
             <artifactId>core-banking-ledger-interfaces</artifactId>
         </dependency>
+
+        <!-- Common Libraries -->
+        <dependency>
+            <groupId>com.catalis</groupId>
+            <artifactId>lib-common-r2dbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Database -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -32,6 +40,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>r2dbc-postgresql</artifactId>
         </dependency>
+
         <!-- Add this dependency for Flyway -->
         <dependency>
             <groupId>org.postgresql</groupId>
