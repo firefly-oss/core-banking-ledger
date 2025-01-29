@@ -35,8 +35,12 @@ import org.springframework.web.reactive.config.EnableWebFlux;
         ),
         servers = {
                 @Server(
+                        url = "http://core.catalis.vc/ledger",
+                        description = "Development Environment"
+                ),
+                @Server(
                         url = "/",
-                        description = "Current Environment"
+                        description = "Local Development Environment"
                 )
         }
 )
