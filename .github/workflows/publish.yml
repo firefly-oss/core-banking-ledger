@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-jar:
-    uses: catalis-vc/cicd/.github/workflows/build-maven.yaml@main
+    uses: firefly-oss/cicd/.github/workflows/build-maven.yaml@main
     with:
       java-version: "21"
       skip-tests: false
@@ -15,7 +15,7 @@ jobs:
       PAT_GITHUB_PACKAGE: ${{ secrets.PAT_GITHUB_PACKAGE }}
   docker-publish:
     needs: [build-jar]
-    uses: catalis-vc/cicd/.github/workflows/docker-publish.yaml@main
+    uses: firefly-oss/cicd/.github/workflows/docker-publish.yaml@main
     with:
       dockerfile-path: "./Dockerfile"
       azure-registry-name: "catalis.azurecr.io"
