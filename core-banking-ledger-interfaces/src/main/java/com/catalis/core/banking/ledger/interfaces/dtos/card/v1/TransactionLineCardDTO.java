@@ -1,6 +1,7 @@
 package com.catalis.core.banking.ledger.interfaces.dtos.card.v1;
 
 import com.catalis.core.banking.ledger.interfaces.dtos.BaseDTO;
+import com.catalis.core.utils.annotations.FilterableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,9 @@ public class TransactionLineCardDTO extends BaseDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long transactionLineCardId;
 
+    @FilterableId
     private Long transactionId;
+
     private String cardAuthCode;
     private String cardMerchantCategoryCode;
     private String cardMerchantName;

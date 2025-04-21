@@ -2,6 +2,7 @@ package com.catalis.core.banking.ledger.interfaces.dtos.wire.v1;
 
 import com.catalis.core.banking.ledger.interfaces.dtos.BaseDTO;
 import com.catalis.core.banking.ledger.interfaces.enums.wire.v1.WireTransferPriorityEnum;
+import com.catalis.core.utils.annotations.FilterableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,9 @@ public class TransactionLineWireTransferDTO extends BaseDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long transactionLineWireTransferId;
 
+    @FilterableId
     private Long transactionId;
+
     private String wireTransferReference;
     private String wireOriginSwiftBic;
     private String wireDestinationSwiftBic;
