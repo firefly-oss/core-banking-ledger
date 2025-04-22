@@ -46,7 +46,12 @@ public class TransactionLineCardServiceImpl implements TransactionLineCardServic
                     return repository.save(updatedEntity);
                 })
                 .map(mapper::toDTO)
-                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to update Transaction Line Card", e)));
+                .onErrorResume(e -> {
+                    if (e.getMessage() != null && e.getMessage().equals("Transaction Line Card not found")) {
+                        return Mono.error(e);
+                    }
+                    return Mono.error(new RuntimeException("Failed to update Transaction Line Card", e));
+                });
     }
 
     @Override
