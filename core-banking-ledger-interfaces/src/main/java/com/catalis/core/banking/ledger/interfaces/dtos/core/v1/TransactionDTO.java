@@ -35,8 +35,19 @@ public class TransactionDTO extends BaseDTO {
     private Long accountId;
 
     @FilterableId
+    private Long accountSpaceId;
+
+    @FilterableId
     private Long transactionCategoryId;
 
     private String branchOfficeCode;
     private String nifInitiatingParty;
+
+    // Geotag fields
+    private Double latitude;
+    private Double longitude;
+    private String locationName;
+    private String country;
+    private String city;
+    private String postalCode;
 }
