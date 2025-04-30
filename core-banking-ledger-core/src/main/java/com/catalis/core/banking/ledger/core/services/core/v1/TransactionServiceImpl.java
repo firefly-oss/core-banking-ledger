@@ -2,7 +2,9 @@ package com.catalis.core.banking.ledger.core.services.core.v1;
 
 import com.catalis.common.core.filters.FilterRequest;
 import com.catalis.common.core.filters.FilterUtils;
+import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
+import com.catalis.common.core.queries.PaginationUtils;
 import com.catalis.core.banking.ledger.core.mappers.core.v1.TransactionMapper;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
 import com.catalis.core.banking.ledger.models.entities.core.v1.Transaction;
@@ -57,8 +59,68 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public Mono<PaginationResponse<TransactionDTO>> findTransactionsByAccountSpaceId(Long accountSpaceId, PaginationRequest paginationRequest) {
+        return PaginationUtils.paginateQuery(
+                paginationRequest,
+                mapper::toDTO,
+                pageable -> repository.findByAccountSpaceId(accountSpaceId, pageable),
+                () -> repository.countByAccountSpaceId(accountSpaceId)
+        );
+    }
+
+    @Override
     public Mono<Void> deleteTransaction(Long transactionId) {
         return repository.findById(transactionId)
                 .flatMap(repository::delete);
+    }
+
+    @Override
+    public Mono<PaginationResponse<TransactionDTO>> findTransactionsByCountry(String country, PaginationRequest paginationRequest) {
+        return PaginationUtils.paginateQuery(
+                paginationRequest,
+                mapper::toDTO,
+                pageable -> repository.findByCountry(country, pageable),
+                () -> repository.countByCountry(country)
+        );
+    }
+
+    @Override
+    public Mono<PaginationResponse<TransactionDTO>> findTransactionsByCity(String city, PaginationRequest paginationRequest) {
+        return PaginationUtils.paginateQuery(
+                paginationRequest,
+                mapper::toDTO,
+                pageable -> repository.findByCity(city, pageable),
+                () -> repository.countByCity(city)
+        );
+    }
+
+    @Override
+    public Mono<PaginationResponse<TransactionDTO>> findTransactionsByPostalCode(String postalCode, PaginationRequest paginationRequest) {
+        return PaginationUtils.paginateQuery(
+                paginationRequest,
+                mapper::toDTO,
+                pageable -> repository.findByPostalCode(postalCode, pageable),
+                () -> repository.countByPostalCode(postalCode)
+        );
+    }
+
+    @Override
+    public Mono<PaginationResponse<TransactionDTO>> findTransactionsByLocationName(String locationName, PaginationRequest paginationRequest) {
+        return PaginationUtils.paginateQuery(
+                paginationRequest,
+                mapper::toDTO,
+                pageable -> repository.findByLocationNameContainingIgnoreCase(locationName, pageable),
+                () -> repository.countByLocationNameContainingIgnoreCase(locationName)
+        );
+    }
+
+    @Override
+    public Mono<PaginationResponse<TransactionDTO>> findTransactionsWithinRadius(Double latitude, Double longitude, Double radiusInKm, PaginationRequest paginationRequest) {
+        return PaginationUtils.paginateQuery(
+                paginationRequest,
+                mapper::toDTO,
+                pageable -> repository.findTransactionsWithinRadius(latitude, longitude, radiusInKm, pageable),
+                () -> repository.countTransactionsWithinRadius(latitude, longitude, radiusInKm)
+        );
     }
 }
