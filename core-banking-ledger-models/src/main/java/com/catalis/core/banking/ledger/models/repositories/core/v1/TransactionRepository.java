@@ -17,8 +17,38 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
     Flux<Transaction> findByAccountId(Long accountId, Pageable pageable);
     Mono<Long> countByAccountId(Long accountId);
 
+    Flux<Transaction> findByAccountSpaceId(Long accountSpaceId, Pageable pageable);
+    Mono<Long> countByAccountSpaceId(Long accountSpaceId);
+
     Flux<Transaction> findByTransactionCategoryId(Long categoryId, Pageable pageable);
     Mono<Long> countByTransactionCategoryId(Long categoryId);
+
+    // Geotag query methods
+    @Query("SELECT t.* FROM transaction t " +
+           "WHERE (6371 * acos(cos(radians(:latitude)) * cos(radians(t.latitude)) * " +
+           "cos(radians(t.longitude) - radians(:longitude)) + sin(radians(:latitude)) * " +
+           "sin(radians(t.latitude)))) <= :radiusInKm " +
+           "ORDER BY (6371 * acos(cos(radians(:latitude)) * cos(radians(t.latitude)) * " +
+           "cos(radians(t.longitude) - radians(:longitude)) + sin(radians(:latitude)) * " +
+           "sin(radians(t.latitude)))) ASC")
+    Flux<Transaction> findTransactionsWithinRadius(Double latitude, Double longitude, Double radiusInKm, Pageable pageable);
+
+    @Query("SELECT COUNT(*) FROM transaction t " +
+           "WHERE (6371 * acos(cos(radians(:latitude)) * cos(radians(t.latitude)) * " +
+           "cos(radians(t.longitude) - radians(:longitude)) + sin(radians(:latitude)) * " +
+           "sin(radians(t.latitude)))) <= :radiusInKm")
+    Mono<Long> countTransactionsWithinRadius(Double latitude, Double longitude, Double radiusInKm);
+    Flux<Transaction> findByCountry(String country, Pageable pageable);
+    Mono<Long> countByCountry(String country);
+
+    Flux<Transaction> findByCity(String city, Pageable pageable);
+    Mono<Long> countByCity(String city);
+
+    Flux<Transaction> findByPostalCode(String postalCode, Pageable pageable);
+    Mono<Long> countByPostalCode(String postalCode);
+
+    Flux<Transaction> findByLocationNameContainingIgnoreCase(String locationName, Pageable pageable);
+    Mono<Long> countByLocationNameContainingIgnoreCase(String locationName);
 
     @Query("SELECT t.* FROM transaction t " +
             "WHERE (:startDate IS NULL OR t.transaction_date >= :startDate) " +

@@ -53,6 +53,9 @@ public class Transaction extends BaseEntity {
     @Column("account_id")
     private Long accountId;
 
+    @Column("account_space_id")
+    private Long accountSpaceId;
+
     @Column("transaction_category_id")
     private Long transactionCategoryId;
 
@@ -61,4 +64,23 @@ public class Transaction extends BaseEntity {
 
     @Column("nif_initiating_party")
     private String nifInitiatingParty;
+
+    // Geotag fields
+    @Column("latitude")
+    private Double latitude;
+
+    @Column("longitude")
+    private Double longitude;
+
+    @Column("location_name")
+    private String locationName;
+
+    @Column("country")
+    private String country;
+
+    @Column("city")
+    private String city;
+
+    @Column("postal_code")
+    private String postalCode;
 }
