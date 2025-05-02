@@ -13,10 +13,15 @@ The tests are organized into the following packages, mirroring the structure of 
 - **card/v1**: Tests for card transaction line services
 - **category/v1**: Tests for transaction category services
 - **core/v1**: Tests for core transaction and transaction status history services
+- **deposit/v1**: Tests for deposit transaction line services
 - **directdebit/v1**: Tests for direct debit transaction line services
+- **fee/v1**: Tests for fee transaction line services
+- **interest/v1**: Tests for interest transaction line services
 - **ledger/v1**: Tests for ledger account and ledger entry services
 - **sepa/v1**: Tests for SEPA transfer transaction line services
 - **standingorder/v1**: Tests for standing order transaction line services
+- **transfer/v1**: Tests for transfer transaction line services
+- **withdrawal/v1**: Tests for withdrawal transaction line services
 - **wire/v1**: Tests for wire transfer transaction line services
 
 ## Testing Approach

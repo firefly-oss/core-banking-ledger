@@ -58,7 +58,6 @@ public class TransactionServiceImplTest {
         transactionDTO.setTransactionStatus(TransactionStatusEnum.POSTED);
         transactionDTO.setCurrency("EUR");
         transactionDTO.setAccountId(100L);
-        transactionDTO.setAccountSpaceId(200L);
 
         transaction = new Transaction();
         transaction.setTransactionId(1L);
@@ -70,7 +69,6 @@ public class TransactionServiceImplTest {
         transaction.setTransactionStatus(TransactionStatusEnum.POSTED);
         transaction.setCurrency("EUR");
         transaction.setAccountId(100L);
-        transaction.setAccountSpaceId(200L);
     }
 
     @Test
@@ -196,40 +194,4 @@ public class TransactionServiceImplTest {
         // and properly mock it
     }
 
-    @Test
-    void findTransactionsByAccountSpaceId_Success() {
-        // This test is simplified due to the complexity of mocking PaginationUtils
-        // In a real test, you would need to properly mock the PaginationUtils class
-
-        // Arrange
-        Long accountSpaceId = 200L;
-        PaginationRequest paginationRequest = new PaginationRequest();
-
-        // Create a mock PaginationResponse using Mockito
-        @SuppressWarnings("unchecked")
-        PaginationResponse<TransactionDTO> mockResponse = Mockito.mock(PaginationResponse.class);
-
-        try (MockedStatic<PaginationUtils> paginationUtilsMock = Mockito.mockStatic(PaginationUtils.class)) {
-            // Mock the static method
-            paginationUtilsMock.when(() -> PaginationUtils.paginateQuery(
-                    any(PaginationRequest.class),
-                    any(),
-                    any(),
-                    any()
-            )).thenReturn(Mono.just(mockResponse));
-
-            // Act & Assert
-            StepVerifier.create(service.findTransactionsByAccountSpaceId(accountSpaceId, paginationRequest))
-                    .expectNext(mockResponse)
-                    .verifyComplete();
-
-            // Verify that PaginationUtils.paginateQuery was called with the correct parameters
-            paginationUtilsMock.verify(() -> PaginationUtils.paginateQuery(
-                    eq(paginationRequest),
-                    any(),
-                    any(),
-                    any()
-            ));
-        }
-    }
 }

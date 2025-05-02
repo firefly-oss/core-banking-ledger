@@ -6,86 +6,51 @@ import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
 import reactor.core.publisher.Mono;
 
+/**
+ * Service interface for managing financial transactions.
+ * Provides methods for creating, retrieving, updating, and deleting transactions,
+ * as well as various search and filtering capabilities.
+ */
 public interface TransactionService {
 
     /**
-     * Create a new transaction record.
+     * Creates a new transaction record.
+     *
+     * @param transactionDTO The transaction data to create
+     * @return A Mono emitting the created transaction with its generated ID
      */
     Mono<TransactionDTO> createTransaction(TransactionDTO transactionDTO);
 
     /**
-     * Filter transactions based on various criteria in FilterRequest.
-     */
-    Mono<PaginationResponse<TransactionDTO>> filterTransactions(FilterRequest<TransactionDTO> filterRequest);
-
-    /**
-     * Find transactions by account space ID with pagination.
-     * 
-     * @param accountSpaceId The ID of the account space
-     * @param paginationRequest The pagination parameters
-     * @return A paginated list of transactions for the specified account space
-     */
-    Mono<PaginationResponse<TransactionDTO>> findTransactionsByAccountSpaceId(Long accountSpaceId, PaginationRequest paginationRequest);
-
-    /**
-     * Retrieve a specific transaction by its unique ID.
+     * Retrieves a specific transaction by its unique ID.
+     *
+     * @param transactionId The unique identifier of the transaction
+     * @return A Mono emitting the transaction if found, or an empty Mono if not found
      */
     Mono<TransactionDTO> getTransaction(Long transactionId);
 
     /**
-     * Update an existing transaction by its unique ID.
+     * Updates an existing transaction by its unique ID.
+     *
+     * @param transactionId The unique identifier of the transaction to update
+     * @param transactionDTO The updated transaction data
+     * @return A Mono emitting the updated transaction, or an empty Mono if not found
      */
     Mono<TransactionDTO> updateTransaction(Long transactionId, TransactionDTO transactionDTO);
 
     /**
-     * Delete a transaction by its unique ID.
+     * Deletes a transaction by its unique ID.
+     *
+     * @param transactionId The unique identifier of the transaction to delete
+     * @return A Mono completing when the deletion is done, or completing empty if not found
      */
     Mono<Void> deleteTransaction(Long transactionId);
 
     /**
-     * Find transactions by country with pagination.
-     * 
-     * @param country The country to search for
-     * @param paginationRequest The pagination parameters
-     * @return A paginated list of transactions for the specified country
+     * Filters transactions based on various criteria specified in the filter request.
+     *
+     * @param filterRequest The filter criteria and pagination parameters
+     * @return A Mono emitting a paginated response of transactions matching the filter criteria
      */
-    Mono<PaginationResponse<TransactionDTO>> findTransactionsByCountry(String country, PaginationRequest paginationRequest);
-
-    /**
-     * Find transactions by city with pagination.
-     * 
-     * @param city The city to search for
-     * @param paginationRequest The pagination parameters
-     * @return A paginated list of transactions for the specified city
-     */
-    Mono<PaginationResponse<TransactionDTO>> findTransactionsByCity(String city, PaginationRequest paginationRequest);
-
-    /**
-     * Find transactions by postal code with pagination.
-     * 
-     * @param postalCode The postal code to search for
-     * @param paginationRequest The pagination parameters
-     * @return A paginated list of transactions for the specified postal code
-     */
-    Mono<PaginationResponse<TransactionDTO>> findTransactionsByPostalCode(String postalCode, PaginationRequest paginationRequest);
-
-    /**
-     * Find transactions by location name with pagination.
-     * 
-     * @param locationName The location name to search for (partial, case-insensitive)
-     * @param paginationRequest The pagination parameters
-     * @return A paginated list of transactions for the specified location name
-     */
-    Mono<PaginationResponse<TransactionDTO>> findTransactionsByLocationName(String locationName, PaginationRequest paginationRequest);
-
-    /**
-     * Find transactions within a specified radius of a point with pagination.
-     * 
-     * @param latitude The latitude of the center point
-     * @param longitude The longitude of the center point
-     * @param radiusInKm The radius in kilometers
-     * @param paginationRequest The pagination parameters
-     * @return A paginated list of transactions within the specified radius
-     */
-    Mono<PaginationResponse<TransactionDTO>> findTransactionsWithinRadius(Double latitude, Double longitude, Double radiusInKm, PaginationRequest paginationRequest);
+    Mono<PaginationResponse<TransactionDTO>> filterTransactions(FilterRequest<TransactionDTO> filterRequest);
 }
