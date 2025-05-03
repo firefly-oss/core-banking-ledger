@@ -31,10 +31,6 @@ The Core Banking Ledger SDK provides reactive clients for all API endpoints:
 - **TransactionStatusHistoryClient**: Client for transaction status history operations
 - **TransactionCategoryClient**: Client for transaction category operations
 
-### Ledger Clients
-- **LedgerAccountClient**: Client for ledger account operations
-- **LedgerEntryClient**: Client for ledger entry operations
-
 ### Transaction Line Clients
 - **TransactionLineCardClient**: Client for card payment transaction lines
 - **TransactionLineDirectDebitClient**: Client for direct debit transaction lines
@@ -166,61 +162,6 @@ client.getTransactionStatusHistoryClient().createStatusHistory(1001L, statusHist
 client.getTransactionStatusHistoryClient().listStatusHistory(1001L, paginationRequest)
     .subscribe(historyList -> {
         System.out.println("Retrieved " + historyList.getTotalElements() + " status history entries");
-    });
-```
-
-### Ledger Clients Examples
-
-#### Ledger Account Client
-
-```java
-// Create a ledger account
-LedgerAccountDTO ledgerAccount = new LedgerAccountDTO();
-ledgerAccount.setAccountCode("1000");
-ledgerAccount.setAccountName("Cash");
-ledgerAccount.setAccountType(AccountType.ASSET);
-ledgerAccount.setActive(true);
-
-client.getLedgerAccountClient().createLedgerAccount(ledgerAccount)
-    .subscribe(createdAccount -> {
-        System.out.println("Created ledger account with ID: " + createdAccount.getLedgerAccountId());
-    });
-
-// Get a ledger account by ID
-client.getLedgerAccountClient().getLedgerAccount(1001L)
-    .subscribe(retrievedAccount -> {
-        System.out.println("Retrieved ledger account: " + retrievedAccount.getAccountName());
-    });
-
-// List ledger accounts with pagination
-client.getLedgerAccountClient().listLedgerAccounts(paginationRequest)
-    .subscribe(accounts -> {
-        System.out.println("Retrieved " + accounts.getTotalElements() + " ledger accounts");
-    });
-```
-
-#### Ledger Entry Client
-
-```java
-// Create a ledger entry
-LedgerEntryDTO ledgerEntry = new LedgerEntryDTO();
-ledgerEntry.setTransactionId(1001L);
-ledgerEntry.setLedgerAccountId(2001L);
-ledgerEntry.setDebitCreditIndicator(DebitCreditIndicator.DEBIT);
-ledgerEntry.setAmount(new BigDecimal("100.00"));
-ledgerEntry.setCurrency("EUR");
-ledgerEntry.setPostingDate(LocalDateTime.now());
-ledgerEntry.setNotes("Test ledger entry");
-
-client.getLedgerEntryClient().createLedgerEntry(ledgerEntry)
-    .subscribe(createdEntry -> {
-        System.out.println("Created ledger entry with ID: " + createdEntry.getLedgerEntryId());
-    });
-
-// List ledger entries for a transaction
-client.getLedgerEntryClient().listLedgerEntries(1001L, null, paginationRequest)
-    .subscribe(entries -> {
-        System.out.println("Retrieved " + entries.getTotalElements() + " ledger entries");
     });
 ```
 

@@ -58,14 +58,6 @@ Handles various types of financial transactions:
 - Interest transactions
 - Transfer transactions
 
-#### Ledger Management
-Provides comprehensive accounting functionality:
-- Account management
-- Double-entry bookkeeping
-- Balance calculation
-- Reconciliation
-- Financial reporting
-- Audit trail
 
 #### Transaction Categorization
 Enables classification and organization of transactions for reporting and analysis.
@@ -530,13 +522,6 @@ You can set these environment variables in your development environment or provi
 - Track transaction status changes
 - Categorize transactions
 
-### Ledger Operations
-- Maintain chart of accounts
-- Record double-entry transactions
-- Calculate account balances
-- Generate financial reports
-- Perform reconciliation
-- Maintain audit trail
 
 ### Reporting
 - Trial balance reports
@@ -581,9 +566,6 @@ The Core Banking Ledger system provides the following REST controllers for inter
 - **TransactionStatusHistoryController**: Tracks changes in transaction status over time
 - **TransactionCategoryController**: Manages transaction categorization
 
-#### Ledger Controllers
-- **LedgerAccountController**: Manages the chart of accounts
-- **LedgerEntryController**: Handles double-entry bookkeeping operations
 
 #### Transaction Line Controllers
 - **TransactionLineCardController**: Manages card payment transaction lines
@@ -771,123 +753,8 @@ Response:
 }
 ```
 
-#### 3. Double-Entry Bookkeeping Flow
 
-This flow demonstrates how to create ledger entries for a transaction, following double-entry bookkeeping principles.
-
-**Step 1: Create Ledger Accounts (if needed)**
-
-```bash
-# Create a debit account (e.g., Expense account)
-curl -X POST http://localhost:8080/api/v1/ledger-accounts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "accountCode": "5100",
-    "accountName": "Utility Expenses",
-    "accountType": "EXPENSE",
-    "isActive": true
-  }'
-```
-
-Response:
-```json
-{
-  "ledgerAccountId": 2001,
-  "accountCode": "5100",
-  "accountName": "Utility Expenses",
-  "accountType": "EXPENSE",
-  "parentAccountId": null,
-  "isActive": true
-}
-```
-
-```bash
-# Create a credit account (e.g., Cash account)
-curl -X POST http://localhost:8080/api/v1/ledger-accounts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "accountCode": "1000",
-    "accountName": "Cash",
-    "accountType": "ASSET",
-    "isActive": true
-  }'
-```
-
-Response:
-```json
-{
-  "ledgerAccountId": 2002,
-  "accountCode": "1000",
-  "accountName": "Cash",
-  "accountType": "ASSET",
-  "parentAccountId": null,
-  "isActive": true
-}
-```
-
-**Step 2: Create Debit Ledger Entry**
-
-```bash
-# Create debit entry (expense increases)
-curl -X POST http://localhost:8080/api/v1/ledger-entries \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transactionId": 10001,
-    "ledgerAccountId": 2001,
-    "debitCreditIndicator": "DEBIT",
-    "amount": 125.50,
-    "currency": "EUR",
-    "postingDate": "2023-06-15T14:30:00",
-    "notes": "Electricity bill payment - debit entry"
-  }'
-```
-
-Response:
-```json
-{
-  "ledgerEntryId": 3001,
-  "transactionId": 10001,
-  "ledgerAccountId": 2001,
-  "debitCreditIndicator": "DEBIT",
-  "amount": 125.50,
-  "currency": "EUR",
-  "postingDate": "2023-06-15T14:30:00",
-  "notes": "Electricity bill payment - debit entry"
-}
-```
-
-**Step 3: Create Credit Ledger Entry**
-
-```bash
-# Create credit entry (cash decreases)
-curl -X POST http://localhost:8080/api/v1/ledger-entries \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transactionId": 10001,
-    "ledgerAccountId": 2002,
-    "debitCreditIndicator": "CREDIT",
-    "amount": 125.50,
-    "currency": "EUR",
-    "postingDate": "2023-06-15T14:30:00",
-    "notes": "Electricity bill payment - credit entry"
-  }'
-```
-
-Response:
-```json
-{
-  "ledgerEntryId": 3002,
-  "transactionId": 10001,
-  "ledgerAccountId": 2002,
-  "debitCreditIndicator": "CREDIT",
-  "amount": 125.50,
-  "currency": "EUR",
-  "postingDate": "2023-06-15T14:30:00",
-  "notes": "Electricity bill payment - credit entry"
-}
-```
-
-#### 4. Generating Financial Reports
+#### 3. Generating Financial Reports
 
 This flow demonstrates how to generate various financial reports.
 
@@ -933,7 +800,7 @@ curl -X GET "http://localhost:8080/api/v1/reports/income-statement?startDate=202
 curl -X GET "http://localhost:8080/api/v1/reports/balance-sheet?asOfDate=2023-06-30"
 ```
 
-#### 5. Processing a SEPA Transfer
+#### 4. Processing a SEPA Transfer
 
 This flow demonstrates how to create and process a SEPA transfer transaction.
 
@@ -1027,37 +894,6 @@ curl -X PUT http://localhost:8080/api/v1/transactions/10003 \
   }'
 ```
 
-**Step 4: Create Ledger Entries**
-
-```bash
-# Create debit entry (bank account decreases)
-curl -X POST http://localhost:8080/api/v1/ledger-entries \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transactionId": 10003,
-    "ledgerAccountId": 2003,
-    "debitCreditIndicator": "DEBIT",
-    "amount": 1000.00,
-    "currency": "EUR",
-    "postingDate": "2023-06-17T09:00:00",
-    "notes": "Monthly rent payment - debit entry"
-  }'
-```
-
-```bash
-# Create credit entry (expense increases)
-curl -X POST http://localhost:8080/api/v1/ledger-entries \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transactionId": 10003,
-    "ledgerAccountId": 2004,
-    "debitCreditIndicator": "CREDIT",
-    "amount": 1000.00,
-    "currency": "EUR",
-    "postingDate": "2023-06-17T09:00:00",
-    "notes": "Monthly rent payment - credit entry"
-  }'
-```
 
 ## 🔍 Monitoring and Logging
 

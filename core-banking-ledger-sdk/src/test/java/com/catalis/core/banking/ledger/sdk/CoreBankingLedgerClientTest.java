@@ -21,8 +21,6 @@ class CoreBankingLedgerClientTest {
 
         assertNotNull(client.getWebClient());
         assertNotNull(client.getTransactionClient());
-        assertNotNull(client.getLedgerAccountClient());
-        assertNotNull(client.getLedgerEntryClient());
         assertNotNull(client.getTransactionLineCardClient());
         assertNotNull(client.getTransactionLineDirectDebitClient());
         assertNotNull(client.getTransactionLineStandingOrderClient());
@@ -47,8 +45,6 @@ class CoreBankingLedgerClientTest {
 
         assertNotNull(client.getWebClient());
         assertNotNull(client.getTransactionClient());
-        assertNotNull(client.getLedgerAccountClient());
-        assertNotNull(client.getLedgerEntryClient());
         assertNotNull(client.getTransactionLineCardClient());
         assertNotNull(client.getTransactionLineDirectDebitClient());
         assertNotNull(client.getTransactionLineStandingOrderClient());
@@ -80,8 +76,6 @@ class CoreBankingLedgerClientTest {
 
         assertNotNull(client.getWebClient());
         assertNotNull(client.getTransactionClient());
-        assertNotNull(client.getLedgerAccountClient());
-        assertNotNull(client.getLedgerEntryClient());
         assertNotNull(client.getTransactionLineCardClient());
         assertNotNull(client.getTransactionLineDirectDebitClient());
         assertNotNull(client.getTransactionLineStandingOrderClient());
@@ -106,8 +100,6 @@ class CoreBankingLedgerClientTest {
 
         assertSame(webClient, client.getWebClient());
         assertNotNull(client.getTransactionClient());
-        assertNotNull(client.getLedgerAccountClient());
-        assertNotNull(client.getLedgerEntryClient());
         assertNotNull(client.getTransactionLineCardClient());
         assertNotNull(client.getTransactionLineDirectDebitClient());
         assertNotNull(client.getTransactionLineStandingOrderClient());

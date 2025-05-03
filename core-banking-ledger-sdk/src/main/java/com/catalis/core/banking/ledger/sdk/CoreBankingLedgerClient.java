@@ -1,6 +1,19 @@
 package com.catalis.core.banking.ledger.sdk;
 
-import com.catalis.core.banking.ledger.sdk.client.*;
+import com.catalis.core.banking.ledger.sdk.client.BaseClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionCategoryClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineCardClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineDepositClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineDirectDebitClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineFeeClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineInterestClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineSepaTransferClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineStandingOrderClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineTransferClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineWireTransferClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionLineWithdrawalClient;
+import com.catalis.core.banking.ledger.sdk.client.TransactionStatusHistoryClient;
 import com.catalis.core.banking.ledger.sdk.config.CoreBankingLedgerClientConfig;
 import lombok.Getter;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,8 +27,6 @@ public class CoreBankingLedgerClient {
 
     private final WebClient webClient;
     private final TransactionClient transactionClient;
-    private final LedgerAccountClient ledgerAccountClient;
-    private final LedgerEntryClient ledgerEntryClient;
     private final TransactionLineCardClient transactionLineCardClient;
     private final TransactionLineDirectDebitClient transactionLineDirectDebitClient;
     private final TransactionLineStandingOrderClient transactionLineStandingOrderClient;
@@ -63,8 +74,6 @@ public class CoreBankingLedgerClient {
     public CoreBankingLedgerClient(WebClient webClient) {
         this.webClient = webClient;
         this.transactionClient = new TransactionClient(webClient);
-        this.ledgerAccountClient = new LedgerAccountClient(webClient);
-        this.ledgerEntryClient = new LedgerEntryClient(webClient);
         this.transactionLineCardClient = new TransactionLineCardClient(webClient);
         this.transactionLineDirectDebitClient = new TransactionLineDirectDebitClient(webClient);
         this.transactionLineStandingOrderClient = new TransactionLineStandingOrderClient(webClient);
