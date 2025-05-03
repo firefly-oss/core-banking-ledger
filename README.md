@@ -944,7 +944,6 @@ First, we create a category to classify our transactions. Categories can be hier
 # Create a transaction category
 curl -X POST http://localhost:8080/api/v1/transaction-categories \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "categoryName": "Utilities",
     "categoryDescription": "Payments for utility services",
@@ -975,7 +974,6 @@ Next, we create a transaction with the category we just created. Note the use of
 # Create a new transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "INV-2023-12345",
     "transactionDate": "2023-06-15T14:30:00",
@@ -1033,7 +1031,6 @@ Now we create the debit and credit legs to implement double-entry accounting:
 # Create debit leg
 curl -X POST http://localhost:8080/api/v1/transactions/10001/legs \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "accountId": 5001,
     "accountSpaceId": 101,
@@ -1048,7 +1045,6 @@ curl -X POST http://localhost:8080/api/v1/transactions/10001/legs \
 # Create credit leg
 curl -X POST http://localhost:8080/api/v1/transactions/10001/legs \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "accountId": 9001,
     "accountSpaceId": 101,
@@ -1069,7 +1065,6 @@ Finally, we update the transaction status to COMPLETED. Note the use of optimist
 # Update transaction status to COMPLETED
 curl -X PATCH http://localhost:8080/api/v1/transactions/10001/status \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "transactionStatus": "COMPLETED",
     "rowVersion": 1,
@@ -1111,8 +1106,7 @@ To verify the complete transaction with its legs:
 
 ```bash
 # Get transaction with legs
-curl -X GET http://localhost:8080/api/v1/transactions/10001?include=legs \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}"
+curl -X GET http://localhost:8080/api/v1/transactions/10001?include=legs
 ```
 
 #### 2. Recording a Card Transaction
@@ -1127,7 +1121,6 @@ First, we create the base transaction record with card payment type:
 # Create a new transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "CARD-2023-6789",
     "transactionDate": "2023-06-16T10:15:00",
@@ -1188,7 +1181,6 @@ Next, we create the debit and credit legs for the card payment:
 # Create debit leg (customer account)
 curl -X POST http://localhost:8080/api/v1/transactions/10002/legs \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "accountId": 5001,
     "accountSpaceId": 101,
@@ -1203,7 +1195,6 @@ curl -X POST http://localhost:8080/api/v1/transactions/10002/legs \
 # Create credit leg (merchant account)
 curl -X POST http://localhost:8080/api/v1/transactions/10002/legs \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "accountId": 9002,
     "accountSpaceId": 102,
@@ -1224,7 +1215,6 @@ Now we add the card-specific details to the transaction:
 # Add card details to the transaction
 curl -X POST http://localhost:8080/api/v1/transactions/10002/line-card \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "cardAuthCode": "AUTH123456",
     "cardMerchantCategoryCode": "5411",
@@ -1275,7 +1265,6 @@ Finally, we update the transaction status to COMPLETED:
 # Update transaction status to COMPLETED
 curl -X PATCH http://localhost:8080/api/v1/transactions/10002/status \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "transactionStatus": "COMPLETED",
     "rowVersion": 1,
@@ -1291,7 +1280,6 @@ We can also attach a receipt to the transaction:
 # Add receipt attachment
 curl -X POST http://localhost:8080/api/v1/transactions/10002/attachments \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "attachmentType": "RECEIPT",
     "attachmentName": "grocery_receipt.pdf",
@@ -1315,7 +1303,6 @@ This flow demonstrates how to create and process a SEPA transfer transaction, in
 # Create a new transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "SEPA-2023-1234",
     "transactionDate": "2023-06-17T09:00:00",
@@ -1376,7 +1363,6 @@ Next, we create the debit and credit legs for the SEPA transfer:
 # Create debit leg (sender account)
 curl -X POST http://localhost:8080/api/v1/transactions/10003/legs \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "accountId": 5001,
     "accountSpaceId": 101,
@@ -1391,7 +1377,6 @@ curl -X POST http://localhost:8080/api/v1/transactions/10003/legs \
 # Create credit leg (recipient account)
 curl -X POST http://localhost:8080/api/v1/transactions/10003/legs \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "accountId": 9003,
     "accountSpaceId": 103,
@@ -1412,7 +1397,6 @@ Now we add the SEPA-specific details to the transaction:
 # Add SEPA transfer details to the transaction
 curl -X POST http://localhost:8080/api/v1/transactions/10003/line-sepa \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "sepaEndToEndId": "E2E-REF-12345",
     "sepaRemittanceInfo": "Monthly rent payment for June 2023",
@@ -1471,7 +1455,6 @@ Finally, we update the transaction status to COMPLETED:
 # Update transaction status to COMPLETED
 curl -X PATCH http://localhost:8080/api/v1/transactions/10003/status \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "transactionStatus": "COMPLETED",
     "rowVersion": 1,
@@ -1487,7 +1470,6 @@ We can also create a separate fee transaction for the SEPA transfer fee:
 # Create fee transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "FEE-SEPA-2023-1234",
     "transactionDate": "2023-06-17T09:00:30",
