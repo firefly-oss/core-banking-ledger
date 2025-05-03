@@ -49,13 +49,13 @@ public class TransactionLineInterestServiceImpl implements TransactionLineIntere
                     return repository.save(updatedEntity);
                 })
                 .map(mapper::toDTO)
-                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to update Transaction Line Interest", e)));
+                .switchIfEmpty(Mono.error(new RuntimeException("Failed to update Transaction Line Interest")));
     }
 
     @Override
     public Mono<Void> deleteInterestLine(Long transactionId) {
         return repository.findByTransactionId(transactionId)
-                .flatMap(repository::delete)
-                .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Interest not found")));
+                .flatMap(entity -> repository.delete(entity))
+                .switchIfEmpty(Mono.empty());
     }
 }

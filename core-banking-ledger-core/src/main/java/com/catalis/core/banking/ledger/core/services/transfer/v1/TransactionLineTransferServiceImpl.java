@@ -49,13 +49,13 @@ public class TransactionLineTransferServiceImpl implements TransactionLineTransf
                     return repository.save(updatedEntity);
                 })
                 .map(mapper::toDTO)
-                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to update Transaction Line Transfer", e)));
+                .switchIfEmpty(Mono.error(new RuntimeException("Failed to update Transaction Line Transfer")));
     }
 
     @Override
     public Mono<Void> deleteTransferLine(Long transactionId) {
         return repository.findByTransactionId(transactionId)
-                .flatMap(repository::delete)
-                .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Transfer not found")));
+                .flatMap(entity -> repository.delete(entity))
+                .switchIfEmpty(Mono.empty());
     }
 }

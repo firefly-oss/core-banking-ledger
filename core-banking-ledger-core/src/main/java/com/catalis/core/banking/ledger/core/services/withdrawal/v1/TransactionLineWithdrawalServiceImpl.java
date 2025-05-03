@@ -49,13 +49,13 @@ public class TransactionLineWithdrawalServiceImpl implements TransactionLineWith
                     return repository.save(updatedEntity);
                 })
                 .map(mapper::toDTO)
-                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to update Transaction Line Withdrawal", e)));
+                .switchIfEmpty(Mono.error(new RuntimeException("Failed to update Transaction Line Withdrawal")));
     }
 
     @Override
     public Mono<Void> deleteWithdrawalLine(Long transactionId) {
         return repository.findByTransactionId(transactionId)
-                .flatMap(repository::delete)
-                .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Withdrawal not found")));
+                .flatMap(entity -> repository.delete(entity))
+                .switchIfEmpty(Mono.empty());
     }
 }

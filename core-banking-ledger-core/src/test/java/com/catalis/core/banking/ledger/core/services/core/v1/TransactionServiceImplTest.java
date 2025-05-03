@@ -6,11 +6,15 @@ import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.common.core.queries.PaginationUtils;
 import com.catalis.core.banking.ledger.core.mappers.core.v1.TransactionMapper;
+import com.catalis.core.banking.ledger.core.mappers.core.v1.TransactionStatusHistoryMapper;
+import com.catalis.core.banking.ledger.core.services.event.v1.EventOutboxService;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionTypeEnum;
 import com.catalis.core.banking.ledger.models.entities.core.v1.Transaction;
+import com.catalis.core.banking.ledger.models.entities.core.v1.TransactionStatusHistory;
 import com.catalis.core.banking.ledger.models.repositories.core.v1.TransactionRepository;
+import com.catalis.core.banking.ledger.models.repositories.core.v1.TransactionStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +24,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -37,7 +42,16 @@ public class TransactionServiceImplTest {
     private TransactionRepository repository;
 
     @Mock
+    private TransactionStatusHistoryRepository statusHistoryRepository;
+
+    @Mock
     private TransactionMapper mapper;
+
+    @Mock
+    private TransactionStatusHistoryMapper statusHistoryMapper;
+
+    @Mock
+    private EventOutboxService eventOutboxService;
 
     @InjectMocks
     private TransactionServiceImpl service;
@@ -64,6 +78,8 @@ public class TransactionServiceImplTest {
         transaction.setTotalAmount(new BigDecimal("100.00"));
         transaction.setDescription("Test Transaction");
         transaction.setTransactionDate(LocalDateTime.now());
+
+
         transaction.setValueDate(LocalDateTime.now());
         transaction.setTransactionType(TransactionTypeEnum.TRANSFER);
         transaction.setTransactionStatus(TransactionStatusEnum.POSTED);
@@ -74,8 +90,14 @@ public class TransactionServiceImplTest {
     @Test
     void createTransaction_Success() {
         // Arrange
+        TransactionStatusHistory statusHistory = new TransactionStatusHistory();
+        statusHistory.setTransactionId(1L);
+        statusHistory.setStatusCode(TransactionStatusEnum.POSTED);
+
         when(mapper.toEntity(any(TransactionDTO.class))).thenReturn(transaction);
         when(repository.save(any(Transaction.class))).thenReturn(Mono.just(transaction));
+        when(statusHistoryRepository.save(any(TransactionStatusHistory.class))).thenReturn(Mono.just(statusHistory));
+        when(eventOutboxService.publishEvent(anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
         when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
 
         // Act & Assert
@@ -85,7 +107,9 @@ public class TransactionServiceImplTest {
 
         verify(mapper).toEntity(transactionDTO);
         verify(repository).save(transaction);
-        verify(mapper).toDTO(transaction);
+        verify(statusHistoryRepository).save(any(TransactionStatusHistory.class));
+        verify(eventOutboxService).publishEvent(anyString(), anyString(), anyString(), any());
+        verify(mapper, times(2)).toDTO(transaction);
     }
 
     @Test
@@ -122,6 +146,7 @@ public class TransactionServiceImplTest {
         when(repository.findById(1L)).thenReturn(Mono.just(transaction));
         when(mapper.toEntity(any(TransactionDTO.class))).thenReturn(transaction);
         when(repository.save(any(Transaction.class))).thenReturn(Mono.just(transaction));
+        when(eventOutboxService.publishEvent(anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
         when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
 
         // Act & Assert
@@ -132,7 +157,8 @@ public class TransactionServiceImplTest {
         verify(repository).findById(1L);
         verify(mapper).toEntity(transactionDTO);
         verify(repository).save(transaction);
-        verify(mapper).toDTO(transaction);
+        verify(eventOutboxService).publishEvent(anyString(), anyString(), anyString(), any());
+        verify(mapper, times(2)).toDTO(transaction);
     }
 
     @Test
@@ -155,12 +181,15 @@ public class TransactionServiceImplTest {
         // Arrange
         when(repository.findById(1L)).thenReturn(Mono.just(transaction));
         when(repository.delete(transaction)).thenReturn(Mono.empty());
+        when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
+        when(eventOutboxService.publishEvent(anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
 
         // Act & Assert
         StepVerifier.create(service.deleteTransaction(1L))
                 .verifyComplete();
 
         verify(repository).findById(1L);
+        verify(eventOutboxService).publishEvent(anyString(), anyString(), anyString(), any());
         verify(repository).delete(transaction);
     }
 

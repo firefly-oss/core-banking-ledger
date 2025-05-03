@@ -49,13 +49,13 @@ public class TransactionLineFeeServiceImpl implements TransactionLineFeeService 
                     return repository.save(updatedEntity);
                 })
                 .map(mapper::toDTO)
-                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to update Transaction Line Fee", e)));
+                .switchIfEmpty(Mono.error(new RuntimeException("Failed to update Transaction Line Fee")));
     }
 
     @Override
     public Mono<Void> deleteFeeLine(Long transactionId) {
         return repository.findByTransactionId(transactionId)
-                .flatMap(repository::delete)
-                .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Fee not found")));
+                .flatMap(entity -> repository.delete(entity))
+                .switchIfEmpty(Mono.empty());
     }
 }
