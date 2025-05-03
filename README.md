@@ -2,6 +2,42 @@
 
 A comprehensive banking transaction management system designed for modern financial institutions.
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Quickstart](#-quickstart)
+   - [Prerequisites](#prerequisites)
+   - [Local Development Setup](#local-development-setup)
+   - [Docker Deployment](#docker-deployment)
+3. [Architecture](#-architecture)
+   - [Module Structure](#module-structure)
+   - [Key Components](#key-components)
+4. [Data Model](#-data-model)
+   - [Data Model Explanation](#data-model-explanation)
+   - [Core Entities](#core-entities)
+   - [Transaction Lines](#transaction-lines)
+   - [Entity Relationships](#entity-relationships)
+5. [Configuration](#-configuration)
+   - [Environment Variables](#environment-variables)
+6. [Key Features](#-key-features)
+   - [Transaction Management](#transaction-management)
+   - [Double-Entry Accounting](#double-entry-accounting)
+   - [Event-Driven Architecture](#event-driven-architecture)
+   - [Regulatory Compliance](#regulatory-compliance)
+   - [Security & Privacy](#security--privacy)
+   - [Reporting](#reporting)
+7. [Testing](#-testing)
+8. [API Documentation](#-api-documentation)
+   - [API Controllers](#api-controllers)
+   - [API Examples Guided by Flows](#api-examples-guided-by-flows)
+9. [Monitoring and Logging](#-monitoring-and-logging)
+10. [Contributing](#-contributing)
+11. [License](#-license)
+
+## Overview
+
+The Core Banking Ledger is a transaction management system that provides a robust foundation for financial operations. It implements double-entry accounting principles, supports various transaction types, and ensures regulatory compliance while maintaining high performance and reliability.
+
 ## 🚀 Quickstart
 
 ### Prerequisites
@@ -34,40 +70,81 @@ docker run -p 8080:8080 core-banking-ledger:latest
 
 ## 🏗️ Architecture
 
-The Core Banking Ledger is designed as a modular, microservice-based system with a clear separation of concerns:
+The Core Banking Ledger is designed as a modular, microservice-based system with a clear separation of concerns following domain-driven design principles. The architecture ensures scalability, maintainability, and resilience.
 
 ### Module Structure
-- **core-banking-ledger-interfaces**: API contracts, DTOs, and enums
-- **core-banking-ledger-models**: Data entities and repository interfaces
-- **core-banking-ledger-core**: Business logic and service implementations
-- **core-banking-ledger-web**: REST controllers and API endpoints
-- **core-banking-ledger-sdk**: Reactive WebClient SDK for API integration
+
+- **core-banking-ledger-interfaces**: Contains all API contracts, Data Transfer Objects (DTOs), and enumerations that define the public interface of the system. This module has minimal dependencies and serves as the contract between the system and its clients.
+
+- **core-banking-ledger-models**: Defines the data entities, repository interfaces, and database migrations. This module encapsulates the persistence layer and data access patterns, using R2DBC for reactive database access.
+
+- **core-banking-ledger-core**: Implements the business logic and service layer. This module contains the core domain logic, transaction processing rules, and service implementations. It follows the hexagonal architecture pattern with clear boundaries between the domain model and external dependencies.
+
+- **core-banking-ledger-web**: Provides the REST API endpoints and controllers that expose the system's functionality to clients. This module handles HTTP requests, input validation, and response formatting, delegating business logic to the core module.
+
 
 ### Key Components
 
-#### Transaction Processing
-Handles various types of financial transactions:
-- Card transactions
-- Direct debit operations
-- SEPA transfers
-- Wire transfers
-- Standing orders
-- Deposit transactions
-- Withdrawal transactions
-- Fee transactions
-- Interest transactions
-- Transfer transactions
+#### Transaction Processing Engine
 
+The transaction processing engine is the heart of the Core Banking Ledger system. It handles various types of financial transactions with specialized processing logic for each type:
 
-#### Transaction Categorization
-Enables classification and organization of transactions for reporting and analysis.
+- **Card Transactions**: Processes debit and credit card payments with merchant details, authorization codes, and fraud detection flags.
+- **Direct Debit Operations**: Manages automated payments to vendors with mandate information and sequence types.
+- **SEPA Transfers**: Handles European payment transfers with IBAN/BIC validation and SEPA-specific fields.
+- **Wire Transfers**: Processes international wire transfers with SWIFT codes and cross-border compliance checks.
+- **Standing Orders**: Manages recurring scheduled payments with frequency and execution tracking.
+- **Deposit Transactions**: Records cash or check deposits with detailed source information.
+- **Withdrawal Transactions**: Records cash withdrawals with ATM or branch details and limit checks.
+- **Fee Transactions**: Manages various banking fees with calculation methods and waiver tracking.
+- **Interest Transactions**: Calculates and applies interest payments or charges with accrual periods.
+- **Transfer Transactions**: Handles internal transfers between accounts with purpose codes.
 
-#### SDK Integration
-Provides a comprehensive SDK for integrating with the Core Banking Ledger system:
-- Reactive WebClient-based API clients
-- Support for all transaction types
-- Consistent error handling
-- Configurable connection settings
+#### Double-Entry Accounting System
+
+The system implements proper double-entry accounting principles to ensure financial integrity:
+
+- **Transaction Legs**: Each transaction consists of at least two legs (debit and credit) that always balance to zero.
+- **Balance Calculation**: Account balances are calculated based on the sum of transaction legs.
+- **Multi-Currency Support**: Handles transactions in different currencies with proper exchange rate tracking.
+- **Booking vs. Value Date**: Distinguishes between when a transaction is booked and when it affects interest calculations.
+
+#### Event-Driven Integration Framework
+
+The system uses an event-driven architecture for reliable integration with other systems:
+
+- **Event Outbox Pattern**: Ensures reliable event publishing even in the face of failures.
+- **Domain Events**: Publishes events for transaction lifecycle (created, updated, status changed).
+- **Idempotent Processing**: Prevents duplicate transactions with unique external references and request IDs.
+- **Asynchronous Communication**: Enables loose coupling between services through event-based integration.
+
+#### Transaction Relationship Management
+
+The system tracks relationships between transactions for comprehensive financial history:
+
+- **Related Transactions**: Links transactions that are related (e.g., original transaction and its reversal).
+- **Relation Types**: Categorizes relationships as reversals, adjustments, chargebacks, or corrections.
+- **Batch Processing**: Groups related transactions with batch IDs for bulk operations.
+- **Audit Trail**: Maintains a complete history of transaction status changes with reasons.
+
+#### Regulatory Compliance Framework
+
+The system includes features to ensure compliance with financial regulations:
+
+- **Anti-Money Laundering (AML)**: Risk scoring, screening results, and large transaction flagging.
+- **Strong Customer Authentication (SCA)**: Tracks authentication methods and results for PSD2/PSD3 compliance.
+- **Instant Payments**: Supports instant payment schemes with confirmation of payee functionality.
+- **EU Regulations**: Designed for PSD3 and EU Instant Payments Regulation 2024/886 compliance.
+- **Spanish Tax Reporting**: Includes fields for Spanish tax codes and reporting requirements.
+
+#### Transaction Categorization System
+
+Enables classification and organization of transactions for reporting and analysis:
+
+- **Hierarchical Categories**: Supports parent-child relationships between categories.
+- **Category Types**: Distinguishes between income, expense, transfer, and other category types.
+- **Tax Coding**: Associates categories with tax codes for reporting purposes.
+
 
 ## 📊 Data Model
 
@@ -79,6 +156,7 @@ erDiagram
         string external_reference
         datetime transaction_date
         datetime value_date
+        datetime booking_date
         enum transaction_type
         enum transaction_status
         decimal total_amount
@@ -88,11 +166,75 @@ erDiagram
         bigint account_id
         bigint account_space_id
         bigint transaction_category_id FK
+        bigint related_transaction_id FK
+        string relation_type
+        string request_id
+        string batch_id
+        bigint row_version
+        integer aml_risk_score
+        string aml_screening_result
+        boolean aml_large_txn_flag
+        string sca_method
+        string sca_result
+        boolean instant_flag
+        string confirmation_of_payee_result
         double latitude
         double longitude
         string location_name
         string branch_office_code
         string nif_initiating_party
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LEG {
+        bigint transaction_leg_id PK
+        bigint transaction_id FK
+        bigint account_id
+        bigint account_space_id
+        string leg_type
+        decimal amount
+        string currency
+        string description
+        datetime value_date
+        datetime booking_date
+        datetime date_created
+        datetime date_updated
+    }
+
+    EVENT_OUTBOX {
+        uuid event_id PK
+        string aggregate_type
+        string aggregate_id
+        string event_type
+        jsonb payload
+        datetime created_at
+        boolean processed
+        datetime processed_at
+        integer retry_count
+        text last_error
+    }
+
+    MONEY {
+        bigint money_id PK
+        decimal amount
+        string currency
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_ATTACHMENT {
+        bigint transaction_attachment_id PK
+        bigint transaction_id FK
+        string attachment_type
+        string attachment_name
+        string attachment_description
+        string object_storage_url
+        string content_type
+        bigint size_bytes
+        string hash_sha256
+        string uploaded_by
+        datetime upload_date
         datetime date_created
         datetime date_updated
     }
@@ -389,25 +531,156 @@ erDiagram
 
 ### Data Model Explanation
 
-The Core Banking Ledger system uses a flexible data model designed to handle various types of financial transactions:
+The Core Banking Ledger system uses a flexible, domain-driven data model designed to handle various types of financial transactions with double-entry accounting principles and comprehensive audit capabilities. The model is optimized for both operational and analytical queries while maintaining data integrity and regulatory compliance.
 
-1. **Transaction**: The central entity representing any financial transaction with common attributes like amount, date, and status.
+### Core Entities
 
-2. **Transaction Lines**: Specialized entities for different transaction types:
-   - **Deposit Transactions** (`TRANSACTION_LINE_DEPOSIT`): Records cash or check deposits into accounts
-   - **Withdrawal Transactions** (`TRANSACTION_LINE_WITHDRAWAL`): Records cash withdrawals from accounts
-   - **Transfer Transactions** (`TRANSACTION_LINE_TRANSFER`): Records internal transfers between accounts
-   - **Fee Transactions** (`TRANSACTION_LINE_FEE`): Records various banking fees charged to customers
-   - **Interest Transactions** (`TRANSACTION_LINE_INTEREST`): Records interest payments or charges
-   - **Card Transactions** (`TRANSACTION_LINE_CARD`): Records debit/credit card payments
-   - **Direct Debit Operations** (`TRANSACTION_LINE_DIRECT_DEBIT`): Records automated payments to vendors
-   - **SEPA Transfers** (`TRANSACTION_LINE_SEPA_TRANSFER`): Records European payment transfers
-   - **Wire Transfers** (`TRANSACTION_LINE_WIRE_TRANSFER`): Records international wire transfers
-   - **Standing Orders** (`TRANSACTION_LINE_STANDING_ORDER`): Records recurring scheduled payments
+#### Transaction
 
-3. **Categories**: Hierarchical classification system for transactions.
+The `TRANSACTION` table is the central entity representing any financial transaction. It contains common attributes applicable to all transaction types:
 
-4. **Status History**: Tracking of transaction status changes over time.
+- **Basic Information**: Transaction ID, external reference, description, amount, currency
+- **Temporal Data**: Transaction date (when initiated), value date (for interest calculations), booking date (when it affects the balance)
+- **Status Tracking**: Current status with full history maintained in a separate table
+- **Relation Fields**: Links to related transactions (reversals, adjustments, chargebacks) with relation type
+- **Idempotency Support**: Unique external references and request IDs to prevent duplicates
+- **Batch Processing**: Batch IDs for grouping related transactions in bulk operations
+- **Concurrency Control**: Row versioning for optimistic locking to prevent concurrent updates
+- **Regulatory Compliance**:
+  - AML risk scoring and screening results
+  - Large transaction flagging for additional scrutiny
+  - Strong Customer Authentication (SCA) method and result
+  - Instant payment flags and confirmation of payee results
+- **Geolocation**: Latitude, longitude, and location name for transaction origin
+- **Organizational Data**: Branch office code and initiating party information
+
+#### Transaction Legs
+
+The `TRANSACTION_LEG` table implements double-entry accounting principles. Each transaction consists of at least two legs (debit and credit) that always balance to zero:
+
+- **Account Information**: Account ID and account space ID for both sides of the transaction
+- **Leg Type**: DEBIT or CREDIT indicator
+- **Amount Information**: Amount and currency for the leg
+- **Temporal Data**: Value date and booking date specific to this leg
+- **Description**: Leg-specific description that may differ from the main transaction description
+
+This structure ensures that the accounting equation always balances and provides a foundation for accurate financial reporting and reconciliation.
+
+#### Event Outbox
+
+The `EVENT_OUTBOX` table implements the outbox pattern for reliable event publishing:
+
+- **Event Metadata**: Event ID, aggregate type, aggregate ID, and event type
+- **Payload**: JSON payload containing the event data
+- **Processing Status**: Flags and timestamps for tracking event processing
+- **Error Handling**: Retry count and last error message for failed events
+
+This pattern ensures that domain events are reliably published even in the face of failures, maintaining consistency between the transaction system and downstream consumers.
+
+#### Money
+
+The `MONEY` table serves as a value object for consistent handling of amount and currency:
+
+- **Amount**: Decimal value with four decimal places for precision
+- **Currency**: ISO 4217 currency code (e.g., EUR, USD)
+
+This ensures that currency is always paired with amount and standardizes money representation across the system, preventing currency-related errors.
+
+#### Transaction Attachments
+
+The `TRANSACTION_ATTACHMENT` table stores documents and files related to transactions:
+
+- **Attachment Metadata**: Type, name, description, content type, and size
+- **Storage Information**: URL to the object storage where the actual file is stored
+- **Security**: SHA-256 hash for integrity verification
+- **Audit Information**: Who uploaded the attachment and when
+
+This enables storing and retrieving supporting documents such as invoices, receipts, and contracts with proper security and audit trails.
+
+### Transaction Lines
+
+The system uses specialized transaction line tables for different transaction types, each capturing type-specific details:
+
+- **Card Transactions** (`TRANSACTION_LINE_CARD`):
+  - Merchant details (name, category code, terminal ID)
+  - Authorization information (auth code, transaction reference)
+  - Card presence and entry mode
+  - Fraud detection flags
+  - Currency conversion and fee information
+
+- **Direct Debit Operations** (`TRANSACTION_LINE_DIRECT_DEBIT`):
+  - Mandate and creditor information
+  - Sequence type (first, recurring, final, one-off)
+  - Debtor details
+  - Authorization and revocation dates
+  - Spanish-specific scheme information
+
+- **SEPA Transfers** (`TRANSACTION_LINE_SEPA_TRANSFER`):
+  - End-to-end ID and remittance information
+  - Origin and destination IBAN/BIC
+  - Creditor and debtor identification
+  - Purpose code and execution date
+  - Fee and exchange rate information
+  - Payment scheme (SCT, SCT Inst)
+
+- **Wire Transfers** (`TRANSACTION_LINE_WIRE_TRANSFER`):
+  - SWIFT BIC codes for origin and destination
+  - Account numbers and beneficiary details
+  - Transfer priority and purpose
+  - Processing status and decline reasons
+  - Bank of Spain regulatory codes
+
+- **Standing Orders** (`TRANSACTION_LINE_STANDING_ORDER`):
+  - Frequency and date parameters (start, end, next execution)
+  - Recipient details
+  - Execution history and status
+  - Suspension and cancellation information
+  - Creation and update audit trail
+
+- **Deposit Transactions** (`TRANSACTION_LINE_DEPOSIT`):
+  - Deposit method and location
+  - Cash and check amount details
+  - Check information (number, date, bank)
+  - ATM or branch identification
+  - Spanish tax code for reporting
+
+- **Withdrawal Transactions** (`TRANSACTION_LINE_WITHDRAWAL`):
+  - Withdrawal method and location
+  - ATM or branch identification
+  - Authorization code
+  - Daily limit tracking
+  - Spanish tax code for reporting
+
+- **Fee Transactions** (`TRANSACTION_LINE_FEE`):
+  - Fee type and description
+  - Calculation method and parameters
+  - Related transaction or service
+  - Waiver information if applicable
+  - Spanish tax code for reporting
+
+- **Interest Transactions** (`TRANSACTION_LINE_INTEREST`):
+  - Interest type and calculation method
+  - Accrual period and days calculated
+  - Rate percentage and calculation base
+  - Tax withholding information
+  - Gross and net amounts
+  - Spanish tax code for reporting
+
+- **Transfer Transactions** (`TRANSACTION_LINE_TRANSFER`):
+  - Source and destination account details
+  - Transfer purpose and notes
+  - Fee information
+  - Scheduled and execution dates
+  - Spanish tax code for reporting
+
+### Entity Relationships
+
+- **Transaction Categories**: Hierarchical structure with parent-child relationships for classification
+- **Transaction Status History**: Tracks all status changes with timestamps and reasons
+- **Transaction to Transaction Lines**: One-to-one relationship between a transaction and its type-specific line
+- **Transaction to Transaction Legs**: One-to-many relationship for double-entry accounting
+- **Transaction to Attachments**: One-to-many relationship for supporting documents
+- **Related Transactions**: Self-referential relationship for reversals, adjustments, etc.
 
 ## 🔧 Configuration
 
@@ -486,11 +759,34 @@ You can set these environment variables in your development environment or provi
 - Process various payment methods
 - Track transaction status changes
 - Categorize transactions
+- Support for transaction reversals and related transactions
+- Idempotent transaction processing with unique external references
 
+### Double-Entry Accounting
+- Transaction legs for debit and credit entries
+- Balance calculation based on transaction legs
+- Support for multi-currency transactions
+- Proper accounting for reversals and adjustments
+
+### Event-Driven Architecture
+- Event outbox pattern for reliable event publishing
+- Domain events for transaction lifecycle
+- Asynchronous integration with other services
+
+### Regulatory Compliance
+- AML risk scoring and screening results
+- Strong Customer Authentication (SCA) tracking
+- Support for instant payments and confirmation of payee
+- Designed for PSD3 and EU Instant Payments Regulation 2024/886
+
+### Security & Privacy
+- Transaction attachments with hash verification
+- Optimistic locking to prevent concurrent updates
 
 ### Reporting
 - Transaction history reports
 - Audit reports
+- Transaction leg reports for accounting reconciliation
 
 ## 🧪 Testing
 
@@ -525,8 +821,22 @@ The Core Banking Ledger system provides the following REST controllers for inter
 
 #### Core Controllers
 - **TransactionController**: Manages basic transaction operations (create, read, update, delete)
+  - Create, retrieve, update, and delete transactions
+  - Update transaction status with reason
+  - Create reversal transactions
+  - Find transactions by external reference
 - **TransactionStatusHistoryController**: Tracks changes in transaction status over time
 - **TransactionCategoryController**: Manages transaction categorization
+
+#### Double-Entry Accounting Controllers
+- **TransactionLegController**: Manages transaction legs for double-entry accounting
+- **AccountLegController**: Queries transaction legs by account
+
+#### Event & Integration Controllers
+- **EventOutboxController**: Manages the event outbox for reliable event publishing
+
+#### Attachment Controllers
+- **TransactionAttachmentController**: Manages attachments related to transactions
 
 
 #### Transaction Line Controllers
@@ -541,30 +851,105 @@ The Core Banking Ledger system provides the following REST controllers for inter
 - **TransactionLineInterestController**: Manages interest transaction lines
 - **TransactionLineTransferController**: Manages general transfer transaction lines
 
-### SDK Integration
-
-The Core Banking Ledger provides a comprehensive SDK for integrating with the API. The SDK offers reactive WebClient-based clients for all API endpoints, consistent error handling, and configurable connection settings.
-
-For detailed information about the SDK, including usage examples and configuration options, please refer to the [SDK README](core-banking-ledger-sdk/README.md).
 
 ### API Examples Guided by Flows
 
 Below are examples of common API workflows in the Core Banking Ledger system. Each example shows the sequence of API calls needed to complete a specific business process.
 
+#### Transaction Processing Flows
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant TransactionController
+    participant TransactionService
+    participant TransactionLegService
+    participant EventOutboxService
+    participant Database
+
+    Client->>TransactionController: Create Transaction Request
+    TransactionController->>TransactionService: createTransaction()
+    TransactionService->>Database: Save Transaction
+    Database-->>TransactionService: Return Transaction ID
+    TransactionService->>TransactionLegService: createTransactionLegs()
+    TransactionLegService->>Database: Save Debit Leg
+    TransactionLegService->>Database: Save Credit Leg
+    Database-->>TransactionLegService: Return Leg IDs
+    TransactionService->>EventOutboxService: publishEvent(TRANSACTION_CREATED)
+    EventOutboxService->>Database: Save Event to Outbox
+    TransactionService-->>TransactionController: Return Transaction
+    TransactionController-->>Client: Transaction Created Response
+```
+
+#### Reversal Transaction Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant TransactionController
+    participant TransactionService
+    participant TransactionLegService
+    participant EventOutboxService
+    participant Database
+
+    Client->>TransactionController: Create Reversal Request
+    TransactionController->>TransactionService: createReversalTransaction()
+    TransactionService->>Database: Fetch Original Transaction
+    Database-->>TransactionService: Return Original Transaction
+    TransactionService->>Database: Save Reversal Transaction
+    Database-->>TransactionService: Return Reversal Transaction ID
+    TransactionService->>TransactionLegService: createReversalLegs()
+    TransactionLegService->>Database: Save Credit Leg (was Debit)
+    TransactionLegService->>Database: Save Debit Leg (was Credit)
+    Database-->>TransactionLegService: Return Leg IDs
+    TransactionService->>EventOutboxService: publishEvent(REVERSAL_TRANSACTION_CREATED)
+    EventOutboxService->>Database: Save Event to Outbox
+    TransactionService-->>TransactionController: Return Reversal Transaction
+    TransactionController-->>Client: Reversal Created Response
+```
+
+#### Transaction Status Change Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant TransactionController
+    participant TransactionService
+    participant TransactionStatusHistoryService
+    participant EventOutboxService
+    participant Database
+
+    Client->>TransactionController: Update Status Request
+    TransactionController->>TransactionService: updateTransactionStatus()
+    TransactionService->>Database: Fetch Transaction
+    Database-->>TransactionService: Return Transaction
+    TransactionService->>TransactionStatusHistoryService: createStatusHistory()
+    TransactionStatusHistoryService->>Database: Save Status History
+    TransactionService->>Database: Update Transaction Status
+    TransactionService->>EventOutboxService: publishEvent(TRANSACTION_STATUS_CHANGED)
+    EventOutboxService->>Database: Save Event to Outbox
+    TransactionService-->>TransactionController: Return Updated Transaction
+    TransactionController-->>Client: Status Updated Response
+```
+
 #### 1. Creating and Categorizing a Transaction
 
-This flow demonstrates how to create a transaction and assign it to a category.
+This flow demonstrates how to create a transaction and assign it to a category, following the complete lifecycle from category creation to transaction completion.
 
 **Step 1: Create a Transaction Category (if needed)**
+
+First, we create a category to classify our transactions. Categories can be hierarchical with parent-child relationships.
 
 ```bash
 # Create a transaction category
 curl -X POST http://localhost:8080/api/v1/transaction-categories \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "categoryName": "Utilities",
     "categoryDescription": "Payments for utility services",
-    "categoryType": "EXPENSE"
+    "categoryType": "EXPENSE",
+    "spanishTaxCode": "G-123"
   }'
 ```
 
@@ -575,20 +960,27 @@ Response:
   "parentCategoryId": null,
   "categoryName": "Utilities",
   "categoryDescription": "Payments for utility services",
-  "categoryType": "EXPENSE"
+  "categoryType": "EXPENSE",
+  "spanishTaxCode": "G-123",
+  "dateCreated": "2023-06-15T10:30:00",
+  "dateUpdated": "2023-06-15T10:30:00"
 }
 ```
 
 **Step 2: Create a Transaction**
 
+Next, we create a transaction with the category we just created. Note the use of `requestId` for idempotency and `accountSpaceId` for multi-tenancy support.
+
 ```bash
 # Create a new transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "INV-2023-12345",
     "transactionDate": "2023-06-15T14:30:00",
     "valueDate": "2023-06-15T14:30:00",
+    "bookingDate": "2023-06-15T14:35:00",
     "transactionType": "PAYMENT",
     "transactionStatus": "PENDING",
     "totalAmount": 125.50,
@@ -596,7 +988,12 @@ curl -X POST http://localhost:8080/api/v1/transactions \
     "description": "Electricity bill payment",
     "initiatingParty": "John Doe",
     "accountId": 5001,
-    "transactionCategoryId": 1001
+    "accountSpaceId": 101,
+    "transactionCategoryId": 1001,
+    "requestId": "req-uuid-123456789",
+    "amlRiskScore": 10,
+    "amlScreeningResult": "PASSED",
+    "instantFlag": false
   }'
 ```
 
@@ -607,6 +1004,7 @@ Response:
   "externalReference": "INV-2023-12345",
   "transactionDate": "2023-06-15T14:30:00",
   "valueDate": "2023-06-15T14:30:00",
+  "bookingDate": "2023-06-15T14:35:00",
   "transactionType": "PAYMENT",
   "transactionStatus": "PENDING",
   "totalAmount": 125.50,
@@ -614,54 +1012,142 @@ Response:
   "description": "Electricity bill payment",
   "initiatingParty": "John Doe",
   "accountId": 5001,
-  "transactionCategoryId": 1001
+  "accountSpaceId": 101,
+  "transactionCategoryId": 1001,
+  "requestId": "req-uuid-123456789",
+  "rowVersion": 1,
+  "amlRiskScore": 10,
+  "amlScreeningResult": "PASSED",
+  "amlLargeTxnFlag": false,
+  "instantFlag": false,
+  "dateCreated": "2023-06-15T14:30:05",
+  "dateUpdated": "2023-06-15T14:30:05"
 }
 ```
 
-**Step 3: Update Transaction Status**
+**Step 3: Create Transaction Legs for Double-Entry Accounting**
+
+Now we create the debit and credit legs to implement double-entry accounting:
+
+```bash
+# Create debit leg
+curl -X POST http://localhost:8080/api/v1/transactions/10001/legs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "accountId": 5001,
+    "accountSpaceId": 101,
+    "legType": "DEBIT",
+    "amount": 125.50,
+    "currency": "EUR",
+    "description": "Debit from customer account",
+    "valueDate": "2023-06-15T14:30:00",
+    "bookingDate": "2023-06-15T14:35:00"
+  }'
+
+# Create credit leg
+curl -X POST http://localhost:8080/api/v1/transactions/10001/legs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "accountId": 9001,
+    "accountSpaceId": 101,
+    "legType": "CREDIT",
+    "amount": 125.50,
+    "currency": "EUR",
+    "description": "Credit to utility provider",
+    "valueDate": "2023-06-15T14:30:00",
+    "bookingDate": "2023-06-15T14:35:00"
+  }'
+```
+
+**Step 4: Update Transaction Status**
+
+Finally, we update the transaction status to COMPLETED. Note the use of optimistic locking with `rowVersion`:
 
 ```bash
 # Update transaction status to COMPLETED
-curl -X PUT http://localhost:8080/api/v1/transactions/10001 \
+curl -X PATCH http://localhost:8080/api/v1/transactions/10001/status \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
-    "transactionId": 10001,
-    "externalReference": "INV-2023-12345",
-    "transactionDate": "2023-06-15T14:30:00",
-    "valueDate": "2023-06-15T14:30:00",
-    "transactionType": "PAYMENT",
     "transactionStatus": "COMPLETED",
-    "totalAmount": 125.50,
-    "currency": "EUR",
-    "description": "Electricity bill payment",
-    "initiatingParty": "John Doe",
-    "accountId": 5001,
-    "transactionCategoryId": 1001
+    "rowVersion": 1,
+    "reason": "Payment processed successfully"
   }'
+```
+
+Response:
+```json
+{
+  "transactionId": 10001,
+  "externalReference": "INV-2023-12345",
+  "transactionDate": "2023-06-15T14:30:00",
+  "valueDate": "2023-06-15T14:30:00",
+  "bookingDate": "2023-06-15T14:35:00",
+  "transactionType": "PAYMENT",
+  "transactionStatus": "COMPLETED",
+  "totalAmount": 125.50,
+  "currency": "EUR",
+  "description": "Electricity bill payment",
+  "initiatingParty": "John Doe",
+  "accountId": 5001,
+  "accountSpaceId": 101,
+  "transactionCategoryId": 1001,
+  "requestId": "req-uuid-123456789",
+  "rowVersion": 2,
+  "amlRiskScore": 10,
+  "amlScreeningResult": "PASSED",
+  "amlLargeTxnFlag": false,
+  "instantFlag": false,
+  "dateCreated": "2023-06-15T14:30:05",
+  "dateUpdated": "2023-06-15T14:40:10"
+}
+```
+
+**Step 5: Retrieve Transaction with Legs**
+
+To verify the complete transaction with its legs:
+
+```bash
+# Get transaction with legs
+curl -X GET http://localhost:8080/api/v1/transactions/10001?include=legs \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}"
 ```
 
 #### 2. Recording a Card Transaction
 
-This flow demonstrates how to create a transaction for a card payment and add the card-specific details.
+This flow demonstrates how to create a transaction for a card payment and add the card-specific details, including transaction legs and fraud detection information.
 
 **Step 1: Create the Base Transaction**
+
+First, we create the base transaction record with card payment type:
 
 ```bash
 # Create a new transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "CARD-2023-6789",
     "transactionDate": "2023-06-16T10:15:00",
     "valueDate": "2023-06-16T10:15:00",
+    "bookingDate": "2023-06-16T10:15:05",
     "transactionType": "CARD_PAYMENT",
-    "transactionStatus": "COMPLETED",
+    "transactionStatus": "PENDING",
     "totalAmount": 75.20,
     "currency": "EUR",
     "description": "Grocery store purchase",
     "initiatingParty": "Jane Smith",
     "accountId": 5001,
-    "transactionCategoryId": 1002
+    "accountSpaceId": 101,
+    "transactionCategoryId": 1002,
+    "requestId": "card-req-uuid-987654321",
+    "latitude": 40.4168,
+    "longitude": -3.7038,
+    "locationName": "Madrid, Spain",
+    "scaMethod": "PIN",
+    "scaResult": "SUCCESS"
   }'
 ```
 
@@ -672,31 +1158,88 @@ Response:
   "externalReference": "CARD-2023-6789",
   "transactionDate": "2023-06-16T10:15:00",
   "valueDate": "2023-06-16T10:15:00",
+  "bookingDate": "2023-06-16T10:15:05",
   "transactionType": "CARD_PAYMENT",
-  "transactionStatus": "COMPLETED",
+  "transactionStatus": "PENDING",
   "totalAmount": 75.20,
   "currency": "EUR",
   "description": "Grocery store purchase",
   "initiatingParty": "Jane Smith",
   "accountId": 5001,
-  "transactionCategoryId": 1002
+  "accountSpaceId": 101,
+  "transactionCategoryId": 1002,
+  "requestId": "card-req-uuid-987654321",
+  "rowVersion": 1,
+  "latitude": 40.4168,
+  "longitude": -3.7038,
+  "locationName": "Madrid, Spain",
+  "scaMethod": "PIN",
+  "scaResult": "SUCCESS",
+  "dateCreated": "2023-06-16T10:15:10",
+  "dateUpdated": "2023-06-16T10:15:10"
 }
 ```
 
-**Step 2: Add Card-Specific Details**
+**Step 2: Create Transaction Legs**
+
+Next, we create the debit and credit legs for the card payment:
+
+```bash
+# Create debit leg (customer account)
+curl -X POST http://localhost:8080/api/v1/transactions/10002/legs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "accountId": 5001,
+    "accountSpaceId": 101,
+    "legType": "DEBIT",
+    "amount": 75.20,
+    "currency": "EUR",
+    "description": "Debit for card payment",
+    "valueDate": "2023-06-16T10:15:00",
+    "bookingDate": "2023-06-16T10:15:05"
+  }'
+
+# Create credit leg (merchant account)
+curl -X POST http://localhost:8080/api/v1/transactions/10002/legs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "accountId": 9002,
+    "accountSpaceId": 102,
+    "legType": "CREDIT",
+    "amount": 75.20,
+    "currency": "EUR",
+    "description": "Credit to merchant",
+    "valueDate": "2023-06-16T10:15:00",
+    "bookingDate": "2023-06-16T10:15:05"
+  }'
+```
+
+**Step 3: Add Card-Specific Details**
+
+Now we add the card-specific details to the transaction:
 
 ```bash
 # Add card details to the transaction
 curl -X POST http://localhost:8080/api/v1/transactions/10002/line-card \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "cardAuthCode": "AUTH123456",
     "cardMerchantCategoryCode": "5411",
     "cardMerchantName": "GROCERY STORE XYZ",
+    "cardPosEntryMode": "CHIP_AND_PIN",
+    "cardTransactionReference": "TXN987654321",
+    "cardTerminalId": "TERM12345",
+    "cardHolderCountry": "ES",
     "cardPresentFlag": true,
     "cardTransactionTimestamp": "2023-06-16T10:15:00",
     "cardFraudFlag": false,
-    "cardFeeAmount": 0.50
+    "cardCurrencyConversionRate": 1.0,
+    "cardFeeAmount": 0.50,
+    "cardFeeCurrency": "EUR",
+    "cardMerchantCif": "B12345678"
   }'
 ```
 
@@ -708,17 +1251,63 @@ Response:
   "cardAuthCode": "AUTH123456",
   "cardMerchantCategoryCode": "5411",
   "cardMerchantName": "GROCERY STORE XYZ",
+  "cardPosEntryMode": "CHIP_AND_PIN",
+  "cardTransactionReference": "TXN987654321",
+  "cardTerminalId": "TERM12345",
+  "cardHolderCountry": "ES",
   "cardPresentFlag": true,
   "cardTransactionTimestamp": "2023-06-16T10:15:00",
   "cardFraudFlag": false,
-  "cardFeeAmount": 0.50
+  "cardCurrencyConversionRate": 1.0,
+  "cardFeeAmount": 0.50,
+  "cardFeeCurrency": "EUR",
+  "cardMerchantCif": "B12345678",
+  "dateCreated": "2023-06-16T10:15:20",
+  "dateUpdated": "2023-06-16T10:15:20"
 }
+```
+
+**Step 4: Update Transaction Status**
+
+Finally, we update the transaction status to COMPLETED:
+
+```bash
+# Update transaction status to COMPLETED
+curl -X PATCH http://localhost:8080/api/v1/transactions/10002/status \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "transactionStatus": "COMPLETED",
+    "rowVersion": 1,
+    "reason": "Card payment authorized and settled"
+  }'
+```
+
+**Step 5: Add Transaction Attachment (Optional)**
+
+We can also attach a receipt to the transaction:
+
+```bash
+# Add receipt attachment
+curl -X POST http://localhost:8080/api/v1/transactions/10002/attachments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "attachmentType": "RECEIPT",
+    "attachmentName": "grocery_receipt.pdf",
+    "attachmentDescription": "Digital receipt for grocery purchase",
+    "objectStorageUrl": "https://storage.example.com/receipts/grocery_receipt_10002.pdf",
+    "contentType": "application/pdf",
+    "sizeBytes": 125000,
+    "hashSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "uploadedBy": "POS_SYSTEM"
+  }'
 ```
 
 
 #### 3. Processing a SEPA Transfer
 
-This flow demonstrates how to create and process a SEPA transfer transaction.
+This flow demonstrates how to create and process a SEPA transfer transaction, including instant payment flags and confirmation of payee checks.
 
 **Step 1: Create the Base Transaction**
 
@@ -726,17 +1315,27 @@ This flow demonstrates how to create and process a SEPA transfer transaction.
 # Create a new transaction
 curl -X POST http://localhost:8080/api/v1/transactions \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "externalReference": "SEPA-2023-1234",
     "transactionDate": "2023-06-17T09:00:00",
     "valueDate": "2023-06-17T09:00:00",
+    "bookingDate": "2023-06-17T09:00:10",
     "transactionType": "SEPA_TRANSFER",
     "transactionStatus": "PENDING",
     "totalAmount": 1000.00,
     "currency": "EUR",
     "description": "Monthly rent payment",
     "initiatingParty": "John Doe",
-    "accountId": 5001
+    "accountId": 5001,
+    "accountSpaceId": 101,
+    "requestId": "sepa-req-uuid-123456789",
+    "instantFlag": true,
+    "confirmationOfPayeeResult": "OK",
+    "amlRiskScore": 15,
+    "amlScreeningResult": "PASSED",
+    "scaMethod": "MOBILE_APP",
+    "scaResult": "SUCCESS"
   }'
 ```
 
@@ -747,30 +1346,92 @@ Response:
   "externalReference": "SEPA-2023-1234",
   "transactionDate": "2023-06-17T09:00:00",
   "valueDate": "2023-06-17T09:00:00",
+  "bookingDate": "2023-06-17T09:00:10",
   "transactionType": "SEPA_TRANSFER",
   "transactionStatus": "PENDING",
   "totalAmount": 1000.00,
   "currency": "EUR",
   "description": "Monthly rent payment",
   "initiatingParty": "John Doe",
-  "accountId": 5001
+  "accountId": 5001,
+  "accountSpaceId": 101,
+  "requestId": "sepa-req-uuid-123456789",
+  "rowVersion": 1,
+  "instantFlag": true,
+  "confirmationOfPayeeResult": "OK",
+  "amlRiskScore": 15,
+  "amlScreeningResult": "PASSED",
+  "scaMethod": "MOBILE_APP",
+  "scaResult": "SUCCESS",
+  "dateCreated": "2023-06-17T09:00:15",
+  "dateUpdated": "2023-06-17T09:00:15"
 }
 ```
 
-**Step 2: Add SEPA-Specific Details**
+**Step 2: Create Transaction Legs**
+
+Next, we create the debit and credit legs for the SEPA transfer:
+
+```bash
+# Create debit leg (sender account)
+curl -X POST http://localhost:8080/api/v1/transactions/10003/legs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "accountId": 5001,
+    "accountSpaceId": 101,
+    "legType": "DEBIT",
+    "amount": 1000.00,
+    "currency": "EUR",
+    "description": "Debit for SEPA transfer",
+    "valueDate": "2023-06-17T09:00:00",
+    "bookingDate": "2023-06-17T09:00:10"
+  }'
+
+# Create credit leg (recipient account)
+curl -X POST http://localhost:8080/api/v1/transactions/10003/legs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "accountId": 9003,
+    "accountSpaceId": 103,
+    "legType": "CREDIT",
+    "amount": 1000.00,
+    "currency": "EUR",
+    "description": "Credit to recipient",
+    "valueDate": "2023-06-17T09:00:00",
+    "bookingDate": "2023-06-17T09:00:10"
+  }'
+```
+
+**Step 3: Add SEPA-Specific Details**
+
+Now we add the SEPA-specific details to the transaction:
 
 ```bash
 # Add SEPA transfer details to the transaction
 curl -X POST http://localhost:8080/api/v1/transactions/10003/line-sepa \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
     "sepaEndToEndId": "E2E-REF-12345",
+    "sepaRemittanceInfo": "Monthly rent payment for June 2023",
     "sepaOriginIban": "ES9121000418450200051332",
     "sepaOriginBic": "CAIXESBBXXX",
     "sepaDestinationIban": "DE89370400440532013000",
     "sepaDestinationBic": "DEUTDEFFXXX",
     "sepaTransactionStatus": "ACCEPTED",
-    "sepaFeeAmount": 2.50
+    "sepaCreditorId": "DE98ZZZ09999999999",
+    "sepaDebtorId": "ES12ZZZ12345678901",
+    "sepaInitiatingAgentBic": "CAIXESBBXXX",
+    "sepaTransactionPurpose": "RENT",
+    "sepaRequestedExecutionDate": "2023-06-17",
+    "sepaFeeAmount": 2.50,
+    "sepaFeeCurrency": "EUR",
+    "sepaRecipientName": "Rental Company GmbH",
+    "sepaRecipientAddress": "Hauptstrasse 1, 10115 Berlin, Germany",
+    "sepaProcessingDate": "2023-06-17T09:00:20",
+    "sepaPaymentScheme": "SCT_INST"
   }'
 ```
 
@@ -780,33 +1441,68 @@ Response:
   "transactionLineSepaId": 601,
   "transactionId": 10003,
   "sepaEndToEndId": "E2E-REF-12345",
+  "sepaRemittanceInfo": "Monthly rent payment for June 2023",
   "sepaOriginIban": "ES9121000418450200051332",
   "sepaOriginBic": "CAIXESBBXXX",
   "sepaDestinationIban": "DE89370400440532013000",
   "sepaDestinationBic": "DEUTDEFFXXX",
   "sepaTransactionStatus": "ACCEPTED",
-  "sepaFeeAmount": 2.50
+  "sepaCreditorId": "DE98ZZZ09999999999",
+  "sepaDebtorId": "ES12ZZZ12345678901",
+  "sepaInitiatingAgentBic": "CAIXESBBXXX",
+  "sepaTransactionPurpose": "RENT",
+  "sepaRequestedExecutionDate": "2023-06-17",
+  "sepaFeeAmount": 2.50,
+  "sepaFeeCurrency": "EUR",
+  "sepaRecipientName": "Rental Company GmbH",
+  "sepaRecipientAddress": "Hauptstrasse 1, 10115 Berlin, Germany",
+  "sepaProcessingDate": "2023-06-17T09:00:20",
+  "sepaPaymentScheme": "SCT_INST",
+  "dateCreated": "2023-06-17T09:00:25",
+  "dateUpdated": "2023-06-17T09:00:25"
 }
 ```
 
-**Step 3: Update Transaction Status**
+**Step 4: Update Transaction Status**
+
+Finally, we update the transaction status to COMPLETED:
 
 ```bash
 # Update transaction status to COMPLETED
-curl -X PUT http://localhost:8080/api/v1/transactions/10003 \
+curl -X PATCH http://localhost:8080/api/v1/transactions/10003/status \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -d '{
-    "transactionId": 10003,
-    "externalReference": "SEPA-2023-1234",
-    "transactionDate": "2023-06-17T09:00:00",
-    "valueDate": "2023-06-17T09:00:00",
-    "transactionType": "SEPA_TRANSFER",
     "transactionStatus": "COMPLETED",
-    "totalAmount": 1000.00,
+    "rowVersion": 1,
+    "reason": "SEPA instant transfer completed successfully"
+  }'
+```
+
+**Step 5: Create a Fee Transaction (Optional)**
+
+We can also create a separate fee transaction for the SEPA transfer fee:
+
+```bash
+# Create fee transaction
+curl -X POST http://localhost:8080/api/v1/transactions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  -d '{
+    "externalReference": "FEE-SEPA-2023-1234",
+    "transactionDate": "2023-06-17T09:00:30",
+    "valueDate": "2023-06-17T09:00:30",
+    "bookingDate": "2023-06-17T09:00:35",
+    "transactionType": "FEE",
+    "transactionStatus": "COMPLETED",
+    "totalAmount": 2.50,
     "currency": "EUR",
-    "description": "Monthly rent payment",
-    "initiatingParty": "John Doe",
-    "accountId": 5001
+    "description": "Fee for SEPA transfer",
+    "initiatingParty": "SYSTEM",
+    "accountId": 5001,
+    "accountSpaceId": 101,
+    "relatedTransactionId": 10003,
+    "relationType": "FEE"
   }'
 ```
 
