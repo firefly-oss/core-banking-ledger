@@ -47,6 +47,8 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
     Flux<Transaction> findByPostalCode(String postalCode, Pageable pageable);
     Mono<Long> countByPostalCode(String postalCode);
 
+    Mono<Transaction> findByExternalReference(String externalReference);
+
     Flux<Transaction> findByLocationNameContainingIgnoreCase(String locationName, Pageable pageable);
     Mono<Long> countByLocationNameContainingIgnoreCase(String locationName);
 
