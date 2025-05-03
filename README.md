@@ -1,6 +1,6 @@
 # Core Banking Ledger
 
-A comprehensive banking transaction management and ledger operations system designed for modern financial institutions.
+A comprehensive banking transaction management system designed for modern financial institutions.
 
 ## 🚀 Quickstart
 
@@ -116,33 +116,6 @@ erDiagram
         datetime status_end_datetime
         string reason
         boolean regulated_reporting_flag
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Ledger Entities
-    LEDGER_ACCOUNT {
-        bigint ledger_account_id PK
-        string account_code
-        string account_name
-        enum account_type
-        bigint parent_account_id FK
-        boolean is_active
-        datetime date_created
-        datetime date_updated
-    }
-
-    LEDGER_ENTRY {
-        bigint ledger_entry_id PK
-        bigint transaction_id FK
-        bigint ledger_account_id FK
-        enum debit_credit_indicator
-        decimal amount
-        string currency
-        datetime posting_date
-        decimal exchange_rate
-        bigint cost_center_id
-        string notes
         datetime date_created
         datetime date_updated
     }
@@ -400,10 +373,6 @@ erDiagram
     TRANSACTION_CATEGORY ||--o{ TRANSACTION_CATEGORY : has_parent
 
     TRANSACTION ||--o{ TRANSACTION_STATUS_HISTORY : has
-    TRANSACTION ||--o{ LEDGER_ENTRY : generates
-
-    LEDGER_ACCOUNT ||--o{ LEDGER_ENTRY : posts_to
-    LEDGER_ACCOUNT ||--o{ LEDGER_ACCOUNT : has_parent
 
     %% Transaction Line Relationships
     TRANSACTION ||--o| TRANSACTION_LINE_CARD : has
@@ -436,13 +405,9 @@ The Core Banking Ledger system uses a flexible data model designed to handle var
    - **Wire Transfers** (`TRANSACTION_LINE_WIRE_TRANSFER`): Records international wire transfers
    - **Standing Orders** (`TRANSACTION_LINE_STANDING_ORDER`): Records recurring scheduled payments
 
-3. **Ledger**: Double-entry bookkeeping system with:
-   - Ledger accounts (chart of accounts)
-   - Ledger entries (debits and credits)
+3. **Categories**: Hierarchical classification system for transactions.
 
-4. **Categories**: Hierarchical classification system for transactions.
-
-5. **Status History**: Tracking of transaction status changes over time.
+4. **Status History**: Tracking of transaction status changes over time.
 
 ## 🔧 Configuration
 
@@ -524,9 +489,6 @@ You can set these environment variables in your development environment or provi
 
 
 ### Reporting
-- Trial balance reports
-- Income statements
-- Balance sheets
 - Transaction history reports
 - Audit reports
 
@@ -544,7 +506,7 @@ mvn test -Dtest=TransactionServiceImplTest
 
 The tests cover all major components of the system, including:
 - Transaction services
-- Ledger operations
+
 - Transaction line services for different payment methods
 - Transaction categorization
 - Status history tracking
@@ -754,53 +716,7 @@ Response:
 ```
 
 
-#### 3. Generating Financial Reports
-
-This flow demonstrates how to generate various financial reports.
-
-**Trial Balance Report**
-
-```bash
-# Generate a trial balance report
-curl -X GET "http://localhost:8080/api/v1/reports/trial-balance?startDate=2023-01-01&endDate=2023-06-30"
-```
-
-Response:
-```
-Trial Balance Report
-Period: 2023-01-01 to 2023-06-30
-
-Account                                  Account Type    Debit           Credit
-------------------------------------------------------------------------------
-Cash                                     ASSET                           1250.75
-Accounts Receivable                      ASSET           3500.00
-Inventory                                ASSET           12500.00
-Equipment                                ASSET           8000.00
-Accounts Payable                         LIABILITY                       2750.00
-Loans Payable                            LIABILITY                       5000.00
-Capital                                  EQUITY                          15000.00
-Revenue                                  REVENUE                         7500.00
-Utility Expenses                         EXPENSE         1250.75
-Salary Expenses                          EXPENSE         5250.00
-------------------------------------------------------------------------------
-Total                                                    30500.75        31500.75
-```
-
-**Income Statement Report**
-
-```bash
-# Generate an income statement report
-curl -X GET "http://localhost:8080/api/v1/reports/income-statement?startDate=2023-01-01&endDate=2023-06-30"
-```
-
-**Balance Sheet Report**
-
-```bash
-# Generate a balance sheet report
-curl -X GET "http://localhost:8080/api/v1/reports/balance-sheet?asOfDate=2023-06-30"
-```
-
-#### 4. Processing a SEPA Transfer
+#### 3. Processing a SEPA Transfer
 
 This flow demonstrates how to create and process a SEPA transfer transaction.
 
