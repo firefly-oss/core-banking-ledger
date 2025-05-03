@@ -43,7 +43,7 @@ public class TransactionLegController {
     public Mono<ResponseEntity<TransactionLegDTO>> createTransactionLeg(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Transaction leg data", required = true,
                     schema = @Schema(implementation = TransactionLegDTO.class))
             @RequestBody TransactionLegDTO legDTO
@@ -66,7 +66,7 @@ public class TransactionLegController {
     public Mono<ResponseEntity<TransactionLegDTO>> getTransactionLeg(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Transaction leg ID", required = true)
             @PathVariable Long legId
     ) {
@@ -88,20 +88,20 @@ public class TransactionLegController {
     public Mono<ResponseEntity<PaginationResponse<TransactionLegDTO>>> listTransactionLegs(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
+
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "20") int size,
-            
+
             @Parameter(description = "Sort field")
             @RequestParam(required = false) String sort,
-            
+
             @Parameter(description = "Sort direction (ASC or DESC)")
             @RequestParam(defaultValue = "DESC") String direction
     ) {
-        PaginationRequest paginationRequest = PaginationRequest.of(page, size, sort, direction);
+        PaginationRequest paginationRequest = new PaginationRequest(page, size, sort, direction);
         return service.listTransactionLegs(transactionId, paginationRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());

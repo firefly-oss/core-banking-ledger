@@ -49,6 +49,17 @@ public class PaginationRequest {
     }
 
     /**
+     * Creates a new PaginationRequest with the specified page and size, without sorting.
+     *
+     * @param page The page number (0-based).
+     * @param size The page size.
+     * @return A new PaginationRequest instance.
+     */
+    public static PaginationRequest of(int page, int size) {
+        return new PaginationRequest(page, size, null, null);
+    }
+
+    /**
      * Gets the page number.
      *
      * @return The page number.

@@ -40,7 +40,7 @@ public class TransactionAttachmentController {
     public Mono<ResponseEntity<TransactionAttachmentDTO>> createAttachment(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Attachment data", required = true,
                     schema = @Schema(implementation = TransactionAttachmentDTO.class))
             @RequestBody TransactionAttachmentDTO attachmentDTO
@@ -63,7 +63,7 @@ public class TransactionAttachmentController {
     public Mono<ResponseEntity<TransactionAttachmentDTO>> getAttachment(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Attachment ID", required = true)
             @PathVariable Long attachmentId
     ) {
@@ -85,20 +85,20 @@ public class TransactionAttachmentController {
     public Mono<ResponseEntity<PaginationResponse<TransactionAttachmentDTO>>> listAttachments(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
+
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "20") int size,
-            
+
             @Parameter(description = "Sort field")
             @RequestParam(required = false) String sort,
-            
+
             @Parameter(description = "Sort direction (ASC or DESC)")
             @RequestParam(defaultValue = "DESC") String direction
     ) {
-        PaginationRequest paginationRequest = PaginationRequest.of(page, size, sort, direction);
+        PaginationRequest paginationRequest = new PaginationRequest(page, size, sort, direction);
         return service.listAttachments(transactionId, paginationRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -117,23 +117,23 @@ public class TransactionAttachmentController {
     public Mono<ResponseEntity<PaginationResponse<TransactionAttachmentDTO>>> listAttachmentsByType(
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
-            
+
             @Parameter(description = "Attachment type", required = true)
             @PathVariable String attachmentType,
-            
+
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
+
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "20") int size,
-            
+
             @Parameter(description = "Sort field")
             @RequestParam(required = false) String sort,
-            
+
             @Parameter(description = "Sort direction (ASC or DESC)")
             @RequestParam(defaultValue = "DESC") String direction
     ) {
-        PaginationRequest paginationRequest = PaginationRequest.of(page, size, sort, direction);
+        PaginationRequest paginationRequest = new PaginationRequest(page, size, sort, direction);
         return service.listAttachmentsByType(transactionId, attachmentType, paginationRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());

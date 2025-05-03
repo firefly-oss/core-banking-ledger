@@ -43,20 +43,20 @@ public class AccountLegController {
     public Mono<ResponseEntity<PaginationResponse<TransactionLegDTO>>> listAccountLegs(
             @Parameter(description = "Account ID", required = true)
             @PathVariable Long accountId,
-            
+
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
+
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "20") int size,
-            
+
             @Parameter(description = "Sort field")
             @RequestParam(required = false) String sort,
-            
+
             @Parameter(description = "Sort direction (ASC or DESC)")
             @RequestParam(defaultValue = "DESC") String direction
     ) {
-        PaginationRequest paginationRequest = PaginationRequest.of(page, size, sort, direction);
+        PaginationRequest paginationRequest = new PaginationRequest(page, size, sort, direction);
         return service.listAccountLegs(accountId, paginationRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -75,26 +75,26 @@ public class AccountLegController {
     public Mono<ResponseEntity<PaginationResponse<TransactionLegDTO>>> listAccountLegsByDateRange(
             @Parameter(description = "Account ID", required = true)
             @PathVariable Long accountId,
-            
+
             @Parameter(description = "Start date (ISO format)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            
+
             @Parameter(description = "End date (ISO format)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            
+
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
+
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "20") int size,
-            
+
             @Parameter(description = "Sort field")
             @RequestParam(required = false) String sort,
-            
+
             @Parameter(description = "Sort direction (ASC or DESC)")
             @RequestParam(defaultValue = "DESC") String direction
     ) {
-        PaginationRequest paginationRequest = PaginationRequest.of(page, size, sort, direction);
+        PaginationRequest paginationRequest = new PaginationRequest(page, size, sort, direction);
         return service.listAccountLegsByDateRange(accountId, startDate, endDate, paginationRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
