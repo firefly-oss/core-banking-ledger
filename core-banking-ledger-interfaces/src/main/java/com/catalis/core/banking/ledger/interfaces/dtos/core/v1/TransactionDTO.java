@@ -50,4 +50,24 @@ public class TransactionDTO extends BaseDTO {
     private String country;
     private String city;
     private String postalCode;
+
+    // Relation fields
+    @FilterableId
+    private Long relatedTransactionId;
+    private String relationType;
+    private String requestId;
+    private String batchId;
+    private LocalDateTime bookingDate;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long rowVersion;
+
+    // Compliance fields
+    private Integer amlRiskScore;
+    private String amlScreeningResult;
+    private Boolean amlLargeTxnFlag;
+    private String scaMethod;
+    private String scaResult;
+    private Boolean instantFlag;
+    private String confirmationOfPayeeResult;
 }
