@@ -49,6 +49,22 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
 
     Mono<Transaction> findByExternalReference(String externalReference);
 
+    /**
+     * Find all transactions for an account.
+     *
+     * @param accountId The account ID
+     * @return A Flux emitting all transactions for the account
+     */
+    Flux<Transaction> findByAccountId(Long accountId);
+
+    /**
+     * Find all transactions for an account space.
+     *
+     * @param accountSpaceId The account space ID
+     * @return A Flux emitting all transactions for the account space
+     */
+    Flux<Transaction> findByAccountSpaceId(Long accountSpaceId);
+
     Flux<Transaction> findByLocationNameContainingIgnoreCase(String locationName, Pageable pageable);
     Mono<Long> countByLocationNameContainingIgnoreCase(String locationName);
 

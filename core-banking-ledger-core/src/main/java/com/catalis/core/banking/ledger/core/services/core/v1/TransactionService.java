@@ -5,6 +5,7 @@ import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -54,6 +55,22 @@ public interface TransactionService {
      * @return A Mono emitting a paginated response of transactions matching the filter criteria
      */
     Mono<PaginationResponse<TransactionDTO>> filterTransactions(FilterRequest<TransactionDTO> filterRequest);
+
+    /**
+     * Gets all transactions for an account.
+     *
+     * @param accountId The account ID
+     * @return A Flux emitting all transactions for the account
+     */
+    Flux<TransactionDTO> getTransactionsByAccountId(Long accountId);
+
+    /**
+     * Gets all transactions for an account space.
+     *
+     * @param accountSpaceId The account space ID
+     * @return A Flux emitting all transactions for the account space
+     */
+    Flux<TransactionDTO> getTransactionsByAccountSpaceId(Long accountSpaceId);
 
     /**
      * Updates the status of a transaction and records the status change in the history.

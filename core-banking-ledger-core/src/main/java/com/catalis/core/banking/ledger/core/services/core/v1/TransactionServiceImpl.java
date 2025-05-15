@@ -15,6 +15,7 @@ import com.catalis.core.banking.ledger.models.repositories.core.v1.TransactionSt
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -151,6 +152,18 @@ public class TransactionServiceImpl implements TransactionService {
                         mapper::toDTO
                 )
                 .filter(filterRequest);
+    }
+
+    @Override
+    public Flux<TransactionDTO> getTransactionsByAccountId(Long accountId) {
+        return repository.findByAccountId(accountId)
+                .map(mapper::toDTO);
+    }
+
+    @Override
+    public Flux<TransactionDTO> getTransactionsByAccountSpaceId(Long accountSpaceId) {
+        return repository.findByAccountSpaceId(accountSpaceId)
+                .map(mapper::toDTO);
     }
 
     @Override

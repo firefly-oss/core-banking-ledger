@@ -1,4 +1,4 @@
--- V20__Remove_transaction_category_table.sql
+-- V14__Remove_transaction_category_table.sql
 
 -- Remove the foreign key constraint from transaction table
 ALTER TABLE transaction DROP CONSTRAINT IF EXISTS fk_transaction_category;

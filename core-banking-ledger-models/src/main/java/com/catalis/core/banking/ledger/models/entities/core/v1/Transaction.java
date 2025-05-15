@@ -51,12 +51,25 @@ public class Transaction extends BaseEntity {
     @Column("initiating_party")
     private String initiatingParty;
 
+    /**
+     * Reference to account ID in external account microservice.
+     * This is a logical reference to an account managed in a separate microservice.
+     */
     @Column("account_id")
     private Long accountId;
 
+    /**
+     * Reference to account space ID in external account microservice.
+     * This is a logical reference to an account space managed in a separate microservice.
+     */
     @Column("account_space_id")
     private Long accountSpaceId;
 
+    /**
+     * Reference to category ID in external master data microservice.
+     * This is no longer a foreign key to an internal table but a logical reference
+     * to a category managed in a separate microservice.
+     */
     @Column("transaction_category_id")
     private Long transactionCategoryId;
 

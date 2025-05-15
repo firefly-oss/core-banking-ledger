@@ -31,12 +31,21 @@ public class TransactionDTO extends BaseDTO {
     private String description;
     private String initiatingParty;
 
+    /**
+     * Reference to account ID in external account microservice.
+     */
     @FilterableId
     private Long accountId;
 
+    /**
+     * Reference to account space ID in external account microservice.
+     */
     @FilterableId
     private Long accountSpaceId;
 
+    /**
+     * Reference to category ID in external master data microservice.
+     */
     @FilterableId
     private Long transactionCategoryId;
 
