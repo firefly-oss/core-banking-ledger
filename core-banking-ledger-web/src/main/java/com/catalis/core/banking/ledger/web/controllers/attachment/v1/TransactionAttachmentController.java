@@ -4,6 +4,7 @@ import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.core.banking.ledger.core.services.attachment.v1.TransactionAttachmentService;
 import com.catalis.core.banking.ledger.interfaces.dtos.attachment.v1.TransactionAttachmentDTO;
+import com.catalis.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -118,8 +119,8 @@ public class TransactionAttachmentController {
             @Parameter(description = "Transaction ID", required = true)
             @PathVariable Long transactionId,
 
-            @Parameter(description = "Attachment type", required = true)
-            @PathVariable String attachmentType,
+            @Parameter(description = "Attachment type", required = true, schema = @Schema(implementation = AttachmentTypeEnum.class))
+            @PathVariable AttachmentTypeEnum attachmentType,
 
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,

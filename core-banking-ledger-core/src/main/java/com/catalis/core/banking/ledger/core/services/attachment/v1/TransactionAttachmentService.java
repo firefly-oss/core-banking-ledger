@@ -3,6 +3,7 @@ package com.catalis.core.banking.ledger.core.services.attachment.v1;
 import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.core.banking.ledger.interfaces.dtos.attachment.v1.TransactionAttachmentDTO;
+import com.catalis.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;
 import reactor.core.publisher.Mono;
 
 /**
@@ -46,7 +47,7 @@ public interface TransactionAttachmentService {
      */
     Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachmentsByType(
             Long transactionId,
-            String attachmentType,
+            AttachmentTypeEnum attachmentType,
             PaginationRequest paginationRequest
     );
 }

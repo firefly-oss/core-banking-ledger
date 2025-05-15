@@ -5,6 +5,7 @@ import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.common.core.queries.PaginationUtils;
 import com.catalis.core.banking.ledger.core.mappers.attachment.v1.TransactionAttachmentMapper;
 import com.catalis.core.banking.ledger.interfaces.dtos.attachment.v1.TransactionAttachmentDTO;
+import com.catalis.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;
 import com.catalis.core.banking.ledger.models.entities.attachment.v1.TransactionAttachment;
 import com.catalis.core.banking.ledger.models.repositories.attachment.v1.TransactionAttachmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class TransactionAttachmentServiceImpl implements TransactionAttachmentSe
     @Override
     public Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachmentsByType(
             Long transactionId,
-            String attachmentType,
+            AttachmentTypeEnum attachmentType,
             PaginationRequest paginationRequest
     ) {
         return PaginationUtils.paginateQuery(

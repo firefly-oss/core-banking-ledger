@@ -1,5 +1,6 @@
 package com.catalis.core.banking.ledger.models.entities.attachment.v1;
 
+import com.catalis.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;
 import com.catalis.core.banking.ledger.models.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,8 +28,11 @@ public class TransactionAttachment extends BaseEntity {
     @Column("transaction_id")
     private Long transactionId;
 
+    /**
+     * Type of attachment (INVOICE, RECEIPT, CONTRACT, etc.)
+     */
     @Column("attachment_type")
-    private String attachmentType;
+    private AttachmentTypeEnum attachmentType;
 
     @Column("attachment_name")
     private String attachmentName;
@@ -36,8 +40,11 @@ public class TransactionAttachment extends BaseEntity {
     @Column("attachment_description")
     private String attachmentDescription;
 
-    @Column("object_storage_url")
-    private String objectStorageUrl;
+    /**
+     * Reference to document ID in external ECM (Enterprise Content Management) system
+     */
+    @Column("document_id")
+    private String documentId;
 
     @Column("content_type")
     private String contentType;

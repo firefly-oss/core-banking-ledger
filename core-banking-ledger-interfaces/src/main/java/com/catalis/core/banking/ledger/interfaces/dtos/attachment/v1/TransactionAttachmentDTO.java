@@ -1,6 +1,7 @@
 package com.catalis.core.banking.ledger.interfaces.dtos.attachment.v1;
 
 import com.catalis.core.banking.ledger.interfaces.dtos.BaseDTO;
+import com.catalis.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;
 import com.catalis.core.utils.annotations.FilterableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -24,10 +25,10 @@ public class TransactionAttachmentDTO extends BaseDTO {
     @FilterableId
     private Long transactionId;
 
-    private String attachmentType;
+    private AttachmentTypeEnum attachmentType;
     private String attachmentName;
     private String attachmentDescription;
-    private String objectStorageUrl;
+    private String documentId;
     private String contentType;
     private Long sizeBytes;
     private String hashSha256;

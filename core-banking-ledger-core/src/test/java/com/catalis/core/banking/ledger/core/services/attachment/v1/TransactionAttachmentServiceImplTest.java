@@ -5,6 +5,7 @@ import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.common.core.queries.PaginationUtils;
 import com.catalis.core.banking.ledger.core.mappers.attachment.v1.TransactionAttachmentMapper;
 import com.catalis.core.banking.ledger.interfaces.dtos.attachment.v1.TransactionAttachmentDTO;
+import com.catalis.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;
 import com.catalis.core.banking.ledger.models.entities.attachment.v1.TransactionAttachment;
 import com.catalis.core.banking.ledger.models.repositories.attachment.v1.TransactionAttachmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ public class TransactionAttachmentServiceImplTest {
     private TransactionAttachment attachmentEntity;
     private final Long transactionId = 1L;
     private final Long attachmentId = 1L;
-    private final String attachmentType = "INVOICE";
+    private final AttachmentTypeEnum attachmentType = AttachmentTypeEnum.INVOICE;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +53,7 @@ public class TransactionAttachmentServiceImplTest {
         attachmentDTO.setAttachmentType(attachmentType);
         attachmentDTO.setAttachmentName("invoice.pdf");
         attachmentDTO.setAttachmentDescription("Test invoice");
-        attachmentDTO.setObjectStorageUrl("https://storage.example.com/invoices/invoice-123.pdf");
+        attachmentDTO.setDocumentId("ECM-DOC-123456");
         attachmentDTO.setContentType("application/pdf");
         attachmentDTO.setSizeBytes(1024L * 1024L);
         attachmentDTO.setHashSha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
@@ -65,7 +66,7 @@ public class TransactionAttachmentServiceImplTest {
         attachmentEntity.setAttachmentType(attachmentType);
         attachmentEntity.setAttachmentName("invoice.pdf");
         attachmentEntity.setAttachmentDescription("Test invoice");
-        attachmentEntity.setObjectStorageUrl("https://storage.example.com/invoices/invoice-123.pdf");
+        attachmentEntity.setDocumentId("ECM-DOC-123456");
         attachmentEntity.setContentType("application/pdf");
         attachmentEntity.setSizeBytes(1024L * 1024L);
         attachmentEntity.setHashSha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
