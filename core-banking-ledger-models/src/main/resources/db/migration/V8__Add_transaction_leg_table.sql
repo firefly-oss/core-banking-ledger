@@ -16,13 +16,15 @@ CREATE TABLE IF NOT EXISTS transaction_leg (
     booking_date            TIMESTAMP,
     date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_updated            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_leg_transaction
     FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id)
 );
 
 -- Add comments explaining the purpose of the table
 COMMENT ON TABLE transaction_leg IS 'Stores individual debit and credit legs for each transaction, enabling double-entry accounting';
+COMMENT ON COLUMN transaction_leg.account_id IS 'Logical reference to the account ID in external account microservice';
+COMMENT ON COLUMN transaction_leg.account_space_id IS 'Logical reference to the account space ID in external account microservice';
 COMMENT ON COLUMN transaction_leg.leg_type IS 'Type of leg: DEBIT or CREDIT';
 COMMENT ON COLUMN transaction_leg.amount IS 'Amount for this leg (always positive)';
 COMMENT ON COLUMN transaction_leg.booking_date IS 'Date when the leg hit the ledger balance';

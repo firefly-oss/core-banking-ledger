@@ -5,7 +5,7 @@ ALTER TABLE transaction
 ADD COLUMN account_space_id BIGINT;
 
 -- Add comment explaining the purpose of the column
-COMMENT ON COLUMN transaction.account_space_id IS 'Reference to the account space associated with this transaction';
+COMMENT ON COLUMN transaction.account_space_id IS 'Logical reference to the account space ID in external account microservice';
 
 -- Update existing transactions if needed (this is a placeholder and might need to be adjusted based on business requirements)
 -- UPDATE transaction SET account_space_id = ... WHERE ...;
