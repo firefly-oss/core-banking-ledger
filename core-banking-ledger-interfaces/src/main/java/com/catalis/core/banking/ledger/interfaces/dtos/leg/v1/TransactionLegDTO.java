@@ -25,9 +25,15 @@ public class TransactionLegDTO extends BaseDTO {
     @FilterableId
     private Long transactionId;
 
+    /**
+     * Reference to account ID in external account microservice.
+     */
     @FilterableId
     private Long accountId;
 
+    /**
+     * Reference to account space ID in external account microservice.
+     */
     @FilterableId
     private Long accountSpaceId;
 

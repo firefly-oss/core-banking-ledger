@@ -29,9 +29,17 @@ public class TransactionLeg extends BaseEntity {
     @Column("transaction_id")
     private Long transactionId;
 
+    /**
+     * Reference to account ID in external account microservice.
+     * This is a logical reference to an account managed in a separate microservice.
+     */
     @Column("account_id")
     private Long accountId;
 
+    /**
+     * Reference to account space ID in external account microservice.
+     * This is a logical reference to an account space managed in a separate microservice.
+     */
     @Column("account_space_id")
     private Long accountSpaceId;
 

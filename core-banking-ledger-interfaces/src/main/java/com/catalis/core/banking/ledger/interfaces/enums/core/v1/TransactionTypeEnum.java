@@ -7,5 +7,9 @@ public enum TransactionTypeEnum {
     FEE,
     INTEREST,
     WIRE_TRANSFER,
-    STANDING_ORDER
+    STANDING_ORDER,
+    ACH,
+    CARD,
+    DIRECT_DEBIT,
+    SEPA_TRANSFER
 }
