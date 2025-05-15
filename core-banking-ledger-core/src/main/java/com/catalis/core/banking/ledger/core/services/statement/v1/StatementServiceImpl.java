@@ -1,5 +1,6 @@
 package com.catalis.core.banking.ledger.core.services.statement.v1;
 
+import com.catalis.common.core.filters.FilterRequest;
 import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.common.core.queries.PaginationUtils;
@@ -20,17 +21,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Implementation of the StatementService interface.
@@ -52,9 +47,6 @@ public class StatementServiceImpl implements StatementService {
     private TransactionMapper transactionMapper;
 
     @Autowired
-    private StatementGenerationService generationService;
-
-    @Autowired
     private EventOutboxService eventOutboxService;
 
     @Override
@@ -68,7 +60,6 @@ public class StatementServiceImpl implements StatementService {
         StatementMetadataDTO metadata = new StatementMetadataDTO();
         metadata.setAccountId(accountId);
         metadata.setPeriodType(requestDTO.getPeriodType());
-        metadata.setFormat(requestDTO.getFormat());
         metadata.setStartDate(startDate);
         metadata.setEndDate(endDate);
         metadata.setGenerationDate(LocalDateTime.now());
@@ -81,13 +72,13 @@ public class StatementServiceImpl implements StatementService {
                 .flatMap(transactions -> {
                     // Create statement entries
                     List<StatementEntryDTO> entries = createStatementEntries(transactions);
-                    
+
                     // Calculate statement totals
                     BigDecimal openingBalance = calculateOpeningBalance(entries);
                     BigDecimal closingBalance = calculateClosingBalance(entries);
                     BigDecimal totalCredits = calculateTotalCredits(entries);
                     BigDecimal totalDebits = calculateTotalDebits(entries);
-                    
+
                     // Create statement DTO
                     StatementDTO statementDTO = new StatementDTO();
                     statementDTO.setMetadata(metadata);
@@ -96,31 +87,23 @@ public class StatementServiceImpl implements StatementService {
                     statementDTO.setTotalCredits(totalCredits);
                     statementDTO.setTotalDebits(totalDebits);
                     statementDTO.setEntries(entries);
-                    
+
                     metadata.setTransactionCount(entries.size());
-                    
-                    // Generate statement file
-                    return generationService.generateStatementFile(statementDTO, metadata.getFormat())
-                            .flatMap(fileContent -> {
-                                // Save file to storage
-                                String fileReference = saveStatementFile(fileContent, metadata);
-                                metadata.setFileReference(fileReference);
-                                
-                                // Save statement metadata to database
-                                Statement entity = mapper.toEntity(metadata);
-                                return repository.save(entity)
-                                        .flatMap(savedEntity -> {
-                                            metadata.setStatementId(savedEntity.getStatementId());
-                                            statementDTO.setMetadata(metadata);
-                                            
-                                            // Publish statement generated event
-                                            return eventOutboxService.publishEvent(
-                                                    "STATEMENT",
-                                                    savedEntity.getStatementId().toString(),
-                                                    "ACCOUNT_STATEMENT_GENERATED",
-                                                    metadata
-                                            ).then(Mono.just(statementDTO));
-                                        });
+
+                    // Save statement metadata to database
+                    Statement entity = mapper.toEntity(metadata);
+                    return repository.save(entity)
+                            .flatMap(savedEntity -> {
+                                metadata.setStatementId(savedEntity.getStatementId());
+                                statementDTO.setMetadata(metadata);
+
+                                // Publish statement generated event
+                                return eventOutboxService.publishEvent(
+                                        "STATEMENT",
+                                        savedEntity.getStatementId().toString(),
+                                        "ACCOUNT_STATEMENT_GENERATED",
+                                        metadata
+                                ).then(Mono.just(statementDTO));
                             });
                 });
     }
@@ -136,7 +119,6 @@ public class StatementServiceImpl implements StatementService {
         StatementMetadataDTO metadata = new StatementMetadataDTO();
         metadata.setAccountSpaceId(accountSpaceId);
         metadata.setPeriodType(requestDTO.getPeriodType());
-        metadata.setFormat(requestDTO.getFormat());
         metadata.setStartDate(startDate);
         metadata.setEndDate(endDate);
         metadata.setGenerationDate(LocalDateTime.now());
@@ -149,13 +131,13 @@ public class StatementServiceImpl implements StatementService {
                 .flatMap(transactions -> {
                     // Create statement entries
                     List<StatementEntryDTO> entries = createStatementEntries(transactions);
-                    
+
                     // Calculate statement totals
                     BigDecimal openingBalance = calculateOpeningBalance(entries);
                     BigDecimal closingBalance = calculateClosingBalance(entries);
                     BigDecimal totalCredits = calculateTotalCredits(entries);
                     BigDecimal totalDebits = calculateTotalDebits(entries);
-                    
+
                     // Create statement DTO
                     StatementDTO statementDTO = new StatementDTO();
                     statementDTO.setMetadata(metadata);
@@ -164,31 +146,23 @@ public class StatementServiceImpl implements StatementService {
                     statementDTO.setTotalCredits(totalCredits);
                     statementDTO.setTotalDebits(totalDebits);
                     statementDTO.setEntries(entries);
-                    
+
                     metadata.setTransactionCount(entries.size());
-                    
-                    // Generate statement file
-                    return generationService.generateStatementFile(statementDTO, metadata.getFormat())
-                            .flatMap(fileContent -> {
-                                // Save file to storage
-                                String fileReference = saveStatementFile(fileContent, metadata);
-                                metadata.setFileReference(fileReference);
-                                
-                                // Save statement metadata to database
-                                Statement entity = mapper.toEntity(metadata);
-                                return repository.save(entity)
-                                        .flatMap(savedEntity -> {
-                                            metadata.setStatementId(savedEntity.getStatementId());
-                                            statementDTO.setMetadata(metadata);
-                                            
-                                            // Publish statement generated event
-                                            return eventOutboxService.publishEvent(
-                                                    "STATEMENT",
-                                                    savedEntity.getStatementId().toString(),
-                                                    "ACCOUNT_SPACE_STATEMENT_GENERATED",
-                                                    metadata
-                                            ).then(Mono.just(statementDTO));
-                                        });
+
+                    // Save statement metadata to database
+                    Statement entity = mapper.toEntity(metadata);
+                    return repository.save(entity)
+                            .flatMap(savedEntity -> {
+                                metadata.setStatementId(savedEntity.getStatementId());
+                                statementDTO.setMetadata(metadata);
+
+                                // Publish statement generated event
+                                return eventOutboxService.publishEvent(
+                                        "STATEMENT",
+                                        savedEntity.getStatementId().toString(),
+                                        "ACCOUNT_SPACE_STATEMENT_GENERATED",
+                                        metadata
+                                ).then(Mono.just(statementDTO));
                             });
                 });
     }
@@ -241,25 +215,6 @@ public class StatementServiceImpl implements StatementService {
         );
     }
 
-    @Override
-    public Mono<byte[]> downloadStatement(Long statementId) {
-        return repository.findById(statementId)
-                .flatMap(statement -> {
-                    String fileReference = statement.getFileReference();
-                    if (fileReference == null || fileReference.isEmpty()) {
-                        return Mono.error(new RuntimeException("Statement file not found"));
-                    }
-                    
-                    try {
-                        Path filePath = Paths.get(fileReference);
-                        byte[] fileContent = Files.readAllBytes(filePath);
-                        return Mono.just(fileContent);
-                    } catch (Exception e) {
-                        return Mono.error(new RuntimeException("Failed to read statement file", e));
-                    }
-                });
-    }
-
     /**
      * Calculate the date range based on the statement request.
      *
@@ -269,7 +224,7 @@ public class StatementServiceImpl implements StatementService {
     private Pair<LocalDate, LocalDate> calculateDateRange(StatementRequestDTO requestDTO) {
         LocalDate startDate;
         LocalDate endDate;
-        
+
         switch (requestDTO.getPeriodType()) {
             case MONTHLY:
                 int month = requestDTO.getMonth() != null ? requestDTO.getMonth() : LocalDate.now().getMonthValue();
@@ -277,7 +232,7 @@ public class StatementServiceImpl implements StatementService {
                 startDate = LocalDate.of(year, month, 1);
                 endDate = startDate.plusMonths(1).minusDays(1);
                 break;
-                
+
             case QUARTERLY:
                 int quarter = requestDTO.getQuarter() != null ? requestDTO.getQuarter() : ((LocalDate.now().getMonthValue() - 1) / 3) + 1;
                 year = requestDTO.getYear() != null ? requestDTO.getYear() : LocalDate.now().getYear();
@@ -285,13 +240,13 @@ public class StatementServiceImpl implements StatementService {
                 startDate = LocalDate.of(year, startMonth, 1);
                 endDate = startDate.plusMonths(3).minusDays(1);
                 break;
-                
+
             case YEARLY:
                 year = requestDTO.getYear() != null ? requestDTO.getYear() : LocalDate.now().getYear();
                 startDate = LocalDate.of(year, 1, 1);
                 endDate = LocalDate.of(year, 12, 31);
                 break;
-                
+
             case CUSTOM:
                 if (requestDTO.getStartDate() == null || requestDTO.getEndDate() == null) {
                     throw new IllegalArgumentException("Start date and end date are required for custom period");
@@ -299,14 +254,14 @@ public class StatementServiceImpl implements StatementService {
                 startDate = requestDTO.getStartDate();
                 endDate = requestDTO.getEndDate();
                 break;
-                
+
             default:
                 // Default to current month
                 startDate = LocalDate.now().withDayOfMonth(1);
                 endDate = startDate.plusMonths(1).minusDays(1);
                 break;
         }
-        
+
         return new Pair<>(startDate, endDate);
     }
 
@@ -320,9 +275,17 @@ public class StatementServiceImpl implements StatementService {
      * @return A flux of transactions.
      */
     private Flux<TransactionDTO> fetchAccountTransactions(Long accountId, LocalDateTime startDateTime, LocalDateTime endDateTime, boolean includePending) {
-        // This is a simplified implementation. In a real system, you would use a more sophisticated query
-        // to fetch transactions with proper filtering and sorting.
-        return Flux.empty(); // Placeholder - implement actual transaction fetching logic
+        // Use the transaction service to get all transactions for the account
+        return transactionService.getTransactionsByAccountId(accountId)
+                // Filter by date range
+                .filter(transaction -> {
+                    LocalDateTime txnDate = transaction.getTransactionDate();
+                    return txnDate != null &&
+                           !txnDate.isBefore(startDateTime) &&
+                           !txnDate.isAfter(endDateTime);
+                })
+                // Filter by status if not including pending transactions
+                .filter(transaction -> includePending || !TransactionStatusEnum.PENDING.equals(transaction.getTransactionStatus()));
     }
 
     /**
@@ -335,9 +298,17 @@ public class StatementServiceImpl implements StatementService {
      * @return A flux of transactions.
      */
     private Flux<TransactionDTO> fetchAccountSpaceTransactions(Long accountSpaceId, LocalDateTime startDateTime, LocalDateTime endDateTime, boolean includePending) {
-        // This is a simplified implementation. In a real system, you would use a more sophisticated query
-        // to fetch transactions with proper filtering and sorting.
-        return Flux.empty(); // Placeholder - implement actual transaction fetching logic
+        // Use the transaction service to get all transactions for the account space
+        return transactionService.getTransactionsByAccountSpaceId(accountSpaceId)
+                // Filter by date range
+                .filter(transaction -> {
+                    LocalDateTime txnDate = transaction.getTransactionDate();
+                    return txnDate != null &&
+                           !txnDate.isBefore(startDateTime) &&
+                           !txnDate.isAfter(endDateTime);
+                })
+                // Filter by status if not including pending transactions
+                .filter(transaction -> includePending || !TransactionStatusEnum.PENDING.equals(transaction.getTransactionStatus()));
     }
 
     /**
@@ -349,10 +320,10 @@ public class StatementServiceImpl implements StatementService {
     private List<StatementEntryDTO> createStatementEntries(List<TransactionDTO> transactions) {
         List<StatementEntryDTO> entries = new ArrayList<>();
         BigDecimal runningBalance = BigDecimal.ZERO; // This would be initialized with the actual opening balance
-        
+
         // Sort transactions by value date
         transactions.sort(Comparator.comparing(TransactionDTO::getValueDate));
-        
+
         for (TransactionDTO transaction : transactions) {
             StatementEntryDTO entry = new StatementEntryDTO();
             entry.setTransactionId(transaction.getTransactionId());
@@ -367,14 +338,14 @@ public class StatementServiceImpl implements StatementService {
             entry.setInitiatingParty(transaction.getInitiatingParty());
             entry.setExternalReference(transaction.getExternalReference());
             entry.setTransactionCategoryId(transaction.getTransactionCategoryId());
-            
+
             // Update running balance
             runningBalance = runningBalance.add(transaction.getTotalAmount());
             entry.setRunningBalance(runningBalance);
-            
+
             entries.add(entry);
         }
-        
+
         return entries;
     }
 
@@ -385,9 +356,13 @@ public class StatementServiceImpl implements StatementService {
      * @return The opening balance.
      */
     private BigDecimal calculateOpeningBalance(List<StatementEntryDTO> entries) {
-        // In a real implementation, this would be calculated based on the account balance at the start date
-        // For simplicity, we'll use a placeholder value
-        return BigDecimal.ZERO;
+        if (entries.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        // Get the first entry's running balance and subtract its amount to get the opening balance
+        StatementEntryDTO firstEntry = entries.get(0);
+        return firstEntry.getRunningBalance().subtract(firstEntry.getAmount());
     }
 
     /**
@@ -428,25 +403,6 @@ public class StatementServiceImpl implements StatementService {
                 .filter(entry -> entry.getAmount().compareTo(BigDecimal.ZERO) < 0)
                 .map(entry -> entry.getAmount().abs()) // Convert to positive for sum
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    /**
-     * Save a statement file to storage.
-     *
-     * @param fileContent The file content.
-     * @param metadata The statement metadata.
-     * @return The file reference.
-     */
-    private String saveStatementFile(byte[] fileContent, StatementMetadataDTO metadata) {
-        // In a real implementation, this would save the file to a storage system
-        // For simplicity, we'll return a placeholder file reference
-        String fileName = String.format("statement_%s_%s_%s.%s",
-                metadata.getAccountId() != null ? "account_" + metadata.getAccountId() : "account_space_" + metadata.getAccountSpaceId(),
-                metadata.getStartDate().toString(),
-                metadata.getEndDate().toString(),
-                metadata.getFormat().toString().toLowerCase());
-        
-        return "/tmp/statements/" + fileName;
     }
 
     /**

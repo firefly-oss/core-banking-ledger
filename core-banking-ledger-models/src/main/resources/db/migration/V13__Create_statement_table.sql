@@ -1,4 +1,4 @@
--- V10__Create_statement_table.sql
+-- V13__Create_statement_table.sql
 
 -- Create statement table
 CREATE TABLE IF NOT EXISTS statement (
@@ -19,16 +19,8 @@ CREATE TABLE IF NOT EXISTS statement (
     created_by VARCHAR(100),
     updated_by VARCHAR(100),
 
-    CONSTRAINT fk_statement_account
-        FOREIGN KEY (account_id)
-        REFERENCES account (account_id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_statement_account_space
-        FOREIGN KEY (account_space_id)
-        REFERENCES account_space (account_space_id)
-        ON DELETE CASCADE,
-
+    -- No foreign key constraints as accounts are managed in an external microservice
+    -- Instead, we use a logical check constraint to ensure either account_id or account_space_id is provided
     CONSTRAINT check_statement_target
         CHECK ((account_id IS NOT NULL AND account_space_id IS NULL) OR
                (account_id IS NULL AND account_space_id IS NOT NULL))
@@ -43,8 +35,8 @@ CREATE INDEX idx_statement_generation_date ON statement(generation_date);
 -- Add comments
 COMMENT ON TABLE statement IS 'Stores metadata about generated account and account space statements';
 COMMENT ON COLUMN statement.statement_id IS 'Unique identifier for the statement';
-COMMENT ON COLUMN statement.account_id IS 'Reference to the account associated with this statement (null if for account space)';
-COMMENT ON COLUMN statement.account_space_id IS 'Reference to the account space associated with this statement (null if for account)';
+COMMENT ON COLUMN statement.account_id IS 'Logical reference to the account ID in external account microservice (null if for account space)';
+COMMENT ON COLUMN statement.account_space_id IS 'Logical reference to the account space ID in external account microservice (null if for account)';
 COMMENT ON COLUMN statement.period_type IS 'Type of period for the statement (MONTHLY, QUARTERLY, YEARLY, CUSTOM)';
 COMMENT ON COLUMN statement.start_date IS 'Start date of the statement period';
 COMMENT ON COLUMN statement.end_date IS 'End date of the statement period';

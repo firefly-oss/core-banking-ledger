@@ -10,7 +10,6 @@ import com.catalis.core.banking.ledger.core.services.event.v1.EventOutboxService
 import com.catalis.core.banking.ledger.interfaces.dtos.statement.v1.StatementDTO;
 import com.catalis.core.banking.ledger.interfaces.dtos.statement.v1.StatementMetadataDTO;
 import com.catalis.core.banking.ledger.interfaces.dtos.statement.v1.StatementRequestDTO;
-import com.catalis.core.banking.ledger.interfaces.enums.statement.v1.StatementFormatEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.statement.v1.StatementPeriodEnum;
 import com.catalis.core.banking.ledger.models.entities.statement.v1.Statement;
 import com.catalis.core.banking.ledger.models.repositories.statement.v1.StatementRepository;
@@ -51,9 +50,6 @@ class StatementServiceImplTest {
     private TransactionMapper transactionMapper;
 
     @Mock
-    private StatementGenerationService generationService;
-
-    @Mock
     private EventOutboxService eventOutboxService;
 
     @InjectMocks
@@ -65,18 +61,15 @@ class StatementServiceImplTest {
     private Long accountId;
     private Long accountSpaceId;
     private Long statementId;
-    private byte[] fileContent;
 
     @BeforeEach
     void setUp() {
         accountId = 123L;
         accountSpaceId = 456L;
         statementId = 789L;
-        fileContent = "test content".getBytes();
 
         requestDTO = new StatementRequestDTO();
         requestDTO.setPeriodType(StatementPeriodEnum.MONTHLY);
-        requestDTO.setFormat(StatementFormatEnum.PDF);
         requestDTO.setMonth(6);
         requestDTO.setYear(2023);
         requestDTO.setIncludePending(true);
@@ -86,12 +79,10 @@ class StatementServiceImplTest {
         metadataDTO.setStatementId(statementId);
         metadataDTO.setAccountId(accountId);
         metadataDTO.setPeriodType(StatementPeriodEnum.MONTHLY);
-        metadataDTO.setFormat(StatementFormatEnum.PDF);
         metadataDTO.setStartDate(LocalDate.of(2023, 6, 1));
         metadataDTO.setEndDate(LocalDate.of(2023, 6, 30));
         metadataDTO.setGenerationDate(LocalDateTime.now());
         metadataDTO.setTransactionCount(10);
-        metadataDTO.setFileReference("/tmp/statements/test.pdf");
         metadataDTO.setIncludedPending(true);
         metadataDTO.setIncludedDetails(true);
 
@@ -99,12 +90,10 @@ class StatementServiceImplTest {
         statement.setStatementId(statementId);
         statement.setAccountId(accountId);
         statement.setPeriodType(StatementPeriodEnum.MONTHLY);
-        statement.setFormat(StatementFormatEnum.PDF);
         statement.setStartDate(LocalDate.of(2023, 6, 1));
         statement.setEndDate(LocalDate.of(2023, 6, 30));
         statement.setGenerationDate(LocalDateTime.now());
         statement.setTransactionCount(10);
-        statement.setFileReference("/tmp/statements/test.pdf");
         statement.setIncludedPending(true);
         statement.setIncludedDetails(true);
     }
@@ -205,18 +194,5 @@ class StatementServiceImplTest {
                     .expectNext(expectedResponse)
                     .verifyComplete();
         }
-    }
-
-    @Test
-    void downloadStatement_Success() {
-        when(repository.findById(statementId)).thenReturn(Mono.just(statement));
-        
-        // This test is simplified due to the complexity of mocking file system operations
-        // In a real test, you would mock the file system operations or use a test file
-
-        // For now, we'll just verify that the method returns the expected Mono
-        StepVerifier.create(service.downloadStatement(statementId))
-                .expectError(RuntimeException.class)
-                .verify();
     }
 }

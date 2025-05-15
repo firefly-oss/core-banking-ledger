@@ -20,7 +20,7 @@ public interface StatementMapper {
     @Mapping(target = "dateCreated", source = "dateCreated")
     @Mapping(target = "dateUpdated", source = "dateUpdated")
     StatementMetadataDTO toDTO(Statement entity);
-    
+
     /**
      * Convert a StatementMetadataDTO to a Statement entity.
      *
@@ -29,7 +29,5 @@ public interface StatementMapper {
      */
     @Mapping(target = "dateCreated", ignore = true)
     @Mapping(target = "dateUpdated", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
     Statement toEntity(StatementMetadataDTO dto);
 }

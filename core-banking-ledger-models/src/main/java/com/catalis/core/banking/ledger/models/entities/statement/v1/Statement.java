@@ -1,6 +1,5 @@
 package com.catalis.core.banking.ledger.models.entities.statement.v1;
 
-import com.catalis.core.banking.ledger.interfaces.enums.statement.v1.StatementFormatEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.statement.v1.StatementPeriodEnum;
 import com.catalis.core.banking.ledger.models.entities.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -26,37 +25,31 @@ public class Statement extends BaseEntity {
     @Id
     @Column("statement_id")
     private Long statementId;
-    
+
     @Column("account_id")
     private Long accountId;
-    
+
     @Column("account_space_id")
     private Long accountSpaceId;
-    
+
     @Column("period_type")
     private StatementPeriodEnum periodType;
-    
-    @Column("format")
-    private StatementFormatEnum format;
-    
+
     @Column("start_date")
     private LocalDate startDate;
-    
+
     @Column("end_date")
     private LocalDate endDate;
-    
+
     @Column("generation_date")
     private LocalDateTime generationDate;
-    
+
     @Column("transaction_count")
     private Integer transactionCount;
-    
-    @Column("file_reference")
-    private String fileReference;
-    
+
     @Column("included_pending")
     private Boolean includedPending;
-    
+
     @Column("included_details")
     private Boolean includedDetails;
 }

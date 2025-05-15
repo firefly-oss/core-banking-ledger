@@ -6,7 +6,6 @@ import com.catalis.core.banking.ledger.core.services.statement.v1.StatementServi
 import com.catalis.core.banking.ledger.interfaces.dtos.statement.v1.StatementDTO;
 import com.catalis.core.banking.ledger.interfaces.dtos.statement.v1.StatementMetadataDTO;
 import com.catalis.core.banking.ledger.interfaces.dtos.statement.v1.StatementRequestDTO;
-import com.catalis.core.banking.ledger.interfaces.enums.statement.v1.StatementFormatEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +69,6 @@ public class AccountStatementController {
     public Mono<ResponseEntity<PaginationResponse<StatementMetadataDTO>>> listStatements(
             @Parameter(description = "Account ID", required = true)
             @PathVariable Long accountId,
-
             @ParameterObject
             @ModelAttribute PaginationRequest paginationRequest
     ) {
@@ -129,69 +126,5 @@ public class AccountStatementController {
                 .filter(statement -> statement.getAccountId() != null && statement.getAccountId().equals(accountId))
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @Operation(
-            summary = "Download Account Statement",
-            description = "Download a specific statement file."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Statement file downloaded successfully",
-            content = @Content(mediaType = "application/octet-stream")
-    )
-    @GetMapping(value = "/{statementId}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<byte[]>> downloadStatement(
-            @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
-
-            @Parameter(description = "Statement ID", required = true)
-            @PathVariable Long statementId
-    ) {
-        return service.getStatement(statementId)
-                .filter(statement -> statement.getAccountId() != null && statement.getAccountId().equals(accountId))
-                .flatMap(statement -> service.downloadStatement(statementId)
-                        .map(fileContent -> {
-                            HttpHeaders headers = new HttpHeaders();
-                            headers.setContentDispositionFormData("attachment", getFileName(statement));
-                            headers.setContentType(getMediaType(statement.getFormat()));
-                            return ResponseEntity.ok()
-                                    .headers(headers)
-                                    .body(fileContent);
-                        }))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    /**
-     * Get the file name for a statement.
-     *
-     * @param statement The statement metadata.
-     * @return The file name.
-     */
-    private String getFileName(StatementMetadataDTO statement) {
-        return String.format("account_%d_statement_%s_to_%s.%s",
-                statement.getAccountId(),
-                statement.getStartDate().toString(),
-                statement.getEndDate().toString(),
-                statement.getFormat().toString().toLowerCase());
-    }
-
-    /**
-     * Get the media type for a statement format.
-     *
-     * @param format The statement format.
-     * @return The media type.
-     */
-    private MediaType getMediaType(StatementFormatEnum format) {
-        switch (format) {
-            case PDF:
-                return MediaType.APPLICATION_PDF;
-            case CSV:
-                return MediaType.parseMediaType("text/csv");
-            case JSON:
-                return MediaType.APPLICATION_JSON;
-            default:
-                return MediaType.APPLICATION_OCTET_STREAM;
-        }
     }
 }

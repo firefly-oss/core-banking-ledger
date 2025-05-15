@@ -21,7 +21,7 @@ public interface StatementService {
      * @return The generated statement.
      */
     Mono<StatementDTO> generateAccountStatement(Long accountId, StatementRequestDTO requestDTO);
-    
+
     /**
      * Generate a statement for an account space.
      *
@@ -30,7 +30,7 @@ public interface StatementService {
      * @return The generated statement.
      */
     Mono<StatementDTO> generateAccountSpaceStatement(Long accountSpaceId, StatementRequestDTO requestDTO);
-    
+
     /**
      * Get a specific statement by ID.
      *
@@ -38,7 +38,7 @@ public interface StatementService {
      * @return The statement metadata.
      */
     Mono<StatementMetadataDTO> getStatement(Long statementId);
-    
+
     /**
      * List statements for an account.
      *
@@ -47,7 +47,7 @@ public interface StatementService {
      * @return A paginated list of statement metadata.
      */
     Mono<PaginationResponse<StatementMetadataDTO>> listAccountStatements(Long accountId, PaginationRequest paginationRequest);
-    
+
     /**
      * List statements for an account space.
      *
@@ -56,7 +56,7 @@ public interface StatementService {
      * @return A paginated list of statement metadata.
      */
     Mono<PaginationResponse<StatementMetadataDTO>> listAccountSpaceStatements(Long accountSpaceId, PaginationRequest paginationRequest);
-    
+
     /**
      * List statements for an account within a date range.
      *
@@ -68,7 +68,7 @@ public interface StatementService {
      */
     Mono<PaginationResponse<StatementMetadataDTO>> listAccountStatementsByDateRange(
             Long accountId, LocalDate startDate, LocalDate endDate, PaginationRequest paginationRequest);
-    
+
     /**
      * List statements for an account space within a date range.
      *
@@ -80,12 +80,4 @@ public interface StatementService {
      */
     Mono<PaginationResponse<StatementMetadataDTO>> listAccountSpaceStatementsByDateRange(
             Long accountSpaceId, LocalDate startDate, LocalDate endDate, PaginationRequest paginationRequest);
-    
-    /**
-     * Download a statement file.
-     *
-     * @param statementId The ID of the statement.
-     * @return The statement file content as a byte array.
-     */
-    Mono<byte[]> downloadStatement(Long statementId);
 }
