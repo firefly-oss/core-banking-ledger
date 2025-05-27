@@ -18,8 +18,8 @@ jobs:
     uses: firefly-oss/cicd/.github/workflows/docker-publish.yaml@main
     with:
       dockerfile-path: "./Dockerfile"
-      image-name: "core-banking-ledger"
-      docker-image-tag: "latest"
+      image-name: "k8-infra-dev-repo"
+      docker-image-tag: "core-banking-ledger-latest"
     secrets:
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
