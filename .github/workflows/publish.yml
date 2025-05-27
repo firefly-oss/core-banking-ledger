@@ -18,9 +18,8 @@ jobs:
     uses: firefly-oss/cicd/.github/workflows/docker-publish.yaml@main
     with:
       dockerfile-path: "./Dockerfile"
-      azure-registry-name: "catalis.azurecr.io"
-      azure-registry-repository: "core-banking-ledger"
+      image-name: "core-banking-ledger"
       docker-image-tag: "latest"
     secrets:
-      AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
-      AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
+      REGISTRY_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
