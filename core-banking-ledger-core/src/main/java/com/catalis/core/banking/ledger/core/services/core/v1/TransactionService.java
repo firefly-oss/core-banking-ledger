@@ -4,6 +4,12 @@ import com.catalis.common.core.filters.FilterRequest;
 import com.catalis.common.core.queries.PaginationRequest;
 import com.catalis.common.core.queries.PaginationResponse;
 import com.catalis.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
+import com.catalis.core.banking.ledger.interfaces.dtos.crypto.v1.CryptoDepositDTO;
+import com.catalis.core.banking.ledger.interfaces.dtos.crypto.v1.CryptoTransferDTO;
+import com.catalis.core.banking.ledger.interfaces.dtos.crypto.v1.CryptoWithdrawalDTO;
+import com.catalis.core.banking.ledger.interfaces.dtos.crypto.v1.NftTransferDTO;
+import com.catalis.core.banking.ledger.interfaces.dtos.crypto.v1.TokenBurnDTO;
+import com.catalis.core.banking.ledger.interfaces.dtos.crypto.v1.TokenMintDTO;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -98,4 +104,88 @@ public interface TransactionService {
      * @return A Mono emitting the transaction if found, or an empty Mono if not found
      */
     Mono<TransactionDTO> findByExternalReference(String externalReference);
+    
+    // Crypto-specific methods
+    
+    /**
+     * Creates a new crypto deposit transaction.
+     *
+     * @param depositDTO The crypto deposit data
+     * @return A Mono emitting the created transaction with its generated ID
+     */
+    Mono<TransactionDTO> createCryptoDeposit(CryptoDepositDTO depositDTO);
+    
+    /**
+     * Creates a new crypto withdrawal transaction.
+     *
+     * @param withdrawalDTO The crypto withdrawal data
+     * @return A Mono emitting the created transaction with its generated ID
+     */
+    Mono<TransactionDTO> createCryptoWithdrawal(CryptoWithdrawalDTO withdrawalDTO);
+    
+    /**
+     * Creates a new crypto transfer transaction between accounts.
+     *
+     * @param transferDTO The crypto transfer data
+     * @return A Mono emitting the created transaction with its generated ID
+     */
+    Mono<TransactionDTO> createCryptoTransfer(CryptoTransferDTO transferDTO);
+    
+    /**
+     * Creates a new token mint transaction.
+     *
+     * @param mintDTO The token mint data
+     * @return A Mono emitting the created transaction with its generated ID
+     */
+    Mono<TransactionDTO> createTokenMint(TokenMintDTO mintDTO);
+    
+    /**
+     * Creates a new token burn transaction.
+     *
+     * @param burnDTO The token burn data
+     * @return A Mono emitting the created transaction with its generated ID
+     */
+    Mono<TransactionDTO> createTokenBurn(TokenBurnDTO burnDTO);
+    
+    /**
+     * Creates a new NFT transfer transaction.
+     *
+     * @param transferDTO The NFT transfer data
+     * @return A Mono emitting the created transaction with its generated ID
+     */
+    Mono<TransactionDTO> createNftTransfer(NftTransferDTO transferDTO);
+    
+    /**
+     * Gets transactions by blockchain transaction hash.
+     *
+     * @param blockchainTransactionHash The blockchain transaction hash
+     * @return A Flux emitting all transactions with the specified blockchain transaction hash
+     */
+    Flux<TransactionDTO> getTransactionsByBlockchainHash(String blockchainTransactionHash);
+    
+    /**
+     * Gets crypto transactions for a specific crypto asset.
+     *
+     * @param cryptoAssetId The ID of the crypto asset
+     * @return A Flux emitting all transactions for the specified crypto asset
+     */
+    Flux<TransactionDTO> getTransactionsByCryptoAssetId(Long cryptoAssetId);
+    
+    /**
+     * Updates the blockchain transaction hash for a transaction.
+     *
+     * @param transactionId The unique identifier of the transaction
+     * @param blockchainTransactionHash The blockchain transaction hash
+     * @return A Mono emitting the updated transaction, or an empty Mono if not found
+     */
+    Mono<TransactionDTO> updateBlockchainTransactionHash(Long transactionId, String blockchainTransactionHash);
+    
+    /**
+     * Updates the confirmation count for a crypto transaction.
+     *
+     * @param transactionId The unique identifier of the transaction
+     * @param confirmationCount The new confirmation count
+     * @return A Mono emitting the updated transaction, or an empty Mono if not found
+     */
+    Mono<TransactionDTO> updateConfirmationCount(Long transactionId, Integer confirmationCount);
 }

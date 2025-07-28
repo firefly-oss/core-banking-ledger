@@ -1,5 +1,6 @@
 package com.catalis.core.banking.ledger.models.entities.core.v1;
 
+import com.catalis.core.banking.ledger.interfaces.enums.asset.v1.AssetTypeEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
 import com.catalis.core.banking.ledger.interfaces.enums.core.v1.TransactionTypeEnum;
 import com.catalis.core.banking.ledger.models.entities.BaseEntity;
@@ -139,4 +140,47 @@ public class Transaction extends BaseEntity {
 
     @Column("confirmation_of_payee_result")
     private String confirmationOfPayeeResult;
+
+    // Crypto and blockchain fields
+    /**
+     * Type of asset (FIAT, CRYPTOCURRENCY, TOKEN_SECURITY, etc.)
+     * Defaults to FIAT for backward compatibility
+     */
+    @Column("asset_type")
+    private AssetTypeEnum assetType = AssetTypeEnum.FIAT;
+
+    /**
+     * Reference to blockchain_network table for cryptocurrency and token transactions
+     * Only populated when assetType is not FIAT
+     */
+    @Column("blockchain_network_id")
+    private Long blockchainNetworkId;
+
+    /**
+     * Transaction hash on the blockchain
+     * Only populated for crypto transactions
+     */
+    @Column("blockchain_transaction_hash")
+    private String blockchainTransactionHash;
+
+    /**
+     * Result of compliance checks specific to crypto transactions
+     * E.g., "APPROVED", "REJECTED", "MANUAL_REVIEW"
+     */
+    @Column("crypto_compliance_check_result")
+    private String cryptoComplianceCheckResult;
+
+    /**
+     * Risk score for crypto addresses involved in the transaction
+     * Higher values indicate higher risk
+     */
+    @Column("crypto_address_risk_score")
+    private Integer cryptoAddressRiskScore;
+
+    /**
+     * Source of the crypto transaction
+     * E.g., "EXCHANGE", "WALLET", "SMART_CONTRACT"
+     */
+    @Column("crypto_transaction_source")
+    private String cryptoTransactionSource;
 }

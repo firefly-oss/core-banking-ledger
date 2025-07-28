@@ -15,6 +15,7 @@ A comprehensive banking transaction management system designed for modern financ
 4. [Data Model](#-data-model)
    - [Data Model Diagram](#data-model-diagram)
    - [Core Entities](#core-entities)
+   - [Blockchain & Crypto Entities](#blockchain--crypto-entities)
    - [Transaction Lines](#transaction-lines)
    - [Entity Relationships](#entity-relationships)
 5. [Configuration](#-configuration)
@@ -23,6 +24,8 @@ A comprehensive banking transaction management system designed for modern financ
    - [Transaction Management](#transaction-management)
    - [Double-Entry Accounting](#double-entry-accounting)
    - [Event-Driven Architecture](#event-driven-architecture)
+   - [Blockchain Integration](#blockchain-integration)
+   - [Cryptocurrency Support](#cryptocurrency-support)
    - [Regulatory Compliance](#regulatory-compliance)
    - [Security & Privacy](#security--privacy)
    - [Reporting](#reporting)
@@ -36,7 +39,7 @@ A comprehensive banking transaction management system designed for modern financ
 
 ## Overview
 
-The Core Banking Ledger is a transaction management system that provides a robust foundation for financial operations. It implements double-entry accounting principles, supports various transaction types, and ensures regulatory compliance while maintaining high performance and reliability.
+The Core Banking Ledger is a transaction management system that provides a robust foundation for financial operations. It implements double-entry accounting principles, supports various transaction types including cryptocurrency transactions, and ensures regulatory compliance while maintaining high performance and reliability.
 
 > **Note**: Transaction categories are now managed in an external master data microservice. The `transactionCategoryId` field in the Transaction entity serves as a logical reference to categories in this external service.
 
@@ -101,6 +104,20 @@ The transaction processing engine is the heart of the Core Banking Ledger system
 - **Fee Transactions**: Manages various banking fees with calculation methods and waiver tracking.
 - **Interest Transactions**: Calculates and applies interest payments or charges with accrual periods.
 - **Transfer Transactions**: Handles internal transfers between accounts with purpose codes.
+- **Cryptocurrency Transactions**: Processes cryptocurrency deposits, withdrawals, transfers, and swaps with blockchain integration.
+- **Token Operations**: Manages token minting, burning, and transfers, including NFT transactions.
+- **Staking Operations**: Handles cryptocurrency staking, unstaking, and reward distribution.
+
+#### Blockchain Integration Framework
+
+The system includes a comprehensive blockchain integration framework for interacting with various blockchain networks:
+
+- **Blockchain Network Management**: Supports multiple blockchain networks (Ethereum, Bitcoin, etc.) with network-specific configurations.
+- **Transaction Monitoring**: Listens for blockchain events like deposits, token transfers, and smart contract events.
+- **Transaction Broadcasting**: Sends transactions to blockchain networks with proper gas fee estimation.
+- **Confirmation Tracking**: Monitors transaction confirmations and updates transaction status accordingly.
+- **Address Management**: Registers and monitors blockchain addresses for incoming transactions.
+- **Smart Contract Interaction**: Interacts with smart contracts for token operations and other blockchain functions.
 
 #### Double-Entry Accounting System
 
@@ -109,6 +126,7 @@ The system implements proper double-entry accounting principles to ensure financ
 - **Transaction Legs**: Each transaction consists of at least two legs (debit and credit) that always balance to zero.
 - **Balance Calculation**: Account balances are calculated based on the sum of transaction legs.
 - **Multi-Currency Support**: Handles transactions in different currencies with proper exchange rate tracking.
+- **Multi-Asset Support**: Supports both fiat currencies and cryptocurrencies with proper accounting.
 - **Booking vs. Value Date**: Distinguishes between when a transaction is booked and when it affects interest calculations.
 
 #### Event-Driven Integration Framework
@@ -119,6 +137,7 @@ The system uses an event-driven architecture for reliable integration with other
 - **Domain Events**: Publishes events for transaction lifecycle (created, updated, status changed).
 - **Idempotent Processing**: Prevents duplicate transactions with unique external references and request IDs.
 - **Asynchronous Communication**: Enables loose coupling between services through event-based integration.
+- **Blockchain Event Processing**: Processes blockchain events asynchronously to update transaction status.
 
 #### Transaction Relationship Management
 
@@ -128,6 +147,7 @@ The system tracks relationships between transactions for comprehensive financial
 - **Relation Types**: Categorizes relationships as reversals, adjustments, chargebacks, or corrections.
 - **Batch Processing**: Groups related transactions with batch IDs for bulk operations.
 - **Audit Trail**: Maintains a complete history of transaction status changes with reasons.
+- **Blockchain Transaction Tracking**: Links on-chain transactions with internal ledger transactions.
 
 #### Regulatory Compliance Framework
 
@@ -138,13 +158,13 @@ The system includes features to ensure compliance with financial regulations:
 - **Instant Payments**: Supports instant payment schemes with confirmation of payee functionality.
 - **EU Regulations**: Designed for PSD3 and EU Instant Payments Regulation 2024/886 compliance.
 - **Spanish Tax Reporting**: Includes fields for Spanish tax codes and reporting requirements.
+- **Crypto Compliance**: Includes crypto-specific compliance checks and risk scoring for blockchain addresses.
 
 #### Transaction Categorization System
 
 Enables classification and organization of transactions for reporting and analysis:
 
 - **External Category Management**: Transaction categories are now managed in an external master data microservice, with the transaction_category_id field serving as a logical reference to categories in this external service.
-
 
 ## 📊 Data Model
 
@@ -188,6 +208,12 @@ erDiagram
         string postal_code
         string branch_office_code
         string nif_initiating_party
+        enum asset_type
+        bigint blockchain_network_id FK
+        string blockchain_transaction_hash
+        string crypto_compliance_check_result
+        integer crypto_address_risk_score
+        string crypto_transaction_source
         datetime date_created
         datetime date_updated
     }
@@ -224,6 +250,65 @@ erDiagram
         bigint money_id PK
         decimal amount
         string currency
+        enum asset_type
+        bigint crypto_asset_id FK
+        datetime date_created
+        datetime date_updated
+    }
+
+    %% Blockchain & Crypto Entities
+    BLOCKCHAIN_NETWORK {
+        bigint blockchain_network_id PK
+        string network_name
+        string network_code
+        boolean is_testnet
+        string blockchain_explorer_url
+        datetime date_created
+        datetime date_updated
+    }
+
+    CRYPTO_ASSET {
+        bigint crypto_asset_id PK
+        string asset_symbol
+        string asset_name
+        enum asset_type
+        bigint blockchain_network_id FK
+        string contract_address
+        integer decimals
+        boolean is_active
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_CRYPTO {
+        bigint transaction_line_crypto_id PK
+        bigint transaction_id FK
+        bigint crypto_asset_id FK
+        string blockchain_transaction_hash
+        string sender_address
+        string recipient_address
+        bigint block_number
+        datetime block_timestamp
+        integer confirmation_count
+        decimal gas_price
+        bigint gas_used
+        decimal transaction_fee
+        string fee_currency
+        string network_status
+        datetime date_created
+        datetime date_updated
+    }
+
+    NFT_METADATA {
+        bigint nft_metadata_id PK
+        bigint crypto_asset_id FK
+        string token_id
+        string token_standard
+        string metadata_uri
+        string token_name
+        string token_description
+        string creator_address
+        datetime creation_date
         datetime date_created
         datetime date_updated
     }
@@ -271,276 +356,23 @@ erDiagram
         datetime date_updated
     }
 
-    %% Card Transaction Line
-    TRANSACTION_LINE_CARD {
-        bigint transaction_line_card_id PK
-        bigint transaction_id FK
-        string card_auth_code
-        string card_merchant_category_code
-        string card_merchant_name
-        string card_pos_entry_mode
-        string card_transaction_reference
-        string card_terminal_id
-        string card_holder_country
-        boolean card_present_flag
-        datetime card_transaction_timestamp
-        boolean card_fraud_flag
-        decimal card_currency_conversion_rate
-        decimal card_fee_amount
-        string card_fee_currency
-        string card_installment_plan
-        string card_merchant_cif
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Direct Debit Transaction Line
-    TRANSACTION_LINE_DIRECT_DEBIT {
-        bigint transaction_line_direct_debit_id PK
-        bigint transaction_id FK
-        string direct_debit_mandate_id
-        string direct_debit_creditor_id
-        string direct_debit_reference
-        enum direct_debit_sequence_type
-        date direct_debit_due_date
-        string direct_debit_payment_method
-        string direct_debit_debtor_name
-        string direct_debit_debtor_address
-        string direct_debit_debtor_contact
-        enum direct_debit_processing_status
-        datetime direct_debit_authorization_date
-        datetime direct_debit_revocation_date
-        enum direct_debit_spanish_scheme
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% SEPA Transfer Transaction Line
-    TRANSACTION_LINE_SEPA_TRANSFER {
-        bigint transaction_line_sepa_id PK
-        bigint transaction_id FK
-        string sepa_end_to_end_id
-        string sepa_remittance_info
-        string sepa_origin_iban
-        string sepa_origin_bic
-        string sepa_destination_iban
-        string sepa_destination_bic
-        enum sepa_transaction_status
-        string sepa_creditor_id
-        string sepa_debtor_id
-        string sepa_initiating_agent_bic
-        string sepa_intermediary_bic
-        string sepa_transaction_purpose
-        date sepa_requested_execution_date
-        decimal sepa_exchange_rate
-        decimal sepa_fee_amount
-        string sepa_fee_currency
-        string sepa_recipient_name
-        string sepa_recipient_address
-        datetime sepa_processing_date
-        string sepa_notes
-        enum sepa_payment_scheme
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Wire Transfer Transaction Line
-    TRANSACTION_LINE_WIRE_TRANSFER {
-        bigint transaction_line_wire_transfer_id PK
-        bigint transaction_id FK
-        string wire_transfer_reference
-        string wire_origin_swift_bic
-        string wire_destination_swift_bic
-        string wire_origin_account_number
-        string wire_destination_account_number
-        string wire_transfer_purpose
-        enum wire_transfer_priority
-        decimal wire_exchange_rate
-        decimal wire_fee_amount
-        string wire_fee_currency
-        string wire_instructing_party
-        string wire_beneficiary_name
-        string wire_beneficiary_address
-        datetime wire_processing_date
-        string wire_transaction_notes
-        enum wire_reception_status
-        string wire_decline_reason
-        boolean wire_cancelled_flag
-        string bank_of_spain_reg_code
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Standing Order Transaction Line
-    TRANSACTION_LINE_STANDING_ORDER {
-        bigint transaction_line_standing_order_id PK
-        bigint transaction_id FK
-        string standing_order_id
-        enum standing_order_frequency
-        date standing_order_start_date
-        date standing_order_end_date
-        date standing_order_next_execution_date
-        string standing_order_reference
-        string standing_order_recipient_name
-        string standing_order_recipient_iban
-        string standing_order_recipient_bic
-        string standing_order_purpose
-        enum standing_order_status
-        string standing_order_notes
-        date standing_order_last_execution_date
-        bigint standing_order_total_executions
-        datetime standing_order_cancelled_date
-        date standing_order_suspended_until_date
-        string standing_order_created_by
-        string standing_order_updated_by
-        datetime standing_order_creation_timestamp
-        datetime standing_order_update_timestamp
-        boolean standing_order_spanish_tax_flag
-    }
-
-    %% Deposit Transaction Line
-    TRANSACTION_LINE_DEPOSIT {
-        bigint transaction_line_deposit_id PK
-        bigint transaction_id FK
-        string deposit_method
-        string deposit_reference
-        string deposit_location
-        string deposit_notes
-        string deposit_confirmation_code
-        string deposit_receipt_number
-        string deposit_atm_id
-        string deposit_branch_id
-        decimal deposit_cash_amount
-        decimal deposit_check_amount
-        string deposit_check_number
-        date deposit_check_date
-        string deposit_check_bank
-        datetime deposit_timestamp
-        string deposit_processed_by
-        string deposit_spanish_tax_code
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Withdrawal Transaction Line
-    TRANSACTION_LINE_WITHDRAWAL {
-        bigint transaction_line_withdrawal_id PK
-        bigint transaction_id FK
-        string withdrawal_method
-        string withdrawal_reference
-        string withdrawal_location
-        string withdrawal_notes
-        string withdrawal_confirmation_code
-        string withdrawal_receipt_number
-        string withdrawal_atm_id
-        string withdrawal_branch_id
-        datetime withdrawal_timestamp
-        string withdrawal_processed_by
-        string withdrawal_authorization_code
-        boolean withdrawal_daily_limit_check
-        decimal withdrawal_daily_amount_used
-        decimal withdrawal_daily_limit
-        string withdrawal_spanish_tax_code
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Fee Transaction Line
-    TRANSACTION_LINE_FEE {
-        bigint transaction_line_fee_id PK
-        bigint transaction_id FK
-        string fee_type
-        string fee_description
-        string fee_reference
-        bigint fee_related_transaction_id
-        string fee_related_service
-        string fee_calculation_method
-        decimal fee_calculation_base
-        decimal fee_rate_percentage
-        decimal fee_fixed_amount
-        string fee_currency
-        boolean fee_waived
-        string fee_waiver_reason
-        string fee_waiver_authorized_by
-        datetime fee_timestamp
-        string fee_processed_by
-        string fee_spanish_tax_code
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Interest Transaction Line
-    TRANSACTION_LINE_INTEREST {
-        bigint transaction_line_interest_id PK
-        bigint transaction_id FK
-        string interest_type
-        string interest_description
-        string interest_reference
-        bigint interest_related_account_id
-        string interest_calculation_method
-        decimal interest_calculation_base
-        decimal interest_rate_percentage
-        date interest_accrual_start_date
-        date interest_accrual_end_date
-        integer interest_days_calculated
-        string interest_currency
-        decimal interest_tax_withheld_amount
-        decimal interest_tax_withheld_rate
-        decimal interest_gross_amount
-        decimal interest_net_amount
-        datetime interest_timestamp
-        string interest_processed_by
-        string interest_spanish_tax_code
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Transfer Transaction Line
-    TRANSACTION_LINE_TRANSFER {
-        bigint transaction_line_transfer_id PK
-        bigint transaction_id FK
-        string transfer_reference
-        bigint transfer_source_account_id
-        bigint transfer_destination_account_id
-        string transfer_source_account_number
-        string transfer_destination_account_number
-        string transfer_source_account_name
-        string transfer_destination_account_name
-        string transfer_purpose
-        string transfer_notes
-        datetime transfer_timestamp
-        string transfer_processed_by
-        decimal transfer_fee_amount
-        string transfer_fee_currency
-        date transfer_scheduled_date
-        date transfer_execution_date
-        string transfer_spanish_tax_code
-        datetime date_created
-        datetime date_updated
-    }
-
     %% Relationships
-    %% Transaction categories are now managed in an external master data microservice
-
     TRANSACTION ||--o{ TRANSACTION_LEG : "has"
     TRANSACTION ||--o{ TRANSACTION_STATUS_HISTORY : "has"
     TRANSACTION ||--o{ TRANSACTION_ATTACHMENT : "has"
     TRANSACTION ||--o| TRANSACTION : "relates to"
-
+    TRANSACTION ||--o| TRANSACTION_LINE_CRYPTO : "has"
+    TRANSACTION }o--|| BLOCKCHAIN_NETWORK : "uses"
+    
+    MONEY }o--o| CRYPTO_ASSET : "references"
+    
+    CRYPTO_ASSET }o--|| BLOCKCHAIN_NETWORK : "belongs to"
+    CRYPTO_ASSET ||--o{ NFT_METADATA : "has"
+    
+    TRANSACTION_LINE_CRYPTO }o--|| CRYPTO_ASSET : "references"
+    
     %% Statement Relationships
     STATEMENT }o--o{ TRANSACTION : "includes"
-
-    %% Transaction Line Relationships
-    TRANSACTION ||--o| TRANSACTION_LINE_CARD : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_DIRECT_DEBIT : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_SEPA_TRANSFER : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_WIRE_TRANSFER : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_STANDING_ORDER : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_DEPOSIT : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_WITHDRAWAL : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_FEE : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_INTEREST : "has"
-    TRANSACTION ||--o| TRANSACTION_LINE_TRANSFER : "has"
 ```
 
 ### Core Entities
@@ -555,7 +387,7 @@ The `TRANSACTION` table is the central entity representing any financial transac
   - `description`: Human-readable description of the transaction
   - `total_amount`: Total monetary value of the transaction
   - `currency`: ISO 4217 currency code (e.g., EUR, USD)
-  - `transaction_type`: Type of transaction (PAYMENT, CARD_PAYMENT, SEPA_TRANSFER, etc.)
+  - `transaction_type`: Type of transaction (PAYMENT, CARD_PAYMENT, SEPA_TRANSFER, CRYPTO_DEPOSIT, etc.)
   - `transaction_status`: Current status (PENDING, COMPLETED, FAILED, REVERSED)
 
 - **Temporal Data**:
@@ -585,6 +417,14 @@ The `TRANSACTION` table is the central entity representing any financial transac
   - `sca_result`: Result of the SCA verification
   - `instant_flag`: Whether this is an instant payment
   - `confirmation_of_payee_result`: Result of name checking (OK, MISMATCH, UNAVAILABLE)
+
+- **Crypto and Blockchain Fields**:
+  - `asset_type`: Type of asset (FIAT, CRYPTOCURRENCY, TOKEN_SECURITY, etc.)
+  - `blockchain_network_id`: Reference to blockchain network for crypto transactions
+  - `blockchain_transaction_hash`: Transaction hash on the blockchain
+  - `crypto_compliance_check_result`: Result of compliance checks for crypto transactions
+  - `crypto_address_risk_score`: Risk score for crypto addresses involved
+  - `crypto_transaction_source`: Source of the crypto transaction (EXCHANGE, WALLET, SMART_CONTRACT)
 
 - **Geolocation**:
   - `latitude`, `longitude`: Coordinates of transaction origin
@@ -627,24 +467,6 @@ The `TRANSACTION_LEG` table implements double-entry accounting principles. Each 
   - `date_created`: When the record was created
   - `date_updated`: When the record was last updated
 
-#### Event Outbox
-
-The `EVENT_OUTBOX` table implements the outbox pattern for reliable event publishing:
-
-- **Event Metadata**:
-  - `event_id`: Unique identifier for the event
-  - `aggregate_type`: Type of aggregate (e.g., "TRANSACTION")
-  - `aggregate_id`: ID of the aggregate (e.g., transaction ID)
-  - `event_type`: Type of event (e.g., "TRANSACTION_CREATED")
-  - `payload`: JSON payload containing the event data
-
-- **Processing Status**:
-  - `created_at`: When the event was created
-  - `processed`: Whether the event has been processed
-  - `processed_at`: When the event was processed
-  - `retry_count`: Number of processing attempts
-  - `last_error`: Last error message for failed events
-
 #### Money
 
 The `MONEY` table serves as a value object for consistent handling of amount and currency:
@@ -655,187 +477,128 @@ The `MONEY` table serves as a value object for consistent handling of amount and
 - **Value Components**:
   - `amount`: Decimal value with four decimal places for precision
   - `currency`: ISO 4217 currency code (e.g., EUR, USD)
+  - `asset_type`: Type of asset (FIAT, CRYPTOCURRENCY, TOKEN_SECURITY, etc.)
+  - `crypto_asset_id`: Reference to crypto_asset table for cryptocurrency and token assets
 
-#### Transaction Attachments
+- **Audit Trail**:
+  - `date_created`: When the record was created
+  - `date_updated`: When the record was last updated
 
-The `TRANSACTION_ATTACHMENT` table stores documents and files related to transactions:
+### Blockchain & Crypto Entities
+
+#### Blockchain Network
+
+The `BLOCKCHAIN_NETWORK` table stores information about supported blockchain networks:
 
 - **Identifiers**:
-  - `transaction_attachment_id`: Unique identifier
+  - `blockchain_network_id`: Unique identifier for the blockchain network
+
+- **Network Information**:
+  - `network_name`: Name of the blockchain network (e.g., Ethereum Mainnet, Bitcoin)
+  - `network_code`: Code for the blockchain network (e.g., ETH, BTC)
+  - `is_testnet`: Whether this is a testnet or mainnet
+  - `blockchain_explorer_url`: URL for the blockchain explorer
+
+- **Audit Trail**:
+  - `date_created`: When the record was created
+  - `date_updated`: When the record was last updated
+
+#### Crypto Asset
+
+The `CRYPTO_ASSET` table stores information about supported cryptocurrencies and tokens:
+
+- **Identifiers**:
+  - `crypto_asset_id`: Unique identifier for the crypto asset
+
+- **Asset Information**:
+  - `asset_symbol`: Symbol of the cryptocurrency or token (e.g., BTC, ETH)
+  - `asset_name`: Name of the cryptocurrency or token (e.g., Bitcoin, Ethereum)
+  - `asset_type`: Type of asset (CRYPTOCURRENCY, TOKEN_SECURITY, TOKEN_UTILITY, TOKEN_NFT)
+  - `blockchain_network_id`: Reference to the blockchain network
+  - `contract_address`: Address of the token contract (for tokens like ERC-20)
+  - `decimals`: Number of decimal places for the asset
+  - `is_active`: Whether the asset is active
+
+- **Audit Trail**:
+  - `date_created`: When the record was created
+  - `date_updated`: When the record was last updated
+
+#### Transaction Line Crypto
+
+The `TRANSACTION_LINE_CRYPTO` table stores crypto-specific transaction details:
+
+- **Identifiers**:
+  - `transaction_line_crypto_id`: Unique identifier
   - `transaction_id`: Reference to the parent transaction
+  - `crypto_asset_id`: Reference to the crypto asset
 
-- **Attachment Metadata**:
-  - `attachment_type`: Type of attachment (RECEIPT, INVOICE, CONTRACT, etc.)
-  - `attachment_name`: Filename or title
-  - `attachment_description`: Description of the attachment
-  - `document_id`: Reference to document in external ECM system
-  - `content_type`: MIME type
-  - `size_bytes`: File size in bytes
-  - `hash_sha256`: SHA-256 hash for integrity verification
+- **Blockchain Details**:
+  - `blockchain_transaction_hash`: Hash of the transaction on the blockchain
+  - `sender_address`: Blockchain address of the sender
+  - `recipient_address`: Blockchain address of the recipient
+  - `block_number`: Block number where the transaction was included
+  - `block_timestamp`: Timestamp of the block
+  - `confirmation_count`: Number of confirmations for the transaction
 
-- **Upload Information**:
-  - `uploaded_by`: Who uploaded the attachment
-  - `upload_date`: When the attachment was uploaded
-
-#### Statement
-
-The `STATEMENT` table represents account or account space statements:
-
-- **Identifiers**:
-  - `statement_id`: Unique identifier
-  - `account_id`: Reference to account in external account microservice
-  - `account_space_id`: Reference to account space in external account microservice
-
-- **Statement Parameters**:
-  - `period_type`: Type of period (DAILY, WEEKLY, MONTHLY, QUARTERLY, ANNUAL)
-  - `start_date`: Start date of the statement period
-  - `end_date`: End date of the statement period
-  - `generation_date`: When the statement was generated
-  - `transaction_count`: Number of transactions in the statement
-  - `included_pending`: Whether pending transactions are included
-  - `included_details`: Whether detailed transaction information is included
-
-#### Transaction Status History
-
-The `TRANSACTION_STATUS_HISTORY` table tracks all status changes with timestamps and reasons:
-
-- **Identifiers**:
-  - `transaction_status_history_id`: Unique identifier
-  - `transaction_id`: Reference to the parent transaction
+- **Fee Information**:
+  - `gas_price`: Price of gas used for the transaction
+  - `gas_used`: Amount of gas used for the transaction
+  - `transaction_fee`: Fee paid for the transaction
+  - `fee_currency`: Currency of the fee
 
 - **Status Information**:
-  - `status_code`: Status value (PENDING, AUTHORIZED, POSTED, REVERSED, FAILED)
-  - `status_start_datetime`: When the status became effective
-  - `status_end_datetime`: When the status was superseded
-  - `reason`: Reason for the status change
-  - `regulated_reporting_flag`: Whether this status change requires regulatory reporting
+  - `network_status`: Status of the transaction on the network
+
+- **Audit Trail**:
+  - `date_created`: When the record was created
+  - `date_updated`: When the record was last updated
+
+#### NFT Metadata
+
+The `NFT_METADATA` table stores metadata for NFT tokens:
+
+- **Identifiers**:
+  - `nft_metadata_id`: Unique identifier
+  - `crypto_asset_id`: Reference to the crypto asset
+  - `token_id`: ID of the token within the contract
+
+- **Token Information**:
+  - `token_standard`: Token standard (ERC-721, ERC-1155, etc.)
+  - `metadata_uri`: URI for the token metadata
+  - `token_name`: Name of the token
+  - `token_description`: Description of the token
+  - `creator_address`: Blockchain address of the creator
+  - `creation_date`: When the token was created
+
+- **Audit Trail**:
+  - `date_created`: When the record was created
+  - `date_updated`: When the record was last updated
 
 ### Transaction Lines
 
-The system uses specialized transaction line tables for different transaction types, each capturing type-specific details:
+The system uses specialized transaction line tables for different transaction types, each capturing type-specific details. In addition to the traditional transaction lines (Card, Direct Debit, SEPA Transfer, etc.), the system now includes a specialized transaction line for cryptocurrency transactions:
 
-#### Card Transactions (`TRANSACTION_LINE_CARD`)
+#### Crypto Transactions (`TRANSACTION_LINE_CRYPTO`)
 
-- **Merchant Information**:
-  - `card_merchant_name`: Name of the merchant
-  - `card_merchant_category_code`: MCC code identifying merchant type
-  - `card_merchant_cif`: Spanish tax ID of the merchant
-  - `card_terminal_id`: ID of the POS terminal
+- **Asset Information**:
+  - `crypto_asset_id`: Reference to the crypto asset involved in the transaction
+  - `sender_address`: Blockchain address of the sender
+  - `recipient_address`: Blockchain address of the recipient
 
-- **Authorization Details**:
-  - `card_auth_code`: Authorization code from the card network
-  - `card_transaction_reference`: Reference from the card processor
-  - `card_pos_entry_mode`: How the card was processed (CHIP_AND_PIN, CONTACTLESS, MANUAL, etc.)
-  - `card_present_flag`: Whether the physical card was present
-  - `card_transaction_timestamp`: When the card transaction occurred
+- **Blockchain Details**:
+  - `blockchain_transaction_hash`: Hash of the transaction on the blockchain
+  - `block_number`: Block number where the transaction was included
+  - `block_timestamp`: Timestamp of the block
+  - `confirmation_count`: Number of confirmations for the transaction
 
-- **Financial Details**:
-  - `card_currency_conversion_rate`: Exchange rate if currency conversion occurred
-  - `card_fee_amount`: Fee charged for the card transaction
-  - `card_fee_currency`: Currency of the fee
-  - `card_installment_plan`: Installment plan details if applicable
+- **Fee Information**:
+  - `gas_price`: Price of gas used for the transaction
+  - `gas_used`: Amount of gas used for the transaction
+  - `transaction_fee`: Fee paid for the transaction
+  - `fee_currency`: Currency of the fee
 
-- **Risk Management**:
-  - `card_fraud_flag`: Whether the transaction was flagged for potential fraud
-  - `card_holder_country`: Country code of the cardholder
-
-#### Direct Debit Operations (`TRANSACTION_LINE_DIRECT_DEBIT`)
-
-- **Mandate Information**:
-  - `direct_debit_mandate_id`: ID of the direct debit mandate
-  - `direct_debit_creditor_id`: ID of the creditor
-  - `direct_debit_reference`: Reference for the direct debit
-  - `direct_debit_sequence_type`: Type of sequence (FRST, RCUR, FNAL, OOFF)
-
-- **Timing Information**:
-  - `direct_debit_due_date`: Due date for the direct debit
-  - `direct_debit_authorization_date`: When the mandate was authorized
-  - `direct_debit_revocation_date`: When the mandate was revoked (if applicable)
-
-- **Debtor Details**:
-  - `direct_debit_debtor_name`: Name of the debtor
-  - `direct_debit_debtor_address`: Address of the debtor
-  - `direct_debit_debtor_contact`: Contact information for the debtor
-
-- **Processing Information**:
-  - `direct_debit_payment_method`: Method of payment
-  - `direct_debit_processing_status`: Current processing status
-  - `direct_debit_spanish_scheme`: Spanish-specific scheme information
-
-#### SEPA Transfers (`TRANSACTION_LINE_SEPA_TRANSFER`)
-
-- **Identification**:
-  - `sepa_end_to_end_id`: End-to-end ID for the SEPA transfer
-  - `sepa_remittance_info`: Remittance information
-  - `sepa_creditor_id`: ID of the creditor
-  - `sepa_debtor_id`: ID of the debtor
-
-- **Bank Details**:
-  - `sepa_origin_iban`: IBAN of the origin account
-  - `sepa_origin_bic`: BIC of the origin bank
-  - `sepa_destination_iban`: IBAN of the destination account
-  - `sepa_destination_bic`: BIC of the destination bank
-  - `sepa_initiating_agent_bic`: BIC of the initiating agent
-  - `sepa_intermediary_bic`: BIC of any intermediary bank
-
-- **Transfer Details**:
-  - `sepa_transaction_purpose`: Purpose code for the transfer
-  - `sepa_requested_execution_date`: Requested date of execution
-  - `sepa_processing_date`: When the transfer was processed
-  - `sepa_transaction_status`: Status of the SEPA transaction
-  - `sepa_payment_scheme`: Scheme used (SCT, SCT_INST)
-
-- **Financial Details**:
-  - `sepa_exchange_rate`: Exchange rate if currency conversion occurred
-  - `sepa_fee_amount`: Fee charged for the transfer
-  - `sepa_fee_currency`: Currency of the fee
-
-- **Recipient Information**:
-  - `sepa_recipient_name`: Name of the recipient
-  - `sepa_recipient_address`: Address of the recipient
-  - `sepa_notes`: Additional notes
-
-#### Wire Transfers (`TRANSACTION_LINE_WIRE_TRANSFER`)
-
-- **Identification**:
-  - `wire_transfer_reference`: Reference for the wire transfer
-  - `wire_instructing_party`: Party instructing the transfer
-
-- **Bank Details**:
-  - `wire_origin_swift_bic`: SWIFT/BIC of the origin bank
-  - `wire_destination_swift_bic`: SWIFT/BIC of the destination bank
-  - `wire_origin_account_number`: Account number of the origin
-  - `wire_destination_account_number`: Account number of the destination
-
-- **Transfer Details**:
-  - `wire_transfer_purpose`: Purpose of the transfer
-  - `wire_transfer_priority`: Priority of the transfer (NORMAL, URGENT, etc.)
-  - `wire_processing_date`: When the transfer was processed
-  - `wire_transaction_notes`: Additional notes
-  - `wire_reception_status`: Status of reception
-  - `wire_decline_reason`: Reason if declined
-  - `wire_cancelled_flag`: Whether the transfer was cancelled
-
-- **Financial Details**:
-  - `wire_exchange_rate`: Exchange rate if currency conversion occurred
-  - `wire_fee_amount`: Fee charged for the transfer
-  - `wire_fee_currency`: Currency of the fee
-
-- **Beneficiary Information**:
-  - `wire_beneficiary_name`: Name of the beneficiary
-  - `wire_beneficiary_address`: Address of the beneficiary
-
-- **Regulatory Information**:
-  - `bank_of_spain_reg_code`: Regulatory code for Bank of Spain reporting
-
-Additional transaction line types include:
-
-- **Standing Orders** (`TRANSACTION_LINE_STANDING_ORDER`): For recurring scheduled payments
-- **Deposits** (`TRANSACTION_LINE_DEPOSIT`): For cash or check deposits
-- **Withdrawals** (`TRANSACTION_LINE_WITHDRAWAL`): For cash withdrawals
-- **Fees** (`TRANSACTION_LINE_FEE`): For various banking fees
-- **Interest** (`TRANSACTION_LINE_INTEREST`): For interest payments or charges
-- **Transfers** (`TRANSACTION_LINE_TRANSFER`): For internal transfers between accounts
+- **Status Information**:
+  - `network_status`: Status of the transaction on the network
 
 ### Entity Relationships
 
@@ -851,21 +614,19 @@ The Core Banking Ledger system has a well-defined set of relationships between e
 
 - **Transaction to Transaction**: Self-referential relationship. A transaction can be related to another transaction (e.g., a reversal transaction references the original transaction).
 
-#### Transaction Line Relationships
+#### Blockchain & Crypto Relationships
 
-- **Transaction to Transaction Line**: One-to-one relationships between a transaction and its type-specific line. Each transaction can have only one specialized line of a given type.
+- **Transaction to Blockchain Network**: Many-to-one relationship. A cryptocurrency transaction is associated with a specific blockchain network.
 
-- **Transaction Line Types**: The system supports multiple transaction line types, each with its own table and specific attributes:
-  - Card Transactions
-  - Direct Debit Operations
-  - SEPA Transfers
-  - Wire Transfers
-  - Standing Orders
-  - Deposits
-  - Withdrawals
-  - Fees
-  - Interest
-  - Transfers
+- **Transaction to Transaction Line Crypto**: One-to-one relationship. A cryptocurrency transaction has one specialized crypto transaction line.
+
+- **Transaction Line Crypto to Crypto Asset**: Many-to-one relationship. A crypto transaction line references a specific crypto asset.
+
+- **Crypto Asset to Blockchain Network**: Many-to-one relationship. A crypto asset belongs to a specific blockchain network.
+
+- **Crypto Asset to NFT Metadata**: One-to-many relationship. An NFT crypto asset can have multiple token instances, each with its own metadata.
+
+- **Money to Crypto Asset**: Many-to-one relationship. A money value can reference a specific crypto asset when representing cryptocurrency amounts.
 
 #### External References
 
@@ -916,6 +677,28 @@ server:
   port: 8080
   shutdown: graceful
 
+# Blockchain configuration
+blockchain:
+  networks:
+    ethereum:
+      enabled: true
+      rpc-url: ${ETH_RPC_URL}
+      chain-id: ${ETH_CHAIN_ID}
+      explorer-url: ${ETH_EXPLORER_URL}
+      gas-price-strategy: MEDIUM
+      confirmation-blocks: 12
+    bitcoin:
+      enabled: ${BTC_ENABLED:false}
+      rpc-url: ${BTC_RPC_URL:}
+      rpc-user: ${BTC_RPC_USER:}
+      rpc-password: ${BTC_RPC_PASSWORD:}
+      confirmation-blocks: 6
+  event-listener:
+    polling-interval-seconds: 15
+    max-blocks-per-poll: 100
+    retry-delay-seconds: 30
+    max-retries: 5
+
 springdoc:
   api-docs:
     enabled: true
@@ -942,6 +725,13 @@ The application uses the following environment variables for configuration:
 | `DB_SSL_MODE` | Database SSL mode | prefer |
 | `DB_USERNAME` | Database username | postgres |
 | `DB_PASSWORD` | Database password | postgres |
+| `ETH_RPC_URL` | Ethereum RPC URL | - |
+| `ETH_CHAIN_ID` | Ethereum chain ID | 1 (mainnet) |
+| `ETH_EXPLORER_URL` | Ethereum explorer URL | https://etherscan.io |
+| `BTC_ENABLED` | Enable Bitcoin support | false |
+| `BTC_RPC_URL` | Bitcoin RPC URL | - |
+| `BTC_RPC_USER` | Bitcoin RPC username | - |
+| `BTC_RPC_PASSWORD` | Bitcoin RPC password | - |
 
 You can set these environment variables in your development environment or provide them when running the Docker container.
 
@@ -949,7 +739,7 @@ You can set these environment variables in your development environment or provi
 
 ### Transaction Management
 - Create, retrieve, update, and delete transactions
-- Process various payment methods
+- Process various payment methods including cryptocurrency transactions
 - Track transaction status changes
 - Categorize transactions
 - Support for transaction reversals and related transactions
@@ -959,27 +749,65 @@ You can set these environment variables in your development environment or provi
 - Transaction legs for debit and credit entries
 - Balance calculation based on transaction legs
 - Support for multi-currency transactions
+- Support for multi-asset transactions (fiat and crypto)
 - Proper accounting for reversals and adjustments
 
 ### Event-Driven Architecture
 - Event outbox pattern for reliable event publishing
 - Domain events for transaction lifecycle
 - Asynchronous integration with other services
+- Blockchain event processing for transaction status updates
+
+### Blockchain Integration
+- Support for multiple blockchain networks (Ethereum, Bitcoin, etc.)
+- Transaction broadcasting with gas fee estimation
+- Transaction confirmation tracking
+- Blockchain event monitoring
+- Smart contract interaction
+- Address management for deposits and withdrawals
+- Secure key management and signing
+
+### Cryptocurrency Support
+- Support for various cryptocurrency transaction types:
+  - Deposits: Receive cryptocurrencies from external wallets
+  - Withdrawals: Send cryptocurrencies to external wallets
+  - Transfers: Move cryptocurrencies between internal accounts
+  - Swaps: Exchange one cryptocurrency for another
+- Token operations:
+  - Minting: Create new tokens
+  - Burning: Destroy tokens
+  - Transfers: Move tokens between accounts
+- NFT support:
+  - NFT transfers
+  - NFT metadata tracking
+- Staking operations:
+  - Staking: Lock cryptocurrencies to earn rewards
+  - Unstaking: Unlock staked cryptocurrencies
+  - Reward distribution: Distribute staking rewards
+- Crypto-specific compliance:
+  - Address risk scoring
+  - Transaction source tracking
+  - Compliance check results
 
 ### Regulatory Compliance
 - AML risk scoring and screening results
 - Strong Customer Authentication (SCA) tracking
 - Support for instant payments and confirmation of payee
 - Designed for PSD3 and EU Instant Payments Regulation 2024/886
+- Crypto-specific compliance checks and risk scoring
 
 ### Security & Privacy
 - Transaction attachments with hash verification
 - Optimistic locking to prevent concurrent updates
+- Secure blockchain key management
+- Address validation and risk assessment
 
 ### Reporting
+- Account and account space statements
 - Transaction history reports
 - Audit reports
 - Transaction leg reports for accounting reconciliation
+- Cryptocurrency holdings reports
 
 ## 🧪 Testing
 
@@ -991,14 +819,18 @@ mvn test
 
 # Run specific test class
 mvn test -Dtest=TransactionServiceImplTest
+
+# Run crypto-specific tests
+mvn test -Dtest=TransactionServiceImplTest_CryptoMethods
 ```
 
 The tests cover all major components of the system, including:
 - Transaction services
-
 - Transaction line services for different payment methods
 - Transaction categorization
 - Status history tracking
+- Blockchain integration services
+- Cryptocurrency transaction processing
 
 ## 📚 API Documentation
 
@@ -1028,9 +860,29 @@ The Core Banking Ledger system provides the following REST controllers for inter
 #### Event & Integration Controllers
 - **EventOutboxController**: Manages the event outbox for reliable event publishing
 
+#### Blockchain & Crypto Controllers
+- **BlockchainController**: Manages blockchain interactions
+  - Send transactions to blockchain networks
+  - Get transaction status from blockchain
+  - Track transaction confirmations
+  - Get gas prices
+  - Estimate gas for transactions
+- **BlockchainEventListenerController**: Manages blockchain event listening
+  - Listen for deposit events
+  - Listen for token transfer events
+  - Listen for smart contract events
+  - Register addresses for monitoring
+- **BlockchainConfirmationController**: Manages blockchain transaction confirmations
+  - Track confirmations for transactions
+  - Check transaction status on blockchain
+- **CryptoTransactionController**: Manages cryptocurrency transactions
+  - Create crypto deposits
+  - Create crypto withdrawals
+  - Create crypto transfers
+  - Create token operations (mint, burn, transfer)
+
 #### Attachment Controllers
 - **TransactionAttachmentController**: Manages attachments related to transactions
-
 
 #### Transaction Line Controllers
 - **TransactionLineCardController**: Manages card payment transaction lines
@@ -1043,399 +895,67 @@ The Core Banking Ledger system provides the following REST controllers for inter
 - **TransactionLineFeeController**: Manages fee transaction lines
 - **TransactionLineInterestController**: Manages interest transaction lines
 - **TransactionLineTransferController**: Manages general transfer transaction lines
-
+- **TransactionLineCryptoController**: Manages cryptocurrency transaction lines
 
 ### API Examples Guided by Flows
 
 Below are examples of common API workflows in the Core Banking Ledger system. Each example shows the sequence of API calls needed to complete a specific business process.
 
-#### Transaction Processing Flows
+#### Cryptocurrency Deposit Flow
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant TransactionController
+    participant CryptoTransactionController
     participant TransactionService
-    participant TransactionLegService
-    participant EventOutboxService
+    participant BlockchainEventListener
     participant Database
-
-    Client->>TransactionController: Create Transaction Request
-    TransactionController->>TransactionService: createTransaction()
+    
+    Client->>BlockchainEventListener: Register Address for Monitoring
+    BlockchainEventListener->>Database: Save Monitored Address
+    BlockchainEventListener-->>Client: Address Registered
+    
+    BlockchainEventListener->>BlockchainEventListener: Listen for Deposits
+    BlockchainEventListener->>Database: Detect Incoming Transaction
+    BlockchainEventListener->>TransactionService: Create Crypto Deposit
     TransactionService->>Database: Save Transaction
-    Database-->>TransactionService: Return Transaction ID
-    TransactionService->>TransactionLegService: createTransactionLegs()
-    TransactionLegService->>Database: Save Debit Leg
-    TransactionLegService->>Database: Save Credit Leg
-    Database-->>TransactionLegService: Return Leg IDs
-    TransactionService->>EventOutboxService: publishEvent(TRANSACTION_CREATED)
-    EventOutboxService->>Database: Save Event to Outbox
-    TransactionService-->>TransactionController: Return Transaction
-    TransactionController-->>Client: Transaction Created Response
+    TransactionService->>Database: Save Transaction Line Crypto
+    TransactionService->>Database: Save Transaction Legs
+    TransactionService-->>BlockchainEventListener: Return Transaction
+    BlockchainEventListener-->>Client: Notify Deposit Received
 ```
 
-#### Reversal Transaction Flow
+#### Cryptocurrency Withdrawal Flow
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant TransactionController
+    participant CryptoTransactionController
     participant TransactionService
-    participant TransactionLegService
-    participant EventOutboxService
+    participant BlockchainService
+    participant BlockchainConfirmationService
     participant Database
-
-    Client->>TransactionController: Create Reversal Request
-    TransactionController->>TransactionService: createReversalTransaction()
-    TransactionService->>Database: Fetch Original Transaction
-    Database-->>TransactionService: Return Original Transaction
-    TransactionService->>Database: Save Reversal Transaction
-    Database-->>TransactionService: Return Reversal Transaction ID
-    TransactionService->>TransactionLegService: createReversalLegs()
-    TransactionLegService->>Database: Save Credit Leg (was Debit)
-    TransactionLegService->>Database: Save Debit Leg (was Credit)
-    Database-->>TransactionLegService: Return Leg IDs
-    TransactionService->>EventOutboxService: publishEvent(REVERSAL_TRANSACTION_CREATED)
-    EventOutboxService->>Database: Save Event to Outbox
-    TransactionService-->>TransactionController: Return Reversal Transaction
-    TransactionController-->>Client: Reversal Created Response
-```
-
-#### Transaction Status Change Flow
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant TransactionController
-    participant TransactionService
-    participant TransactionStatusHistoryService
-    participant EventOutboxService
-    participant Database
-
-    Client->>TransactionController: Update Status Request
-    TransactionController->>TransactionService: updateTransactionStatus()
-    TransactionService->>Database: Fetch Transaction
-    Database-->>TransactionService: Return Transaction
-    TransactionService->>TransactionStatusHistoryService: createStatusHistory()
-    TransactionStatusHistoryService->>Database: Save Status History
+    
+    Client->>CryptoTransactionController: Create Withdrawal Request
+    CryptoTransactionController->>TransactionService: Create Crypto Withdrawal
+    TransactionService->>Database: Save Transaction (PENDING)
+    TransactionService->>Database: Save Transaction Line Crypto
+    TransactionService->>Database: Save Transaction Legs
+    TransactionService-->>CryptoTransactionController: Return Transaction
+    CryptoTransactionController-->>Client: Withdrawal Created
+    
+    Client->>CryptoTransactionController: Approve Withdrawal
+    CryptoTransactionController->>TransactionService: Update Status (APPROVED)
+    TransactionService->>BlockchainService: Send Transaction to Blockchain
+    BlockchainService->>Database: Update with Transaction Hash
+    BlockchainService-->>TransactionService: Return Transaction Hash
+    
+    BlockchainConfirmationService->>BlockchainConfirmationService: Track Confirmations
+    BlockchainConfirmationService->>TransactionService: Update Status (COMPLETED)
     TransactionService->>Database: Update Transaction Status
-    TransactionService->>EventOutboxService: publishEvent(TRANSACTION_STATUS_CHANGED)
-    EventOutboxService->>Database: Save Event to Outbox
-    TransactionService-->>TransactionController: Return Updated Transaction
-    TransactionController-->>Client: Status Updated Response
+    TransactionService-->>BlockchainConfirmationService: Status Updated
+    BlockchainConfirmationService-->>Client: Notify Withdrawal Completed
 ```
-
-#### 1. Creating a Transaction with Category Reference
-
-This flow demonstrates how to create a transaction with a reference to a category in the external master data microservice.
-
-**Step 1: Create a Transaction**
-
-Request:
-```json
-POST /api/v1/transactions
-Content-Type: application/json
-
-{
-  "externalReference": "INV-2023-12345",
-  "transactionDate": "2023-06-15T14:30:00",
-  "valueDate": "2023-06-15T14:30:00",
-  "bookingDate": "2023-06-15T14:35:00",
-  "transactionType": "PAYMENT",
-  "transactionStatus": "PENDING",
-  "totalAmount": 125.50,
-  "currency": "EUR",
-  "description": "Electricity bill payment",
-  "initiatingParty": "John Doe",
-  "accountId": 5001,
-  "accountSpaceId": 101,
-  "transactionCategoryId": 1001,
-  "requestId": "req-uuid-123456789",
-  "amlRiskScore": 10,
-  "amlScreeningResult": "PASSED",
-  "instantFlag": false
-}
-```
-
-Response:
-```json
-{
-  "transactionId": 10001,
-  "externalReference": "INV-2023-12345",
-  "transactionDate": "2023-06-15T14:30:00",
-  "valueDate": "2023-06-15T14:30:00",
-  "bookingDate": "2023-06-15T14:35:00",
-  "transactionType": "PAYMENT",
-  "transactionStatus": "PENDING",
-  "totalAmount": 125.50,
-  "currency": "EUR",
-  "description": "Electricity bill payment",
-  "initiatingParty": "John Doe",
-  "accountId": 5001,
-  "accountSpaceId": 101,
-  "transactionCategoryId": 1001,
-  "requestId": "req-uuid-123456789",
-  "rowVersion": 1,
-  "amlRiskScore": 10,
-  "amlScreeningResult": "PASSED",
-  "amlLargeTxnFlag": false,
-  "instantFlag": false,
-  "dateCreated": "2023-06-15T14:30:05",
-  "dateUpdated": "2023-06-15T14:30:05"
-}
-```
-
-**Step 2: Create Transaction Legs for Double-Entry Accounting**
-
-Debit Leg Request:
-```json
-POST /api/v1/transactions/10001/legs
-Content-Type: application/json
-
-{
-  "accountId": 5001,
-  "accountSpaceId": 101,
-  "legType": "DEBIT",
-  "amount": 125.50,
-  "currency": "EUR",
-  "description": "Debit from customer account",
-  "valueDate": "2023-06-15T14:30:00",
-  "bookingDate": "2023-06-15T14:35:00"
-}
-```
-
-Credit Leg Request:
-```json
-POST /api/v1/transactions/10001/legs
-Content-Type: application/json
-
-{
-  "accountId": 9001,
-  "accountSpaceId": 101,
-  "legType": "CREDIT",
-  "amount": 125.50,
-  "currency": "EUR",
-  "description": "Credit to utility provider",
-  "valueDate": "2023-06-15T14:30:00",
-  "bookingDate": "2023-06-15T14:35:00"
-}
-```
-
-**Step 3: Update Transaction Status**
-
-Request:
-```json
-PATCH /api/v1/transactions/10001/status
-Content-Type: application/json
-
-{
-  "transactionStatus": "COMPLETED",
-  "rowVersion": 1,
-  "reason": "Payment processed successfully"
-}
-```
-
-Response:
-```json
-{
-  "transactionId": 10001,
-  "externalReference": "INV-2023-12345",
-  "transactionDate": "2023-06-15T14:30:00",
-  "valueDate": "2023-06-15T14:30:00",
-  "bookingDate": "2023-06-15T14:35:00",
-  "transactionType": "PAYMENT",
-  "transactionStatus": "COMPLETED",
-  "totalAmount": 125.50,
-  "currency": "EUR",
-  "description": "Electricity bill payment",
-  "initiatingParty": "John Doe",
-  "accountId": 5001,
-  "accountSpaceId": 101,
-  "transactionCategoryId": 1001,
-  "requestId": "req-uuid-123456789",
-  "rowVersion": 2,
-  "amlRiskScore": 10,
-  "amlScreeningResult": "PASSED",
-  "amlLargeTxnFlag": false,
-  "instantFlag": false,
-  "dateCreated": "2023-06-15T14:30:05",
-  "dateUpdated": "2023-06-15T14:40:10"
-}
-```
-
-#### 2. Recording a SEPA Transfer with Instant Payment
-
-This flow demonstrates how to create a SEPA transfer with instant payment flag and confirmation of payee checks.
-
-**Step 1: Create the Base Transaction**
-
-Request:
-```json
-POST /api/v1/transactions
-Content-Type: application/json
-
-{
-  "externalReference": "SEPA-2023-1234",
-  "transactionDate": "2023-06-17T09:00:00",
-  "valueDate": "2023-06-17T09:00:00",
-  "bookingDate": "2023-06-17T09:00:10",
-  "transactionType": "SEPA_TRANSFER",
-  "transactionStatus": "PENDING",
-  "totalAmount": 1000.00,
-  "currency": "EUR",
-  "description": "Monthly rent payment",
-  "initiatingParty": "John Doe",
-  "accountId": 5001,
-  "accountSpaceId": 101,
-  "requestId": "sepa-req-uuid-123456789",
-  "instantFlag": true,
-  "confirmationOfPayeeResult": "OK",
-  "amlRiskScore": 15,
-  "amlScreeningResult": "PASSED",
-  "scaMethod": "MOBILE_APP",
-  "scaResult": "SUCCESS"
-}
-```
-
-**Step 2: Add SEPA-Specific Details**
-
-Request:
-```json
-POST /api/v1/transactions/10003/line-sepa
-Content-Type: application/json
-
-{
-  "sepaEndToEndId": "E2E-REF-12345",
-  "sepaRemittanceInfo": "Monthly rent payment for June 2023",
-  "sepaOriginIban": "ES9121000418450200051332",
-  "sepaOriginBic": "CAIXESBBXXX",
-  "sepaDestinationIban": "DE89370400440532013000",
-  "sepaDestinationBic": "DEUTDEFFXXX",
-  "sepaTransactionStatus": "ACCEPTED",
-  "sepaCreditorId": "DE98ZZZ09999999999",
-  "sepaDebtorId": "ES12ZZZ12345678901",
-  "sepaInitiatingAgentBic": "CAIXESBBXXX",
-  "sepaTransactionPurpose": "RENT",
-  "sepaRequestedExecutionDate": "2023-06-17",
-  "sepaFeeAmount": 2.50,
-  "sepaFeeCurrency": "EUR",
-  "sepaRecipientName": "Rental Company GmbH",
-  "sepaRecipientAddress": "Hauptstrasse 1, 10115 Berlin, Germany",
-  "sepaProcessingDate": "2023-06-17T09:00:20",
-  "sepaPaymentScheme": "SCT_INST"
-}
-```
-
-#### 3. Generating an Account Statement
-
-This flow demonstrates how to generate a monthly statement for an account.
-
-Request:
-```json
-POST /api/v1/accounts/5001/statements
-Content-Type: application/json
-
-{
-  "periodType": "MONTHLY",
-  "month": 6,
-  "year": 2023,
-  "includePending": true,
-  "includeDetails": true
-}
-```
-
-Response:
-```json
-{
-  "statementId": 1001,
-  "accountId": 5001,
-  "periodType": "MONTHLY",
-  "startDate": "2023-06-01",
-  "endDate": "2023-06-30",
-  "generationDate": "2023-07-01T00:05:23",
-  "transactionCount": 15,
-  "includedPending": true,
-  "includedDetails": true,
-  "transactions": [
-    {
-      "transactionId": 10001,
-      "externalReference": "INV-2023-12345",
-      "transactionDate": "2023-06-15T14:30:00",
-      "transactionType": "PAYMENT",
-      "transactionStatus": "COMPLETED",
-      "totalAmount": 125.50,
-      "currency": "EUR",
-      "description": "Electricity bill payment"
-    },
-    {
-      "transactionId": 10003,
-      "externalReference": "SEPA-2023-1234",
-      "transactionDate": "2023-06-17T09:00:00",
-      "transactionType": "SEPA_TRANSFER",
-      "transactionStatus": "COMPLETED",
-      "totalAmount": 1000.00,
-      "currency": "EUR",
-      "description": "Monthly rent payment"
-    }
-    // Additional transactions...
-  ]
-}
-```
-
-## 🛠️ Key Features
-
-### Transaction Management
-- Create, retrieve, update, and delete transactions
-- Process various payment methods
-- Track transaction status changes
-- Categorize transactions
-- Support for transaction reversals and related transactions
-- Idempotent transaction processing with unique external references
-
-### Double-Entry Accounting
-- Transaction legs for debit and credit entries
-- Balance calculation based on transaction legs
-- Support for multi-currency transactions
-- Proper accounting for reversals and adjustments
-
-### Event-Driven Architecture
-- Event outbox pattern for reliable event publishing
-- Domain events for transaction lifecycle
-- Asynchronous integration with other services
-
-### Regulatory Compliance
-- AML risk scoring and screening results
-- Strong Customer Authentication (SCA) tracking
-- Support for instant payments and confirmation of payee
-- Designed for PSD3 and EU Instant Payments Regulation 2024/886
-
-### Security & Privacy
-- Transaction attachments with hash verification
-- Optimistic locking to prevent concurrent updates
-
-### Reporting
-- Account and account space statements
-- Transaction history reports
-- Audit reports
-- Transaction leg reports for accounting reconciliation
-
-## 🧰 Testing
-
-The project includes comprehensive unit and integration tests. All tests are currently passing (98 tests in total).
-
-```bash
-# Run all tests
-mvn test
-
-# Run specific test class
-mvn test -Dtest=TransactionServiceImplTest
-```
-
-The tests cover all major components of the system, including:
-- Transaction services
-- Transaction line services for different payment methods
-- Transaction categorization
-- Status history tracking
 
 ## 📝 Monitoring and Logging
 
@@ -1447,6 +967,7 @@ The Core Banking Ledger system includes comprehensive monitoring and logging cap
 - Configurable log levels (INFO, DEBUG, ERROR, etc.)
 - Transaction audit logging for regulatory compliance
 - Error logging with detailed exception information
+- Blockchain transaction logging for tracking on-chain activities
 
 ### Monitoring
 
@@ -1454,12 +975,14 @@ The Core Banking Ledger system includes comprehensive monitoring and logging cap
 - Prometheus metrics for performance monitoring
 - Micrometer integration for collecting application metrics
 - Dashboard templates for Grafana visualization
+- Blockchain-specific metrics for monitoring network interactions
 
 ### Alerting
 
 - Configurable alert thresholds for critical metrics
 - Integration with notification systems
 - Automated incident response workflows
+- Blockchain confirmation alerts for delayed transactions
 
 ## 💪 Contributing
 
@@ -1476,4 +999,3 @@ Please ensure your code follows the project's coding standards and includes appr
 ## 📜 License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-

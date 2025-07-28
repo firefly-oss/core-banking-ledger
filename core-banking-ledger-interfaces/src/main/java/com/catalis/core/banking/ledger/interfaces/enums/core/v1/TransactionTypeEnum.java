@@ -11,5 +11,17 @@ public enum TransactionTypeEnum {
     ACH,
     CARD,
     DIRECT_DEBIT,
-    SEPA_TRANSFER
+    SEPA_TRANSFER,
+    
+    // Crypto-specific transaction types
+    CRYPTO_DEPOSIT,
+    CRYPTO_WITHDRAWAL,
+    CRYPTO_TRANSFER,
+    CRYPTO_SWAP,
+    TOKEN_MINT,
+    TOKEN_BURN,
+    NFT_TRANSFER,
+    STAKING,
+    UNSTAKING,
+    REWARD
 }
