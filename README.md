@@ -648,8 +648,8 @@ spring:
     version: 1.0.0
     description: Banking Ledger Core Application
     team:
-      name: Catalis Development
-      email: dev@catalis.com
+      name: Firefly Software Solutions Inc
+      email: dev@getfirefly.io
 
   r2dbc:
     pool:
