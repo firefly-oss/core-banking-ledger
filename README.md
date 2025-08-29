@@ -709,7 +709,7 @@ springdoc:
     operationsSorter: method
     docExpansion: none
     filter: true
-  packages-to-scan: com.catalis.core.banking.ledger.web.controllers
+  packages-to-scan: com.firefly.core.banking.ledger.web.controllers
   paths-to-match: /api/**
 ```
 

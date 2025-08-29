@@ -4,8 +4,8 @@ spring:
     version: 1.0.0
     description: Banking Ledger Core Application
     team:
-      name: Catalis Development
-      email: dev@catalis.com
+      name: Firefly Software Solutions Inc
+      email: dev@getfirefly.io
 
   r2dbc:
     pool:
@@ -30,7 +30,8 @@ spring:
       enabled: true
 
 server:
-  port: 8080
+  address: ${SERVER_ADDRESS:localhost}
+  port: ${SERVER_PORT:8080}
   shutdown: graceful
 
 springdoc:
