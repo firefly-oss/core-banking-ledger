@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.withdrawal.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.withdrawal.v1.TransactionLineWithdrawalMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.withdrawal.v1.TransactionLineWithdrawalDTO;
 import com.firefly.core.banking.ledger.models.entities.withdrawal.v1.TransactionLineWithdrawal;
@@ -24,14 +26,14 @@ public class TransactionLineWithdrawalServiceImpl implements TransactionLineWith
     private TransactionLineWithdrawalMapper mapper;
 
     @Override
-    public Mono<TransactionLineWithdrawalDTO> getWithdrawalLine(Long transactionId) {
+    public Mono<TransactionLineWithdrawalDTO> getWithdrawalLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Withdrawal not found")));
     }
 
     @Override
-    public Mono<TransactionLineWithdrawalDTO> createWithdrawalLine(Long transactionId, TransactionLineWithdrawalDTO withdrawalDTO) {
+    public Mono<TransactionLineWithdrawalDTO> createWithdrawalLine(UUID transactionId, TransactionLineWithdrawalDTO withdrawalDTO) {
         withdrawalDTO.setTransactionId(transactionId);
         TransactionLineWithdrawal entity = mapper.toEntity(withdrawalDTO);
         return repository.save(entity)
@@ -40,7 +42,7 @@ public class TransactionLineWithdrawalServiceImpl implements TransactionLineWith
     }
 
     @Override
-    public Mono<TransactionLineWithdrawalDTO> updateWithdrawalLine(Long transactionId, TransactionLineWithdrawalDTO withdrawalDTO) {
+    public Mono<TransactionLineWithdrawalDTO> updateWithdrawalLine(UUID transactionId, TransactionLineWithdrawalDTO withdrawalDTO) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(existingEntity -> {
                     TransactionLineWithdrawal updatedEntity = mapper.toEntity(withdrawalDTO);
@@ -53,7 +55,7 @@ public class TransactionLineWithdrawalServiceImpl implements TransactionLineWith
     }
 
     @Override
-    public Mono<Void> deleteWithdrawalLine(Long transactionId) {
+    public Mono<Void> deleteWithdrawalLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(entity -> repository.delete(entity))
                 .switchIfEmpty(Mono.empty());

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing detailed information about an ACH (Automated Clearing House) transaction.
  */
@@ -23,19 +24,19 @@ import java.time.LocalDateTime;
 public class TransactionLineAch extends BaseEntity {
     @Id
     @Column("transaction_line_ach_id")
-    private Long transactionLineAchId;
+    private UUID transactionLineAchId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("ach_reference")
     private String achReference;
 
     @Column("ach_source_account_id")
-    private Long achSourceAccountId;
+    private UUID achSourceAccountId;
 
     @Column("ach_destination_account_id")
-    private Long achDestinationAccountId;
+    private UUID achDestinationAccountId;
 
     @Column("ach_source_account_number")
     private String achSourceAccountNumber;

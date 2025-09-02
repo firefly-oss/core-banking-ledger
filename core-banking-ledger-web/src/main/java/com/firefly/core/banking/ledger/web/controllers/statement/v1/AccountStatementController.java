@@ -3,9 +3,7 @@ package com.firefly.core.banking.ledger.web.controllers.statement.v1;
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.statement.v1.StatementService;
-import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementDTO;
 import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementMetadataDTO;
-import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,39 +20,20 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
+import java.util.UUID;
 /**
- * REST controller for managing account statements.
+ * REST controller for managing account statement records.
+ * Provides basic CRUD operations for statement data persistence.
  */
 @RestController
 @RequestMapping("/api/v1/accounts/{accountId}/statements")
-@Tag(name = "Account Statements", description = "API endpoints for managing account statements")
+@Tag(name = "Account Statements", description = "API endpoints for managing account statement records")
 public class AccountStatementController {
 
     @Autowired
     private StatementService service;
 
-    @Operation(
-            summary = "Generate Account Statement",
-            description = "Generate a new statement for a specific account based on the provided parameters."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Statement generated successfully",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StatementDTO.class))
-    )
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<StatementDTO>> generateStatement(
-            @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
 
-            @Parameter(description = "Statement request parameters", required = true,
-                    schema = @Schema(implementation = StatementRequestDTO.class))
-            @RequestBody StatementRequestDTO requestDTO
-    ) {
-        return service.generateAccountStatement(accountId, requestDTO)
-                .map(statement -> ResponseEntity.ok().body(statement))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
 
     @Operation(
             summary = "List Account Statements",
@@ -68,7 +47,7 @@ public class AccountStatementController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<StatementMetadataDTO>>> listStatements(
             @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
+            @PathVariable UUID accountId,
             @ParameterObject
             @ModelAttribute PaginationRequest paginationRequest
     ) {
@@ -89,7 +68,7 @@ public class AccountStatementController {
     @GetMapping(value = "/date-range", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<StatementMetadataDTO>>> listStatementsByDateRange(
             @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
+            @PathVariable UUID accountId,
 
             @Parameter(description = "Start date (ISO format)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -117,10 +96,10 @@ public class AccountStatementController {
     @GetMapping(value = "/{statementId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<StatementMetadataDTO>> getStatement(
             @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
+            @PathVariable UUID accountId,
 
             @Parameter(description = "Statement ID", required = true)
-            @PathVariable Long statementId
+            @PathVariable UUID statementId
     ) {
         return service.getStatement(statementId)
                 .filter(statement -> statement.getAccountId() != null && statement.getAccountId().equals(accountId))

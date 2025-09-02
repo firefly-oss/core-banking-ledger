@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,10 +20,10 @@ import java.time.LocalDateTime;
 public class TransactionLineCard extends BaseEntity {
     @Id
     @Column("transaction_line_card_id")
-    private Long transactionLineCardId;
+    private UUID transactionLineCardId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("card_auth_code")
     private String cardAuthCode;

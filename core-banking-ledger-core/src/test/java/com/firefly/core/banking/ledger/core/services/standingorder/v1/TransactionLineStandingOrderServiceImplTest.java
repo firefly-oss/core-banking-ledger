@@ -8,6 +8,7 @@ import com.firefly.core.banking.ledger.models.entities.standingorder.v1.Transact
 import com.firefly.core.banking.ledger.models.repositories.standingorder.v1.TransactionLineStandingOrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,8 +36,8 @@ public class TransactionLineStandingOrderServiceImplTest {
 
     private TransactionLineStandingOrderDTO standingOrderDTO;
     private TransactionLineStandingOrder standingOrderEntity;
-    private final Long transactionId = 1L;
-    private final Long standingOrderId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID standingOrderId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {

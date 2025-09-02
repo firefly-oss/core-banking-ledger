@@ -8,6 +8,7 @@ import com.firefly.core.banking.ledger.models.entities.sepa.v1.TransactionLineSe
 import com.firefly.core.banking.ledger.models.repositories.sepa.v1.TransactionLineSepaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,8 +37,8 @@ public class TransactionLineSepaTransferServiceImplTest {
 
     private TransactionLineSepaTransferDTO sepaDTO;
     private TransactionLineSepaTransfer sepaEntity;
-    private final Long transactionId = 1L;
-    private final Long sepaId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID sepaId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -56,8 +57,8 @@ public class TransactionLineSepaTransferServiceImplTest {
         sepaDTO.setSepaDebtorId("DEBTOR456");
         sepaDTO.setSepaTransactionPurpose("SERVICES");
         sepaDTO.setSepaRequestedExecutionDate(LocalDate.now().plusDays(1));
-        sepaDTO.setSepaExchangeRate(new BigDecimal("1.1"));
-        sepaDTO.setSepaFeeAmount(new BigDecimal("5.00"));
+        sepaDTO.setSepaExchangeRate(new BigDecimal("1.15"));
+        sepaDTO.setSepaFeeAmount(new BigDecimal("10.00"));
         sepaDTO.setSepaFeeCurrency("EUR");
         sepaDTO.setSepaRecipientName("John Doe");
         sepaDTO.setSepaRecipientAddress("123 Main St, Berlin, Germany");
@@ -79,8 +80,8 @@ public class TransactionLineSepaTransferServiceImplTest {
         sepaEntity.setSepaDebtorId("DEBTOR456");
         sepaEntity.setSepaTransactionPurpose("SERVICES");
         sepaEntity.setSepaRequestedExecutionDate(LocalDate.now().plusDays(1));
-        sepaEntity.setSepaExchangeRate(new BigDecimal("1.1"));
-        sepaEntity.setSepaFeeAmount(new BigDecimal("5.00"));
+        sepaEntity.setSepaExchangeRate(new BigDecimal("1.15"));
+        sepaEntity.setSepaFeeAmount(new BigDecimal("10.00"));
         sepaEntity.setSepaFeeCurrency("EUR");
         sepaEntity.setSepaRecipientName("John Doe");
         sepaEntity.setSepaRecipientAddress("123 Main St, Berlin, Germany");

@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.attachment.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.interfaces.dtos.attachment.v1.TransactionAttachmentDTO;
@@ -17,7 +19,7 @@ public interface TransactionAttachmentService {
      * @param attachmentDTO The attachment data.
      * @return The created attachment.
      */
-    Mono<TransactionAttachmentDTO> createAttachment(Long transactionId, TransactionAttachmentDTO attachmentDTO);
+    Mono<TransactionAttachmentDTO> createAttachment(UUID transactionId, TransactionAttachmentDTO attachmentDTO);
 
     /**
      * Get a specific transaction attachment by ID.
@@ -26,7 +28,7 @@ public interface TransactionAttachmentService {
      * @param attachmentId The ID of the attachment.
      * @return The attachment.
      */
-    Mono<TransactionAttachmentDTO> getAttachment(Long transactionId, Long attachmentId);
+    Mono<TransactionAttachmentDTO> getAttachment(UUID transactionId, UUID attachmentId);
 
     /**
      * List all attachments for a specific transaction.
@@ -35,7 +37,7 @@ public interface TransactionAttachmentService {
      * @param paginationRequest Pagination parameters.
      * @return A paginated list of attachments.
      */
-    Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachments(Long transactionId, PaginationRequest paginationRequest);
+    Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachments(UUID transactionId, PaginationRequest paginationRequest);
 
     /**
      * List all attachments of a specific type for a transaction.
@@ -46,7 +48,7 @@ public interface TransactionAttachmentService {
      * @return A paginated list of attachments.
      */
     Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachmentsByType(
-            Long transactionId,
+            UUID transactionId,
             AttachmentTypeEnum attachmentType,
             PaginationRequest paginationRequest
     );

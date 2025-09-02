@@ -1,6 +1,9 @@
 # Core Banking Ledger
 
-A comprehensive banking transaction management system designed for modern financial institutions.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green.svg)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-3.9-red.svg)](https://maven.apache.org/)
 
 ## Table of Contents
 
@@ -13,168 +16,142 @@ A comprehensive banking transaction management system designed for modern financ
    - [Module Structure](#module-structure)
    - [Key Components](#key-components)
 4. [Data Model](#-data-model)
-   - [Data Model Diagram](#data-model-diagram)
+   - [Entity Relationship Diagram](#entity-relationship-diagram)
    - [Core Entities](#core-entities)
-   - [Blockchain & Crypto Entities](#blockchain--crypto-entities)
-   - [Transaction Lines](#transaction-lines)
-   - [Entity Relationships](#entity-relationships)
-5. [Configuration](#-configuration)
+   - [Transaction Line Entities](#transaction-line-entities)
+   - [Supporting Entities](#supporting-entities)
+5. [API Documentation](#-api-documentation)
+   - [Core Controllers](#core-controllers)
+   - [Transaction Line Controllers](#transaction-line-controllers)
+   - [Supporting Controllers](#supporting-controllers)
+6. [Configuration](#-configuration)
    - [Environment Variables](#environment-variables)
-6. [Key Features](#-key-features)
+   - [Database Configuration](#database-configuration)
+7. [Key Features](#-key-features)
    - [Transaction Management](#transaction-management)
    - [Double-Entry Accounting](#double-entry-accounting)
-   - [Event-Driven Architecture](#event-driven-architecture)
-   - [Blockchain Integration](#blockchain-integration)
-   - [Cryptocurrency Support](#cryptocurrency-support)
-   - [Regulatory Compliance](#regulatory-compliance)
-   - [Security & Privacy](#security--privacy)
-   - [Reporting](#reporting)
-7. [Testing](#-testing)
-8. [API Documentation](#-api-documentation)
-   - [API Controllers](#api-controllers)
-   - [API Examples Guided by Flows](#api-examples-guided-by-flows)
-9. [Monitoring and Logging](#-monitoring-and-logging)
-10. [Contributing](#-contributing)
-11. [License](#-license)
+   - [Transaction Lines](#transaction-lines)
+   - [Status History Tracking](#status-history-tracking)
+   - [Statement Generation](#statement-generation)
+8. [Testing](#-testing)
+9. [Contributing](#-contributing)
+10. [License](#-license)
 
 ## Overview
 
-The Core Banking Ledger is a transaction management system that provides a robust foundation for financial operations. It implements double-entry accounting principles, supports various transaction types including cryptocurrency transactions, and ensures regulatory compliance while maintaining high performance and reliability.
+The **Core Banking Ledger** is a high-performance, reactive microservice designed for modern banking systems. Built with Spring Boot 3.2 and Java 21, it provides comprehensive transaction management, double-entry accounting, and multi-payment method support for banking operations.
 
-> **Note**: Transaction categories are now managed in an external master data microservice. The `transactionCategoryId` field in the Transaction entity serves as a logical reference to categories in this external service.
+This microservice is part of the **Firefly OpenCore Banking Platform** developed by **Firefly Software Solutions Inc.** and focuses exclusively on **data management and CRUD operations** for banking transactions and related entities. It does not contain business logic for financial calculations, balance computations, or payment processing - these responsibilities are handled by other microservices in the platform.
+
+### Key Characteristics
+
+- **Reactive Architecture**: Built with Spring WebFlux and R2DBC for non-blocking, high-throughput operations
+- **Multi-Payment Support**: Handles various payment methods including cards, wire transfers, SEPA, ACH, and more
+- **Double-Entry Accounting**: Maintains transaction legs for proper accounting practices
+- **Event-Driven**: Implements outbox pattern for reliable event publishing
+- **Microservice-Ready**: Designed for cloud-native deployments with external service integration
+- **Comprehensive Audit Trail**: Tracks transaction status changes and maintains detailed history
+- **UUID-Based**: Uses UUID primary keys for distributed system compatibility
+
+---
 
 ## 🚀 Quickstart
 
 ### Prerequisites
-- JDK 21
-- Maven 3.8+
-- Docker (for containerized deployment)
+
+- **Java 21** or higher
+- **Maven 3.9** or higher
+- **PostgreSQL 15** or higher
+- **Docker** (optional, for containerized deployment)
 
 ### Local Development Setup
-```bash
-# Clone the repository
-git clone https://github.com/firefly-oss/core-banking-ledger.git
-cd core-banking-ledger
 
-# Build the project
-mvn clean install
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/firefly-oss/core-banking-ledger.git
+   cd core-banking-ledger
+   ```
 
-# Run the application
-mvn spring-boot:run -pl core-banking-ledger-web
-```
+2. **Set up the database**:
+   ```bash
+   # Create PostgreSQL database
+   createdb core_banking_ledger
+   ```
+
+3. **Configure environment variables**:
+   ```bash
+   export DB_HOST=localhost
+   export DB_PORT=5432
+   export DB_NAME=core_banking_ledger
+   export DB_USERNAME=your_username
+   export DB_PASSWORD=your_password
+   export DB_SSL_MODE=disable
+   ```
+
+4. **Build and run the application**:
+   ```bash
+   mvn clean install
+   mvn spring-boot:run -pl core-banking-ledger-web
+   ```
+
+5. **Verify the application**:
+   ```bash
+   curl http://localhost:8080/actuator/health
+   ```
 
 ### Docker Deployment
-```bash
-# Build the Docker image
-mvn clean package
-docker build -t core-banking-ledger:latest .
 
-# Run the container
-docker run -p 8080:8080 core-banking-ledger:latest
-```
+1. **Build the Docker image**:
+   ```bash
+   docker build -t core-banking-ledger .
+   ```
 
-## 🏗️ Architecture
+2. **Run with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
 
-The Core Banking Ledger is designed as a modular, microservice-based system with a clear separation of concerns following domain-driven design principles. The architecture ensures scalability, maintainability, and resilience.
+---
+
+## 🏗 Architecture
 
 ### Module Structure
+
+The project follows a clean, modular architecture with clear separation of concerns:
 
 - **core-banking-ledger-interfaces**: Contains all API contracts, Data Transfer Objects (DTOs), and enumerations that define the public interface of the system. This module has minimal dependencies and serves as the contract between the system and its clients.
 
 - **core-banking-ledger-models**: Defines the data entities, repository interfaces, and database migrations. This module encapsulates the persistence layer and data access patterns, using R2DBC for reactive database access.
 
-- **core-banking-ledger-core**: Implements the business logic and service layer. This module contains the core domain logic, transaction processing rules, and service implementations. It follows the hexagonal architecture pattern with clear boundaries between the domain model and external dependencies.
+- **core-banking-ledger-core**: Implements the business logic and service layer. Contains all service implementations, validation logic, and business rules while maintaining the principle of containing only CRUD operations without complex financial calculations.
 
-- **core-banking-ledger-web**: Provides the REST API endpoints and controllers that expose the system's functionality to clients. This module handles HTTP requests, input validation, and response formatting, delegating business logic to the core module.
+- **core-banking-ledger-web**: Provides the REST API layer with Spring WebFlux controllers. Handles HTTP requests, response formatting, and API documentation through OpenAPI/Swagger.
 
+- **core-banking-ledger-sdk**: Auto-generated client SDK for easy integration with other microservices. Provides type-safe client libraries for consuming the API.
 
 ### Key Components
 
-#### Transaction Processing Engine
+- **Reactive Data Access**: Uses Spring Data R2DBC for non-blocking database operations
+- **Database Migrations**: Flyway manages schema evolution and data migrations
+- **API Documentation**: OpenAPI 3.0 specification with Swagger UI
+- **Validation**: Comprehensive input validation using Bean Validation API
+- **Monitoring**: Spring Boot Actuator for health checks and metrics
 
-The transaction processing engine is the heart of the Core Banking Ledger system. It handles various types of financial transactions with specialized processing logic for each type:
-
-- **Card Transactions**: Processes debit and credit card payments with merchant details, authorization codes, and fraud detection flags.
-- **Direct Debit Operations**: Manages automated payments to vendors with mandate information and sequence types.
-- **SEPA Transfers**: Handles European payment transfers with IBAN/BIC validation and SEPA-specific fields.
-- **Wire Transfers**: Processes international wire transfers with SWIFT codes and cross-border compliance checks.
-- **Standing Orders**: Manages recurring scheduled payments with frequency and execution tracking.
-- **Deposit Transactions**: Records cash or check deposits with detailed source information.
-- **Withdrawal Transactions**: Records cash withdrawals with ATM or branch details and limit checks.
-- **Fee Transactions**: Manages various banking fees with calculation methods and waiver tracking.
-- **Interest Transactions**: Calculates and applies interest payments or charges with accrual periods.
-- **Transfer Transactions**: Handles internal transfers between accounts with purpose codes.
-- **Cryptocurrency Transactions**: Processes cryptocurrency deposits, withdrawals, transfers, and swaps with blockchain integration.
-- **Token Operations**: Manages token minting, burning, and transfers, including NFT transactions.
-- **Staking Operations**: Handles cryptocurrency staking, unstaking, and reward distribution.
-
-#### Blockchain Integration Framework
-
-The system includes a comprehensive blockchain integration framework for interacting with various blockchain networks:
-
-- **Blockchain Network Management**: Supports multiple blockchain networks (Ethereum, Bitcoin, etc.) with network-specific configurations.
-- **Transaction Monitoring**: Listens for blockchain events like deposits, token transfers, and smart contract events.
-- **Transaction Broadcasting**: Sends transactions to blockchain networks with proper gas fee estimation.
-- **Confirmation Tracking**: Monitors transaction confirmations and updates transaction status accordingly.
-- **Address Management**: Registers and monitors blockchain addresses for incoming transactions.
-- **Smart Contract Interaction**: Interacts with smart contracts for token operations and other blockchain functions.
-
-#### Double-Entry Accounting System
-
-The system implements proper double-entry accounting principles to ensure financial integrity:
-
-- **Transaction Legs**: Each transaction consists of at least two legs (debit and credit) that always balance to zero.
-- **Balance Calculation**: Account balances are calculated based on the sum of transaction legs.
-- **Multi-Currency Support**: Handles transactions in different currencies with proper exchange rate tracking.
-- **Multi-Asset Support**: Supports both fiat currencies and cryptocurrencies with proper accounting.
-- **Booking vs. Value Date**: Distinguishes between when a transaction is booked and when it affects interest calculations.
-
-#### Event-Driven Integration Framework
-
-The system uses an event-driven architecture for reliable integration with other systems:
-
-- **Event Outbox Pattern**: Ensures reliable event publishing even in the face of failures.
-- **Domain Events**: Publishes events for transaction lifecycle (created, updated, status changed).
-- **Idempotent Processing**: Prevents duplicate transactions with unique external references and request IDs.
-- **Asynchronous Communication**: Enables loose coupling between services through event-based integration.
-- **Blockchain Event Processing**: Processes blockchain events asynchronously to update transaction status.
-
-#### Transaction Relationship Management
-
-The system tracks relationships between transactions for comprehensive financial history:
-
-- **Related Transactions**: Links transactions that are related (e.g., original transaction and its reversal).
-- **Relation Types**: Categorizes relationships as reversals, adjustments, chargebacks, or corrections.
-- **Batch Processing**: Groups related transactions with batch IDs for bulk operations.
-- **Audit Trail**: Maintains a complete history of transaction status changes with reasons.
-- **Blockchain Transaction Tracking**: Links on-chain transactions with internal ledger transactions.
-
-#### Regulatory Compliance Framework
-
-The system includes features to ensure compliance with financial regulations:
-
-- **Anti-Money Laundering (AML)**: Risk scoring, screening results, and large transaction flagging.
-- **Strong Customer Authentication (SCA)**: Tracks authentication methods and results for PSD2/PSD3 compliance.
-- **Instant Payments**: Supports instant payment schemes with confirmation of payee functionality.
-- **EU Regulations**: Designed for PSD3 and EU Instant Payments Regulation 2024/886 compliance.
-- **Spanish Tax Reporting**: Includes fields for Spanish tax codes and reporting requirements.
-- **Crypto Compliance**: Includes crypto-specific compliance checks and risk scoring for blockchain addresses.
-
-#### Transaction Categorization System
-
-Enables classification and organization of transactions for reporting and analysis:
-
-- **External Category Management**: Transaction categories are now managed in an external master data microservice, with the transaction_category_id field serving as a logical reference to categories in this external service.
+---
 
 ## 📊 Data Model
 
-### Data Model Diagram
+### Entity Relationship Diagram
+
+The following entity relationship diagram shows the complete data model of the Core Banking Ledger system:
+
+> **Note**: The diagram above shows all entities currently implemented in the system. Crypto and blockchain entities mentioned in some database migrations are not yet implemented as Java entities and are not part of the current active data model.
 
 ```mermaid
 erDiagram
     %% Core Entities
     TRANSACTION {
-        bigint transaction_id PK
+        uuid transaction_id PK
         string external_reference
         datetime transaction_date
         datetime value_date
@@ -185,10 +162,10 @@ erDiagram
         string currency
         string description
         string initiating_party
-        bigint account_id
-        bigint account_space_id
-        bigint transaction_category_id FK
-        bigint related_transaction_id FK
+        uuid account_id
+        uuid account_space_id
+        uuid transaction_category_id
+        uuid related_transaction_id FK
         string relation_type
         string request_id
         string batch_id
@@ -209,7 +186,7 @@ erDiagram
         string branch_office_code
         string nif_initiating_party
         enum asset_type
-        bigint blockchain_network_id FK
+        uuid blockchain_network_id
         string blockchain_transaction_hash
         string crypto_compliance_check_result
         integer crypto_address_risk_score
@@ -219,10 +196,10 @@ erDiagram
     }
 
     TRANSACTION_LEG {
-        bigint transaction_leg_id PK
-        bigint transaction_id FK
-        bigint account_id
-        bigint account_space_id
+        uuid transaction_leg_id PK
+        uuid transaction_id FK
+        uuid account_id
+        uuid account_space_id
         string leg_type
         decimal amount
         string currency
@@ -233,120 +210,9 @@ erDiagram
         datetime date_updated
     }
 
-    EVENT_OUTBOX {
-        uuid event_id PK
-        string aggregate_type
-        string aggregate_id
-        string event_type
-        jsonb payload
-        datetime created_at
-        boolean processed
-        datetime processed_at
-        integer retry_count
-        text last_error
-    }
-
-    MONEY {
-        bigint money_id PK
-        decimal amount
-        string currency
-        enum asset_type
-        bigint crypto_asset_id FK
-        datetime date_created
-        datetime date_updated
-    }
-
-    %% Blockchain & Crypto Entities
-    BLOCKCHAIN_NETWORK {
-        bigint blockchain_network_id PK
-        string network_name
-        string network_code
-        boolean is_testnet
-        string blockchain_explorer_url
-        datetime date_created
-        datetime date_updated
-    }
-
-    CRYPTO_ASSET {
-        bigint crypto_asset_id PK
-        string asset_symbol
-        string asset_name
-        enum asset_type
-        bigint blockchain_network_id FK
-        string contract_address
-        integer decimals
-        boolean is_active
-        datetime date_created
-        datetime date_updated
-    }
-
-    TRANSACTION_LINE_CRYPTO {
-        bigint transaction_line_crypto_id PK
-        bigint transaction_id FK
-        bigint crypto_asset_id FK
-        string blockchain_transaction_hash
-        string sender_address
-        string recipient_address
-        bigint block_number
-        datetime block_timestamp
-        integer confirmation_count
-        decimal gas_price
-        bigint gas_used
-        decimal transaction_fee
-        string fee_currency
-        string network_status
-        datetime date_created
-        datetime date_updated
-    }
-
-    NFT_METADATA {
-        bigint nft_metadata_id PK
-        bigint crypto_asset_id FK
-        string token_id
-        string token_standard
-        string metadata_uri
-        string token_name
-        string token_description
-        string creator_address
-        datetime creation_date
-        datetime date_created
-        datetime date_updated
-    }
-
-    TRANSACTION_ATTACHMENT {
-        bigint transaction_attachment_id PK
-        bigint transaction_id FK
-        string attachment_type
-        string attachment_name
-        string attachment_description
-        string document_id
-        string content_type
-        bigint size_bytes
-        string hash_sha256
-        string uploaded_by
-        datetime upload_date
-        datetime date_created
-        datetime date_updated
-    }
-
-    STATEMENT {
-        bigint statement_id PK
-        bigint account_id
-        bigint account_space_id
-        enum period_type
-        date start_date
-        date end_date
-        datetime generation_date
-        integer transaction_count
-        boolean included_pending
-        boolean included_details
-        datetime date_created
-        datetime date_updated
-    }
-
     TRANSACTION_STATUS_HISTORY {
-        bigint transaction_status_history_id PK
-        bigint transaction_id FK
+        uuid transaction_status_history_id PK
+        uuid transaction_id FK
         enum status_code
         datetime status_start_datetime
         datetime status_end_datetime
@@ -356,481 +222,255 @@ erDiagram
         datetime date_updated
     }
 
+    TRANSACTION_ATTACHMENT {
+        uuid transaction_attachment_id PK
+        uuid transaction_id FK
+        enum attachment_type
+        string attachment_name
+        string attachment_description
+        string document_id
+        datetime date_created
+        datetime date_updated
+    }
+
+
+
+    MONEY {
+        uuid money_id PK
+        decimal amount
+        string currency
+        enum asset_type
+        uuid crypto_asset_id FK
+        datetime date_created
+        datetime date_updated
+    }
+
+    STATEMENT {
+        uuid statement_id PK
+        uuid account_id
+        uuid account_space_id
+        enum period_type
+        date start_date
+        date end_date
+        datetime generation_date
+        integer transaction_count
+        boolean included_pending
+        datetime date_created
+        datetime date_updated
+    }
+
+    %% Transaction Line Entities
+    TRANSACTION_LINE_CARD {
+        uuid transaction_line_card_id PK
+        uuid transaction_id FK
+        string card_auth_code
+        string card_merchant_category_code
+        string card_merchant_name
+        string card_pos_entry_mode
+        string card_transaction_reference
+        string card_terminal_id
+        string card_holder_country
+        boolean card_present_flag
+        datetime card_transaction_timestamp
+        boolean card_fraud_flag
+        decimal card_currency_conversion_rate
+        decimal card_fee_amount
+        string card_fee_currency
+        string card_installment_plan
+        string card_merchant_cif
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_WIRE_TRANSFER {
+        uuid transaction_line_wire_transfer_id PK
+        uuid transaction_id FK
+        string wire_beneficiary_name
+        string wire_beneficiary_account
+        string wire_beneficiary_bank
+        string wire_beneficiary_swift_code
+        string wire_originator_name
+        string wire_originator_account
+        string wire_originator_bank
+        string wire_originator_swift_code
+        string wire_purpose_code
+        string wire_regulatory_reporting
+        decimal wire_exchange_rate
+        string wire_correspondent_bank
+        string wire_intermediary_bank
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_SEPA_TRANSFER {
+        uuid transaction_line_sepa_transfer_id PK
+        uuid transaction_id FK
+        string sepa_creditor_iban
+        string sepa_creditor_bic
+        string sepa_creditor_name
+        string sepa_debtor_iban
+        string sepa_debtor_bic
+        string sepa_debtor_name
+        string sepa_end_to_end_id
+        string sepa_mandate_id
+        string sepa_purpose_code
+        string sepa_remittance_info
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_DIRECT_DEBIT {
+        uuid transaction_line_direct_debit_id PK
+        uuid transaction_id FK
+        string dd_mandate_id
+        string dd_creditor_id
+        string dd_sequence_type
+        string dd_scheme
+        datetime dd_mandate_date
+        string dd_creditor_name
+        string dd_debtor_name
+        string dd_debtor_iban
+        string dd_debtor_bic
+        string dd_purpose_code
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_DEPOSIT {
+        uuid transaction_line_deposit_id PK
+        uuid transaction_id FK
+        string deposit_source
+        string deposit_reference
+        string deposit_location
+        string deposit_teller_id
+        string deposit_check_number
+        string deposit_routing_number
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_WITHDRAWAL {
+        uuid transaction_line_withdrawal_id PK
+        uuid transaction_id FK
+        string withdrawal_location
+        string withdrawal_atm_id
+        string withdrawal_card_number
+        string withdrawal_authorization_code
+        decimal withdrawal_fee_amount
+        string withdrawal_fee_currency
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_TRANSFER {
+        uuid transaction_line_transfer_id PK
+        uuid transaction_id FK
+        string transfer_purpose_code
+        string transfer_reference
+        string transfer_beneficiary_name
+        string transfer_originator_name
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_FEE {
+        uuid transaction_line_fee_id PK
+        uuid transaction_id FK
+        string fee_type
+        string fee_description
+        decimal fee_amount
+        string fee_currency
+        string fee_calculation_method
+        boolean fee_waived
+        string fee_waiver_reason
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_INTEREST {
+        uuid transaction_line_interest_id PK
+        uuid transaction_id FK
+        string interest_type
+        decimal interest_rate
+        decimal interest_amount
+        string interest_currency
+        date interest_period_start
+        date interest_period_end
+        string interest_calculation_method
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_STANDING_ORDER {
+        uuid transaction_line_standing_order_id PK
+        uuid transaction_id FK
+        string so_reference
+        string so_frequency
+        date so_start_date
+        date so_end_date
+        date so_next_execution_date
+        integer so_execution_count
+        string so_beneficiary_name
+        string so_beneficiary_account
+        datetime date_created
+        datetime date_updated
+    }
+
+    TRANSACTION_LINE_ACH {
+        uuid transaction_line_ach_id PK
+        uuid transaction_id FK
+        string ach_routing_number
+        string ach_account_number
+        string ach_account_type
+        string ach_transaction_code
+        string ach_company_name
+        string ach_company_id
+        string ach_entry_description
+        string ach_trace_number
+        datetime date_created
+        datetime date_updated
+    }
+
     %% Relationships
     TRANSACTION ||--o{ TRANSACTION_LEG : "has"
     TRANSACTION ||--o{ TRANSACTION_STATUS_HISTORY : "has"
     TRANSACTION ||--o{ TRANSACTION_ATTACHMENT : "has"
     TRANSACTION ||--o| TRANSACTION : "relates to"
-    TRANSACTION ||--o| TRANSACTION_LINE_CRYPTO : "has"
-    TRANSACTION }o--|| BLOCKCHAIN_NETWORK : "uses"
-    
-    MONEY }o--o| CRYPTO_ASSET : "references"
-    
-    CRYPTO_ASSET }o--|| BLOCKCHAIN_NETWORK : "belongs to"
-    CRYPTO_ASSET ||--o{ NFT_METADATA : "has"
-    
-    TRANSACTION_LINE_CRYPTO }o--|| CRYPTO_ASSET : "references"
-    
+
+    TRANSACTION ||--o| TRANSACTION_LINE_CARD : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_WIRE_TRANSFER : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_SEPA_TRANSFER : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_DIRECT_DEBIT : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_DEPOSIT : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_WITHDRAWAL : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_TRANSFER : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_FEE : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_INTEREST : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_STANDING_ORDER : "has"
+    TRANSACTION ||--o| TRANSACTION_LINE_ACH : "has"
+
     %% Statement Relationships
     STATEMENT }o--o{ TRANSACTION : "includes"
 ```
 
-### Core Entities
+### Entity Overview
 
-#### Transaction
+The data model consists of three main categories:
 
-The `TRANSACTION` table is the central entity representing any financial transaction. It contains common attributes applicable to all transaction types:
+**Core Entities:**
+- **Transaction**: Central entity representing financial transactions with comprehensive fields for compliance, geolocation, and crypto support
+- **TransactionLeg**: Implements double-entry accounting with debit/credit legs
+- **TransactionStatusHistory**: Complete audit trail of status changes
+- **TransactionAttachment**: Document management integration
 
-- **Basic Information**:
-  - `transaction_id`: Unique identifier for the transaction
-  - `external_reference`: External system reference (e.g., payment processor ID)
-  - `description`: Human-readable description of the transaction
-  - `total_amount`: Total monetary value of the transaction
-  - `currency`: ISO 4217 currency code (e.g., EUR, USD)
-  - `transaction_type`: Type of transaction (PAYMENT, CARD_PAYMENT, SEPA_TRANSFER, CRYPTO_DEPOSIT, etc.)
-  - `transaction_status`: Current status (PENDING, COMPLETED, FAILED, REVERSED)
+**Transaction Line Entities:**
+Payment-method-specific details for various transaction types including Card, Wire Transfer, SEPA, Direct Debit, Deposit, Withdrawal, Transfer, Fee, Interest, Standing Order, and ACH transactions.
 
-- **Temporal Data**:
-  - `transaction_date`: When the transaction was initiated
-  - `value_date`: Date used for interest calculations
-  - `booking_date`: When the transaction affects the account balance
+**Supporting Entities:**
+- **Money**: Monetary values with multi-asset support
+- **Statement**: Account statement metadata
 
-- **Account References**:
-  - `account_id`: Reference to account in external account microservice
-  - `account_space_id`: Reference to account space in external account microservice
-  - `transaction_category_id`: Reference to category in external master data microservice
-
-- **Relation Fields**:
-  - `related_transaction_id`: Link to related transaction (e.g., original transaction for a reversal)
-  - `relation_type`: Type of relationship (REVERSAL, ADJUSTMENT, CHARGEBACK, CORRECTION)
-  - `request_id`: Unique ID for idempotency support
-  - `batch_id`: ID for grouping related transactions in bulk operations
-
-- **Concurrency Control**:
-  - `row_version`: Version number for optimistic locking
-
-- **Regulatory Compliance**:
-  - `aml_risk_score`: Anti-Money Laundering risk score
-  - `aml_screening_result`: Result of AML screening
-  - `aml_large_txn_flag`: Flag for transactions exceeding reporting thresholds
-  - `sca_method`: Strong Customer Authentication method used
-  - `sca_result`: Result of the SCA verification
-  - `instant_flag`: Whether this is an instant payment
-  - `confirmation_of_payee_result`: Result of name checking (OK, MISMATCH, UNAVAILABLE)
-
-- **Crypto and Blockchain Fields**:
-  - `asset_type`: Type of asset (FIAT, CRYPTOCURRENCY, TOKEN_SECURITY, etc.)
-  - `blockchain_network_id`: Reference to blockchain network for crypto transactions
-  - `blockchain_transaction_hash`: Transaction hash on the blockchain
-  - `crypto_compliance_check_result`: Result of compliance checks for crypto transactions
-  - `crypto_address_risk_score`: Risk score for crypto addresses involved
-  - `crypto_transaction_source`: Source of the crypto transaction (EXCHANGE, WALLET, SMART_CONTRACT)
-
-- **Geolocation**:
-  - `latitude`, `longitude`: Coordinates of transaction origin
-  - `location_name`: Human-readable location name
-  - `country`: Country code
-  - `city`: City name
-  - `postal_code`: Postal/ZIP code
-
-- **Organizational Data**:
-  - `branch_office_code`: Branch where transaction was initiated
-  - `nif_initiating_party`: Spanish tax ID of initiating party
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-#### Transaction Legs
-
-The `TRANSACTION_LEG` table implements double-entry accounting principles. Each transaction consists of at least two legs (debit and credit) that always balance to zero:
-
-- **Identifiers**:
-  - `transaction_leg_id`: Unique identifier for the leg
-  - `transaction_id`: Reference to the parent transaction
-
-- **Account Information**:
-  - `account_id`: Reference to account in external account microservice
-  - `account_space_id`: Reference to account space in external account microservice
-
-- **Financial Details**:
-  - `leg_type`: DEBIT or CREDIT indicator
-  - `amount`: Monetary value for this leg
-  - `currency`: ISO 4217 currency code
-  - `description`: Leg-specific description
-
-- **Temporal Data**:
-  - `value_date`: Date used for interest calculations
-  - `booking_date`: When the leg affects the account balance
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-#### Money
-
-The `MONEY` table serves as a value object for consistent handling of amount and currency:
-
-- **Identifiers**:
-  - `money_id`: Unique identifier
-
-- **Value Components**:
-  - `amount`: Decimal value with four decimal places for precision
-  - `currency`: ISO 4217 currency code (e.g., EUR, USD)
-  - `asset_type`: Type of asset (FIAT, CRYPTOCURRENCY, TOKEN_SECURITY, etc.)
-  - `crypto_asset_id`: Reference to crypto_asset table for cryptocurrency and token assets
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-### Blockchain & Crypto Entities
-
-#### Blockchain Network
-
-The `BLOCKCHAIN_NETWORK` table stores information about supported blockchain networks:
-
-- **Identifiers**:
-  - `blockchain_network_id`: Unique identifier for the blockchain network
-
-- **Network Information**:
-  - `network_name`: Name of the blockchain network (e.g., Ethereum Mainnet, Bitcoin)
-  - `network_code`: Code for the blockchain network (e.g., ETH, BTC)
-  - `is_testnet`: Whether this is a testnet or mainnet
-  - `blockchain_explorer_url`: URL for the blockchain explorer
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-#### Crypto Asset
-
-The `CRYPTO_ASSET` table stores information about supported cryptocurrencies and tokens:
-
-- **Identifiers**:
-  - `crypto_asset_id`: Unique identifier for the crypto asset
-
-- **Asset Information**:
-  - `asset_symbol`: Symbol of the cryptocurrency or token (e.g., BTC, ETH)
-  - `asset_name`: Name of the cryptocurrency or token (e.g., Bitcoin, Ethereum)
-  - `asset_type`: Type of asset (CRYPTOCURRENCY, TOKEN_SECURITY, TOKEN_UTILITY, TOKEN_NFT)
-  - `blockchain_network_id`: Reference to the blockchain network
-  - `contract_address`: Address of the token contract (for tokens like ERC-20)
-  - `decimals`: Number of decimal places for the asset
-  - `is_active`: Whether the asset is active
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-#### Transaction Line Crypto
-
-The `TRANSACTION_LINE_CRYPTO` table stores crypto-specific transaction details:
-
-- **Identifiers**:
-  - `transaction_line_crypto_id`: Unique identifier
-  - `transaction_id`: Reference to the parent transaction
-  - `crypto_asset_id`: Reference to the crypto asset
-
-- **Blockchain Details**:
-  - `blockchain_transaction_hash`: Hash of the transaction on the blockchain
-  - `sender_address`: Blockchain address of the sender
-  - `recipient_address`: Blockchain address of the recipient
-  - `block_number`: Block number where the transaction was included
-  - `block_timestamp`: Timestamp of the block
-  - `confirmation_count`: Number of confirmations for the transaction
-
-- **Fee Information**:
-  - `gas_price`: Price of gas used for the transaction
-  - `gas_used`: Amount of gas used for the transaction
-  - `transaction_fee`: Fee paid for the transaction
-  - `fee_currency`: Currency of the fee
-
-- **Status Information**:
-  - `network_status`: Status of the transaction on the network
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-#### NFT Metadata
-
-The `NFT_METADATA` table stores metadata for NFT tokens:
-
-- **Identifiers**:
-  - `nft_metadata_id`: Unique identifier
-  - `crypto_asset_id`: Reference to the crypto asset
-  - `token_id`: ID of the token within the contract
-
-- **Token Information**:
-  - `token_standard`: Token standard (ERC-721, ERC-1155, etc.)
-  - `metadata_uri`: URI for the token metadata
-  - `token_name`: Name of the token
-  - `token_description`: Description of the token
-  - `creator_address`: Blockchain address of the creator
-  - `creation_date`: When the token was created
-
-- **Audit Trail**:
-  - `date_created`: When the record was created
-  - `date_updated`: When the record was last updated
-
-### Transaction Lines
-
-The system uses specialized transaction line tables for different transaction types, each capturing type-specific details. In addition to the traditional transaction lines (Card, Direct Debit, SEPA Transfer, etc.), the system now includes a specialized transaction line for cryptocurrency transactions:
-
-#### Crypto Transactions (`TRANSACTION_LINE_CRYPTO`)
-
-- **Asset Information**:
-  - `crypto_asset_id`: Reference to the crypto asset involved in the transaction
-  - `sender_address`: Blockchain address of the sender
-  - `recipient_address`: Blockchain address of the recipient
-
-- **Blockchain Details**:
-  - `blockchain_transaction_hash`: Hash of the transaction on the blockchain
-  - `block_number`: Block number where the transaction was included
-  - `block_timestamp`: Timestamp of the block
-  - `confirmation_count`: Number of confirmations for the transaction
-
-- **Fee Information**:
-  - `gas_price`: Price of gas used for the transaction
-  - `gas_used`: Amount of gas used for the transaction
-  - `transaction_fee`: Fee paid for the transaction
-  - `fee_currency`: Currency of the fee
-
-- **Status Information**:
-  - `network_status`: Status of the transaction on the network
-
-### Entity Relationships
-
-The Core Banking Ledger system has a well-defined set of relationships between entities:
-
-#### Core Relationships
-
-- **Transaction to Transaction Legs**: One-to-many relationship. Each transaction has at least two legs (debit and credit) to implement double-entry accounting.
-
-- **Transaction to Transaction Status History**: One-to-many relationship. Each transaction has a history of status changes with timestamps and reasons.
-
-- **Transaction to Transaction Attachments**: One-to-many relationship. A transaction can have multiple supporting documents attached.
-
-- **Transaction to Transaction**: Self-referential relationship. A transaction can be related to another transaction (e.g., a reversal transaction references the original transaction).
-
-#### Blockchain & Crypto Relationships
-
-- **Transaction to Blockchain Network**: Many-to-one relationship. A cryptocurrency transaction is associated with a specific blockchain network.
-
-- **Transaction to Transaction Line Crypto**: One-to-one relationship. A cryptocurrency transaction has one specialized crypto transaction line.
-
-- **Transaction Line Crypto to Crypto Asset**: Many-to-one relationship. A crypto transaction line references a specific crypto asset.
-
-- **Crypto Asset to Blockchain Network**: Many-to-one relationship. A crypto asset belongs to a specific blockchain network.
-
-- **Crypto Asset to NFT Metadata**: One-to-many relationship. An NFT crypto asset can have multiple token instances, each with its own metadata.
-
-- **Money to Crypto Asset**: Many-to-one relationship. A money value can reference a specific crypto asset when representing cryptocurrency amounts.
-
-#### External References
-
-- **Transaction Categories**: Now managed in an external master data microservice, with the `transaction_category_id` field serving as a logical reference.
-
-- **Accounts and Account Spaces**: Managed in an external account microservice, with the `account_id` and `account_space_id` fields serving as logical references.
-
-- **Document Management**: Transaction attachments reference documents in an external ECM system using the `document_id` field.
-
-## 🔧 Configuration
-
-Configuration properties can be set in the `application.yaml` file in the `core-banking-ledger-web/src/main/resources` directory:
-
-```yaml
-# Example configuration
-spring:
-  application:
-    name: core-banking-ledger
-    version: 1.0.0
-    description: Banking Ledger Core Application
-    team:
-      name: Firefly Software Solutions Inc
-      email: dev@getfirefly.io
-
-  r2dbc:
-    pool:
-      initial-size: 5
-      max-size: 10
-      max-idle-time: 30m
-      validation-query: SELECT 1
-    url: r2dbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslMode=${DB_SSL_MODE}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslMode=${DB_SSL_MODE}
-    user: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  threads:
-    virtual:
-      enabled: true
-
-server:
-  port: 8080
-  shutdown: graceful
-
-# Blockchain configuration
-blockchain:
-  networks:
-    ethereum:
-      enabled: true
-      rpc-url: ${ETH_RPC_URL}
-      chain-id: ${ETH_CHAIN_ID}
-      explorer-url: ${ETH_EXPLORER_URL}
-      gas-price-strategy: MEDIUM
-      confirmation-blocks: 12
-    bitcoin:
-      enabled: ${BTC_ENABLED:false}
-      rpc-url: ${BTC_RPC_URL:}
-      rpc-user: ${BTC_RPC_USER:}
-      rpc-password: ${BTC_RPC_PASSWORD:}
-      confirmation-blocks: 6
-  event-listener:
-    polling-interval-seconds: 15
-    max-blocks-per-poll: 100
-    retry-delay-seconds: 30
-    max-retries: 5
-
-springdoc:
-  api-docs:
-    enabled: true
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    tagsSorter: alpha
-    operationsSorter: method
-    docExpansion: none
-    filter: true
-  packages-to-scan: com.firefly.core.banking.ledger.web.controllers
-  paths-to-match: /api/**
-```
-
-### Environment Variables
-
-The application uses the following environment variables for configuration:
-
-| Variable | Description | Default Value |
-|----------|-------------|---------------|
-| `DB_HOST` | Database host | localhost |
-| `DB_PORT` | Database port | 5432 |
-| `DB_NAME` | Database name | ledger_db |
-| `DB_SSL_MODE` | Database SSL mode | prefer |
-| `DB_USERNAME` | Database username | postgres |
-| `DB_PASSWORD` | Database password | postgres |
-| `ETH_RPC_URL` | Ethereum RPC URL | - |
-| `ETH_CHAIN_ID` | Ethereum chain ID | 1 (mainnet) |
-| `ETH_EXPLORER_URL` | Ethereum explorer URL | https://etherscan.io |
-| `BTC_ENABLED` | Enable Bitcoin support | false |
-| `BTC_RPC_URL` | Bitcoin RPC URL | - |
-| `BTC_RPC_USER` | Bitcoin RPC username | - |
-| `BTC_RPC_PASSWORD` | Bitcoin RPC password | - |
-
-You can set these environment variables in your development environment or provide them when running the Docker container.
-
-## 🛠️ Key Features
-
-### Transaction Management
-- Create, retrieve, update, and delete transactions
-- Process various payment methods including cryptocurrency transactions
-- Track transaction status changes
-- Categorize transactions
-- Support for transaction reversals and related transactions
-- Idempotent transaction processing with unique external references
-
-### Double-Entry Accounting
-- Transaction legs for debit and credit entries
-- Balance calculation based on transaction legs
-- Support for multi-currency transactions
-- Support for multi-asset transactions (fiat and crypto)
-- Proper accounting for reversals and adjustments
-
-### Event-Driven Architecture
-- Event outbox pattern for reliable event publishing
-- Domain events for transaction lifecycle
-- Asynchronous integration with other services
-- Blockchain event processing for transaction status updates
-
-### Blockchain Integration
-- Support for multiple blockchain networks (Ethereum, Bitcoin, etc.)
-- Transaction broadcasting with gas fee estimation
-- Transaction confirmation tracking
-- Blockchain event monitoring
-- Smart contract interaction
-- Address management for deposits and withdrawals
-- Secure key management and signing
-
-### Cryptocurrency Support
-- Support for various cryptocurrency transaction types:
-  - Deposits: Receive cryptocurrencies from external wallets
-  - Withdrawals: Send cryptocurrencies to external wallets
-  - Transfers: Move cryptocurrencies between internal accounts
-  - Swaps: Exchange one cryptocurrency for another
-- Token operations:
-  - Minting: Create new tokens
-  - Burning: Destroy tokens
-  - Transfers: Move tokens between accounts
-- NFT support:
-  - NFT transfers
-  - NFT metadata tracking
-- Staking operations:
-  - Staking: Lock cryptocurrencies to earn rewards
-  - Unstaking: Unlock staked cryptocurrencies
-  - Reward distribution: Distribute staking rewards
-- Crypto-specific compliance:
-  - Address risk scoring
-  - Transaction source tracking
-  - Compliance check results
-
-### Regulatory Compliance
-- AML risk scoring and screening results
-- Strong Customer Authentication (SCA) tracking
-- Support for instant payments and confirmation of payee
-- Designed for PSD3 and EU Instant Payments Regulation 2024/886
-- Crypto-specific compliance checks and risk scoring
-
-### Security & Privacy
-- Transaction attachments with hash verification
-- Optimistic locking to prevent concurrent updates
-- Secure blockchain key management
-- Address validation and risk assessment
-
-### Reporting
-- Account and account space statements
-- Transaction history reports
-- Audit reports
-- Transaction leg reports for accounting reconciliation
-- Cryptocurrency holdings reports
-
-## 🧪 Testing
-
-The project includes comprehensive unit and integration tests. All tests are currently passing (98 tests in total).
-
-```bash
-# Run all tests
-mvn test
-
-# Run specific test class
-mvn test -Dtest=TransactionServiceImplTest
-
-# Run crypto-specific tests
-mvn test -Dtest=TransactionServiceImplTest_CryptoMethods
-```
-
-The tests cover all major components of the system, including:
-- Transaction services
-- Transaction line services for different payment methods
-- Transaction categorization
-- Status history tracking
-- Blockchain integration services
-- Cryptocurrency transaction processing
+---
 
 ## 📚 API Documentation
 
@@ -840,162 +480,292 @@ API documentation is available via Swagger UI when the application is running:
 http://localhost:8080/swagger-ui.html
 ```
 
-### API Controllers
+The API follows RESTful principles and provides comprehensive CRUD operations for all entities.
 
-The Core Banking Ledger system provides the following REST controllers for interacting with the API:
+### Core Controllers
 
-#### Core Controllers
-- **TransactionController**: Manages basic transaction operations (create, read, update, delete)
-  - Create, retrieve, update, and delete transactions
-  - Update transaction status with reason
-  - Create reversal transactions
-  - Find transactions by external reference
-- **TransactionStatusHistoryController**: Tracks changes in transaction status over time
-- **TransactionCategoryController**: Manages transaction categorization
+#### TransactionController (`/api/v1/transactions`)
+- `POST /api/v1/transactions` - Create a new transaction
+- `GET /api/v1/transactions/{transactionId}` - Get transaction by ID
+- `PUT /api/v1/transactions/{transactionId}` - Update transaction
+- `DELETE /api/v1/transactions/{transactionId}` - Delete transaction
+- `GET /api/v1/transactions` - List transactions with pagination
+- `GET /api/v1/transactions/external-reference/{externalReference}` - Find by external reference
+- `POST /api/v1/transactions/{transactionId}/reversal` - Create reversal transaction
+- `PUT /api/v1/transactions/{transactionId}/status` - Update transaction status
 
-#### Double-Entry Accounting Controllers
-- **TransactionLegController**: Manages transaction legs for double-entry accounting
-- **AccountLegController**: Queries transaction legs by account
+#### TransactionStatusHistoryController (`/api/v1/transactions/{transactionId}/status-history`)
+- `GET /api/v1/transactions/{transactionId}/status-history` - Get status history
+- `POST /api/v1/transactions/{transactionId}/status-history` - Add status history entry
 
-#### Event & Integration Controllers
-- **EventOutboxController**: Manages the event outbox for reliable event publishing
+#### TransactionLegController (`/api/v1/transactions/{transactionId}/legs`)
+- `POST /api/v1/transactions/{transactionId}/legs` - Create transaction leg
+- `GET /api/v1/transactions/{transactionId}/legs` - Get transaction legs
+- `PUT /api/v1/transactions/{transactionId}/legs/{legId}` - Update transaction leg
+- `DELETE /api/v1/transactions/{transactionId}/legs/{legId}` - Delete transaction leg
 
-#### Blockchain & Crypto Controllers
-- **BlockchainController**: Manages blockchain interactions
-  - Send transactions to blockchain networks
-  - Get transaction status from blockchain
-  - Track transaction confirmations
-  - Get gas prices
-  - Estimate gas for transactions
-- **BlockchainEventListenerController**: Manages blockchain event listening
-  - Listen for deposit events
-  - Listen for token transfer events
-  - Listen for smart contract events
-  - Register addresses for monitoring
-- **BlockchainConfirmationController**: Manages blockchain transaction confirmations
-  - Track confirmations for transactions
-  - Check transaction status on blockchain
-- **CryptoTransactionController**: Manages cryptocurrency transactions
-  - Create crypto deposits
-  - Create crypto withdrawals
-  - Create crypto transfers
-  - Create token operations (mint, burn, transfer)
+#### AccountLegController (`/api/v1/accounts/{accountId}/legs`)
+- `GET /api/v1/accounts/{accountId}/legs` - Get legs by account
+- `GET /api/v1/account-spaces/{accountSpaceId}/legs` - Get legs by account space
 
-#### Attachment Controllers
-- **TransactionAttachmentController**: Manages attachments related to transactions
+### Transaction Line Controllers
 
-#### Transaction Line Controllers
-- **TransactionLineCardController**: Manages card payment transaction lines
-- **TransactionLineDirectDebitController**: Manages direct debit transaction lines
-- **TransactionLineSepaTransferController**: Manages SEPA transfer transaction lines
-- **TransactionLineWireTransferController**: Manages wire transfer transaction lines
-- **TransactionLineStandingOrderController**: Manages standing order transaction lines
-- **TransactionLineDepositController**: Manages deposit transaction lines
-- **TransactionLineWithdrawalController**: Manages withdrawal transaction lines
-- **TransactionLineFeeController**: Manages fee transaction lines
-- **TransactionLineInterestController**: Manages interest transaction lines
-- **TransactionLineTransferController**: Manages general transfer transaction lines
-- **TransactionLineCryptoController**: Manages cryptocurrency transaction lines
+Each payment method has its own dedicated controller for managing payment-specific details:
 
-### API Examples Guided by Flows
+#### TransactionLineCardController (`/api/v1/transactions/{transactionId}/lines/card`)
+- Full CRUD operations for card transaction details
 
-Below are examples of common API workflows in the Core Banking Ledger system. Each example shows the sequence of API calls needed to complete a specific business process.
+#### TransactionLineWireTransferController (`/api/v1/transactions/{transactionId}/lines/wire`)
+- Full CRUD operations for wire transfer details
 
-#### Cryptocurrency Deposit Flow
+#### TransactionLineSepaTransferController (`/api/v1/transactions/{transactionId}/lines/sepa`)
+- Full CRUD operations for SEPA transfer details
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant CryptoTransactionController
-    participant TransactionService
-    participant BlockchainEventListener
-    participant Database
-    
-    Client->>BlockchainEventListener: Register Address for Monitoring
-    BlockchainEventListener->>Database: Save Monitored Address
-    BlockchainEventListener-->>Client: Address Registered
-    
-    BlockchainEventListener->>BlockchainEventListener: Listen for Deposits
-    BlockchainEventListener->>Database: Detect Incoming Transaction
-    BlockchainEventListener->>TransactionService: Create Crypto Deposit
-    TransactionService->>Database: Save Transaction
-    TransactionService->>Database: Save Transaction Line Crypto
-    TransactionService->>Database: Save Transaction Legs
-    TransactionService-->>BlockchainEventListener: Return Transaction
-    BlockchainEventListener-->>Client: Notify Deposit Received
+#### TransactionLineDirectDebitController (`/api/v1/transactions/{transactionId}/lines/direct-debit`)
+- Full CRUD operations for direct debit details
+
+#### TransactionLineDepositController (`/api/v1/transactions/{transactionId}/lines/deposit`)
+- Full CRUD operations for deposit details
+
+#### TransactionLineWithdrawalController (`/api/v1/transactions/{transactionId}/lines/withdrawal`)
+- Full CRUD operations for withdrawal details
+
+#### TransactionLineTransferController (`/api/v1/transactions/{transactionId}/lines/transfer`)
+- Full CRUD operations for transfer details
+
+#### TransactionLineFeeController (`/api/v1/transactions/{transactionId}/lines/fee`)
+- Full CRUD operations for fee details
+
+#### TransactionLineInterestController (`/api/v1/transactions/{transactionId}/lines/interest`)
+- Full CRUD operations for interest details
+
+#### TransactionLineStandingOrderController (`/api/v1/transactions/{transactionId}/lines/standing-order`)
+- Full CRUD operations for standing order details
+
+#### TransactionLineAchController (`/api/v1/transactions/{transactionId}/line-ach`)
+- Full CRUD operations for ACH transfer details
+
+### Supporting Controllers
+
+#### TransactionAttachmentController (`/api/v1/transactions/{transactionId}/attachments`)
+- Full CRUD operations for transaction attachments
+
+#### MoneyController (`/api/v1/money`)
+- Full CRUD operations for money entities
+
+#### AccountStatementController (`/api/v1/accounts/{accountId}/statements`)
+- `GET /api/v1/accounts/{accountId}/statements` - List account statements
+- `GET /api/v1/accounts/{accountId}/statements/date-range` - Get statements by date range
+- `GET /api/v1/accounts/{accountId}/statements/{statementId}` - Get specific statement
+
+#### AccountSpaceStatementController (`/api/v1/account-spaces/{accountSpaceId}/statements`)
+- Similar operations for account space statements
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+The application requires the following environment variables:
+
+#### Database Configuration
+```bash
+DB_HOST=localhost                    # Database host
+DB_PORT=5432                        # Database port
+DB_NAME=core_banking_ledger         # Database name
+DB_USERNAME=your_username           # Database username
+DB_PASSWORD=your_password           # Database password
+DB_SSL_MODE=disable                 # SSL mode (disable/require/verify-ca/verify-full)
 ```
 
-#### Cryptocurrency Withdrawal Flow
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant CryptoTransactionController
-    participant TransactionService
-    participant BlockchainService
-    participant BlockchainConfirmationService
-    participant Database
-    
-    Client->>CryptoTransactionController: Create Withdrawal Request
-    CryptoTransactionController->>TransactionService: Create Crypto Withdrawal
-    TransactionService->>Database: Save Transaction (PENDING)
-    TransactionService->>Database: Save Transaction Line Crypto
-    TransactionService->>Database: Save Transaction Legs
-    TransactionService-->>CryptoTransactionController: Return Transaction
-    CryptoTransactionController-->>Client: Withdrawal Created
-    
-    Client->>CryptoTransactionController: Approve Withdrawal
-    CryptoTransactionController->>TransactionService: Update Status (APPROVED)
-    TransactionService->>BlockchainService: Send Transaction to Blockchain
-    BlockchainService->>Database: Update with Transaction Hash
-    BlockchainService-->>TransactionService: Return Transaction Hash
-    
-    BlockchainConfirmationService->>BlockchainConfirmationService: Track Confirmations
-    BlockchainConfirmationService->>TransactionService: Update Status (COMPLETED)
-    TransactionService->>Database: Update Transaction Status
-    TransactionService-->>BlockchainConfirmationService: Status Updated
-    BlockchainConfirmationService-->>Client: Notify Withdrawal Completed
+#### Server Configuration
+```bash
+SERVER_ADDRESS=localhost            # Server bind address
+SERVER_PORT=8080                   # Server port
 ```
 
-## 📝 Monitoring and Logging
+### Database Configuration
 
-The Core Banking Ledger system includes comprehensive monitoring and logging capabilities:
+The application uses PostgreSQL with R2DBC for reactive database access and Flyway for database migrations.
 
-### Logging
+**Key Configuration:**
+- **R2DBC Pool**: Configured with initial size 5, max size 10
+- **Flyway**: Automatically runs migrations on startup
+- **UUID Support**: All primary keys use UUID for distributed system compatibility
+- **Optimistic Locking**: Uses version fields for concurrent access control
 
-- Structured JSON logging with correlation IDs for request tracing
-- Configurable log levels (INFO, DEBUG, ERROR, etc.)
-- Transaction audit logging for regulatory compliance
-- Error logging with detailed exception information
-- Blockchain transaction logging for tracking on-chain activities
+**Database Schema:**
+- All tables use UUID primary keys
+- Comprehensive foreign key relationships
+- Check constraints for data integrity
+- Indexes for performance optimization
+- Audit fields (date_created, date_updated) on all entities
 
-### Monitoring
+---
 
-- Health check endpoints for infrastructure monitoring
-- Prometheus metrics for performance monitoring
-- Micrometer integration for collecting application metrics
-- Dashboard templates for Grafana visualization
-- Blockchain-specific metrics for monitoring network interactions
+## 🔧 Key Features
 
-### Alerting
+### Transaction Management
 
-- Configurable alert thresholds for critical metrics
-- Integration with notification systems
-- Automated incident response workflows
-- Blockchain confirmation alerts for delayed transactions
+The Core Banking Ledger provides comprehensive transaction management capabilities:
 
-## 💪 Contributing
+- **CRUD Operations**: Full create, read, update, delete operations for all transaction types
+- **External References**: Support for external system references and idempotency
+- **Transaction Relations**: Support for reversals, adjustments, chargebacks, and corrections
+- **Batch Processing**: Batch ID support for bulk operations
+- **Request Tracking**: Request ID support for idempotency and tracing
 
-Contributions to the Core Banking Ledger project are welcome! Please follow these steps:
+### Double-Entry Accounting
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Implements proper double-entry accounting principles:
 
-Please ensure your code follows the project's coding standards and includes appropriate tests.
+- **Transaction Legs**: Every transaction consists of at least two legs (debit and credit)
+- **Balance Integrity**: Ensures debits equal credits for each transaction
+- **Account References**: Logical references to accounts in external account microservice
+- **Multi-Currency**: Support for different currencies in transaction legs
+- **Audit Trail**: Complete history of all accounting entries
 
-## 📜 License
+### Transaction Lines
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+Specialized support for various payment methods:
+
+- **Card Payments**: Comprehensive card transaction details with fraud detection
+- **Wire Transfers**: International transfers with SWIFT codes and compliance
+- **SEPA Transfers**: European payment system integration
+- **Direct Debits**: Mandate-based automated payments
+- **ACH Transfers**: US domestic automated clearing house transfers
+- **Cash Operations**: Deposits and withdrawals with location tracking
+- **Fee Management**: Banking fees with calculation methods and waivers
+- **Interest Calculations**: Interest accrual and payment tracking
+- **Standing Orders**: Recurring payment management
+
+### Status History Tracking
+
+Complete audit trail for transaction status changes:
+
+- **Status Transitions**: Track all status changes with timestamps
+- **Reason Codes**: Capture reasons for status changes
+- **Regulatory Reporting**: Flag transactions requiring regulatory reporting
+- **Historical Analysis**: Query historical status information
+
+### Statement Generation
+
+Support for account statement generation:
+
+- **Account Statements**: Generate statements for individual accounts
+- **Account Space Statements**: Generate statements for account spaces
+- **Period Types**: Support for different statement periods
+- **Transaction Inclusion**: Control over pending transaction inclusion
+- **Metadata Tracking**: Statement generation dates and transaction counts
+
+
+
+---
+
+## 🧪 Testing
+
+The project includes comprehensive unit and integration tests covering all major components.
+
+### Running Tests
+
+```bash
+# Run all tests
+mvn test
+
+# Run specific test class
+mvn test -Dtest=TransactionServiceImplTest
+
+# Run tests with coverage
+mvn test jacoco:report
+```
+
+### Test Coverage
+
+The test suite covers:
+- **Transaction Services**: Core transaction CRUD operations and business logic
+- **Transaction Line Services**: All payment method-specific services
+- **Status History Services**: Status tracking and audit trail functionality
+- **Repository Layer**: Data access and persistence operations
+- **Controller Layer**: REST API endpoints and request/response handling
+- **Validation**: Input validation and business rule enforcement
+
+### Test Categories
+
+- **Unit Tests**: Fast, isolated tests for individual components
+- **Integration Tests**: Tests that verify component interactions
+- **Repository Tests**: Database integration tests using test containers
+- **Controller Tests**: Web layer tests using MockWebServer
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions to the Core Banking Ledger project! Please follow these guidelines:
+
+### Development Setup
+
+1. **Fork the repository** and clone your fork
+2. **Create a feature branch** from `main`
+3. **Set up your development environment** following the quickstart guide
+4. **Make your changes** following the coding standards
+5. **Write tests** for new functionality
+6. **Run the test suite** to ensure all tests pass
+7. **Submit a pull request** with a clear description
+
+### Coding Standards
+
+- **Java Code Style**: Follow Google Java Style Guide
+- **Commit Messages**: Use conventional commit format
+- **Documentation**: Update documentation for new features
+- **Testing**: Maintain test coverage above 80%
+- **API Changes**: Update OpenAPI specification for API changes
+
+### Pull Request Process
+
+1. Ensure all tests pass and coverage requirements are met
+2. Update documentation as needed
+3. Add appropriate labels to your PR
+4. Request review from maintainers
+5. Address review feedback promptly
+
+### Reporting Issues
+
+- Use GitHub Issues for bug reports and feature requests
+- Provide detailed reproduction steps for bugs
+- Include relevant logs and error messages
+- Tag issues appropriately
+
+---
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+```
+Copyright 2024 Firefly Software Solutions Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+---
+
+## 📞 Contact
+
+- **Website**: [getfirefly.io](https://getfirefly.io)
+- **GitHub Organization**: [firefly-oss](https://github.com/firefly-oss)
+- **Email**: dev@getfirefly.io
+
+---
+
+**Firefly OpenCore Banking Platform** - Building the future of banking technology.

@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.interest.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.interest.v1.TransactionLineInterestServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.interest.v1.TransactionLineInterestDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineInterestController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineInterestDTO>> getInterestLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getInterestLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineInterestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineInterestDTO>> createInterestLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new interest line record", required = true,
                     schema = @Schema(implementation = TransactionLineInterestDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineInterestController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineInterestDTO>> updateInterestLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the interest line record", required = true,
                     schema = @Schema(implementation = TransactionLineInterestDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineInterestController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteInterestLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteInterestLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

@@ -9,6 +9,7 @@ import com.firefly.core.banking.ledger.models.entities.directdebit.v1.Transactio
 import com.firefly.core.banking.ledger.models.repositories.directdebit.v1.TransactionLineDirectDebitRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,8 +37,8 @@ public class TransactionLineDirectDebitServiceImplTest {
 
     private TransactionLineDirectDebitDTO directDebitDTO;
     private TransactionLineDirectDebit directDebitEntity;
-    private final Long transactionId = 1L;
-    private final Long directDebitId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID directDebitId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {

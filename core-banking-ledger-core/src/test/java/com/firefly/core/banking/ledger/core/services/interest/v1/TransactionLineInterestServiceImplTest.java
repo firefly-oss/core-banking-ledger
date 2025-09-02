@@ -6,6 +6,7 @@ import com.firefly.core.banking.ledger.models.entities.interest.v1.TransactionLi
 import com.firefly.core.banking.ledger.models.repositories.interest.v1.TransactionLineInterestRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,8 +34,8 @@ public class TransactionLineInterestServiceImplTest {
 
     private TransactionLineInterestDTO interestDTO;
     private TransactionLineInterest interestEntity;
-    private final Long transactionId = 1L;
-    private final Long interestId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID interestId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {

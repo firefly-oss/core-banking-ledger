@@ -7,20 +7,22 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * Repository interface for TransactionLineWithdrawal entity.
  */
-public interface TransactionLineWithdrawalRepository extends BaseRepository<TransactionLineWithdrawal, Long> {
+public interface TransactionLineWithdrawalRepository extends BaseRepository<TransactionLineWithdrawal, UUID> {
     /**
      * Find withdrawal transaction line by transaction ID.
      *
      * @param transactionId The transaction ID
      * @return A Mono containing the withdrawal transaction line if found
      */
-    Mono<TransactionLineWithdrawal> findByTransactionId(Long transactionId);
+    Mono<TransactionLineWithdrawal> findByTransactionId(UUID transactionId);
 
     /**
      * Find withdrawal transaction lines by withdrawal method.

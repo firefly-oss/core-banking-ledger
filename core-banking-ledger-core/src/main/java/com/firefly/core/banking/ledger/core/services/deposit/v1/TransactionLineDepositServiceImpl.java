@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.deposit.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.deposit.v1.TransactionLineDepositMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.deposit.v1.TransactionLineDepositDTO;
 import com.firefly.core.banking.ledger.models.entities.deposit.v1.TransactionLineDeposit;
@@ -24,14 +26,14 @@ public class TransactionLineDepositServiceImpl implements TransactionLineDeposit
     private TransactionLineDepositMapper mapper;
 
     @Override
-    public Mono<TransactionLineDepositDTO> getDepositLine(Long transactionId) {
+    public Mono<TransactionLineDepositDTO> getDepositLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Deposit not found")));
     }
 
     @Override
-    public Mono<TransactionLineDepositDTO> createDepositLine(Long transactionId, TransactionLineDepositDTO depositDTO) {
+    public Mono<TransactionLineDepositDTO> createDepositLine(UUID transactionId, TransactionLineDepositDTO depositDTO) {
         depositDTO.setTransactionId(transactionId);
         TransactionLineDeposit entity = mapper.toEntity(depositDTO);
         return repository.save(entity)
@@ -40,7 +42,7 @@ public class TransactionLineDepositServiceImpl implements TransactionLineDeposit
     }
 
     @Override
-    public Mono<TransactionLineDepositDTO> updateDepositLine(Long transactionId, TransactionLineDepositDTO depositDTO) {
+    public Mono<TransactionLineDepositDTO> updateDepositLine(UUID transactionId, TransactionLineDepositDTO depositDTO) {
         return repository.findByTransactionId(transactionId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Failed to update Transaction Line Deposit: Entity not found")))
                 .flatMap(existingEntity -> {
@@ -54,7 +56,7 @@ public class TransactionLineDepositServiceImpl implements TransactionLineDeposit
     }
 
     @Override
-    public Mono<Void> deleteDepositLine(Long transactionId) {
+    public Mono<Void> deleteDepositLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Deposit not found")))
                 .flatMap(repository::delete);

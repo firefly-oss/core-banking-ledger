@@ -7,12 +7,14 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.time.LocalDate;
 
 /**
  * Repository for managing statement records.
  */
-public interface StatementRepository extends BaseRepository<Statement, Long> {
+public interface StatementRepository extends BaseRepository<Statement, UUID> {
     /**
      * Find statements by account ID.
      *
@@ -20,7 +22,7 @@ public interface StatementRepository extends BaseRepository<Statement, Long> {
      * @param pageable Pagination parameters.
      * @return A flux of statements.
      */
-    Flux<Statement> findByAccountId(Long accountId, Pageable pageable);
+    Flux<Statement> findByAccountId(UUID accountId, Pageable pageable);
     
     /**
      * Count statements by account ID.
@@ -28,7 +30,7 @@ public interface StatementRepository extends BaseRepository<Statement, Long> {
      * @param accountId The account ID.
      * @return The count of statements.
      */
-    Mono<Long> countByAccountId(Long accountId);
+    Mono<Long> countByAccountId(UUID accountId);
     
     /**
      * Find statements by account space ID.
@@ -37,7 +39,7 @@ public interface StatementRepository extends BaseRepository<Statement, Long> {
      * @param pageable Pagination parameters.
      * @return A flux of statements.
      */
-    Flux<Statement> findByAccountSpaceId(Long accountSpaceId, Pageable pageable);
+    Flux<Statement> findByAccountSpaceId(UUID accountSpaceId, Pageable pageable);
     
     /**
      * Count statements by account space ID.
@@ -45,7 +47,7 @@ public interface StatementRepository extends BaseRepository<Statement, Long> {
      * @param accountSpaceId The account space ID.
      * @return The count of statements.
      */
-    Mono<Long> countByAccountSpaceId(Long accountSpaceId);
+    Mono<Long> countByAccountSpaceId(UUID accountSpaceId);
     
     /**
      * Find statements by account ID and date range.
@@ -62,7 +64,7 @@ public interface StatementRepository extends BaseRepository<Statement, Long> {
            "AND end_date <= :endDate " +
            "ORDER BY generation_date DESC " +
            "LIMIT :#{#pageable.pageSize} OFFSET :#{#pageable.offset}")
-    Flux<Statement> findByAccountIdAndDateRange(Long accountId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Flux<Statement> findByAccountIdAndDateRange(UUID accountId, LocalDate startDate, LocalDate endDate, Pageable pageable);
     
     /**
      * Find statements by account space ID and date range.
@@ -79,5 +81,5 @@ public interface StatementRepository extends BaseRepository<Statement, Long> {
            "AND end_date <= :endDate " +
            "ORDER BY generation_date DESC " +
            "LIMIT :#{#pageable.pageSize} OFFSET :#{#pageable.offset}")
-    Flux<Statement> findByAccountSpaceIdAndDateRange(Long accountSpaceId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Flux<Statement> findByAccountSpaceIdAndDateRange(UUID accountSpaceId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 }

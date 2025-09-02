@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,10 +23,10 @@ import java.time.LocalDateTime;
 public class TransactionLineSepaTransfer extends BaseEntity {
     @Id
     @Column("transaction_line_sepa_id")
-    private Long transactionLineSepaId;
+    private UUID transactionLineSepaId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("sepa_end_to_end_id")
     private String sepaEndToEndId;

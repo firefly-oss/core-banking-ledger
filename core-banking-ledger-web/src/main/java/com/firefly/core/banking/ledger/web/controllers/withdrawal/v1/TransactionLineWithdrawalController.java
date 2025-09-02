@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.withdrawal.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.withdrawal.v1.TransactionLineWithdrawalServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.withdrawal.v1.TransactionLineWithdrawalDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineWithdrawalController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineWithdrawalDTO>> getWithdrawalLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getWithdrawalLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineWithdrawalController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineWithdrawalDTO>> createWithdrawalLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new withdrawal line record", required = true,
                     schema = @Schema(implementation = TransactionLineWithdrawalDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineWithdrawalController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineWithdrawalDTO>> updateWithdrawalLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the withdrawal line record", required = true,
                     schema = @Schema(implementation = TransactionLineWithdrawalDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineWithdrawalController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteWithdrawalLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteWithdrawalLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

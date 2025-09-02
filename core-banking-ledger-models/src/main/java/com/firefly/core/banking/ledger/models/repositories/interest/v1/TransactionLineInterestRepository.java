@@ -7,6 +7,8 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,14 +16,14 @@ import java.time.LocalDateTime;
 /**
  * Repository interface for TransactionLineInterest entity.
  */
-public interface TransactionLineInterestRepository extends BaseRepository<TransactionLineInterest, Long> {
+public interface TransactionLineInterestRepository extends BaseRepository<TransactionLineInterest, UUID> {
     /**
      * Find interest transaction line by transaction ID.
      *
      * @param transactionId The transaction ID
      * @return A Mono containing the interest transaction line if found
      */
-    Mono<TransactionLineInterest> findByTransactionId(Long transactionId);
+    Mono<TransactionLineInterest> findByTransactionId(UUID transactionId);
 
     /**
      * Find interest transaction lines by interest type.

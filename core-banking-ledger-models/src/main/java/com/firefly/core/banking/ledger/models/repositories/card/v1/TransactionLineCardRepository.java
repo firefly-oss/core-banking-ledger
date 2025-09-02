@@ -7,11 +7,13 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public interface TransactionLineCardRepository extends BaseRepository<TransactionLineCard, Long> {
-    Mono<TransactionLineCard> findByTransactionId(Long transactionId);
+public interface TransactionLineCardRepository extends BaseRepository<TransactionLineCard, UUID> {
+    Mono<TransactionLineCard> findByTransactionId(UUID transactionId);
 
     @Query("SELECT * FROM transaction_line_card " +
             "WHERE card_merchant_category_code = :merchantCode " +

@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 
+import java.util.UUID;
 /**
  * Entity representing a money value with amount, currency, and asset type.
  * Supports both fiat currencies and crypto assets.
@@ -24,7 +25,7 @@ import java.math.BigDecimal;
 public class Money extends BaseEntity {
     @Id
     @Column("money_id")
-    private Long moneyId;
+    private UUID moneyId;
 
     @Column("amount")
     private BigDecimal amount;
@@ -44,5 +45,5 @@ public class Money extends BaseEntity {
      * Only populated when assetType is not FIAT
      */
     @Column("crypto_asset_id")
-    private Long cryptoAssetId;
+    private UUID cryptoAssetId;
 }

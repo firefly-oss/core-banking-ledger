@@ -33,7 +33,7 @@ CREATE INDEX idx_transaction_line_crypto_hash ON transaction_line_crypto(blockch
 CREATE INDEX idx_transaction_line_crypto_sender ON transaction_line_crypto(sender_address);
 CREATE INDEX idx_transaction_line_crypto_recipient ON transaction_line_crypto(recipient_address);
 
--- Add unique constraint on blockchain_transaction_hash to prevent duplicates
-ALTER TABLE transaction_line_crypto
-ADD CONSTRAINT uq_transaction_line_crypto_hash UNIQUE (blockchain_transaction_hash)
+-- Add partial unique index on blockchain_transaction_hash to prevent duplicates (only for non-null values)
+CREATE UNIQUE INDEX uq_transaction_line_crypto_hash
+ON transaction_line_crypto(blockchain_transaction_hash)
 WHERE blockchain_transaction_hash IS NOT NULL;

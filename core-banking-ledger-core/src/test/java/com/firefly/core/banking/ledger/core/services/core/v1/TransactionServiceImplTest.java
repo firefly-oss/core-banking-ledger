@@ -7,7 +7,7 @@ import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.common.core.queries.PaginationUtils;
 import com.firefly.core.banking.ledger.core.mappers.core.v1.TransactionMapper;
 import com.firefly.core.banking.ledger.core.mappers.core.v1.TransactionStatusHistoryMapper;
-import com.firefly.core.banking.ledger.core.services.event.v1.EventOutboxService;
+
 import com.firefly.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
 import com.firefly.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
 import com.firefly.core.banking.ledger.interfaces.enums.core.v1.TransactionTypeEnum;
@@ -17,6 +17,7 @@ import com.firefly.core.banking.ledger.models.repositories.core.v1.TransactionRe
 import com.firefly.core.banking.ledger.models.repositories.core.v1.TransactionStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -50,8 +51,7 @@ public class TransactionServiceImplTest {
     @Mock
     private TransactionStatusHistoryMapper statusHistoryMapper;
 
-    @Mock
-    private EventOutboxService eventOutboxService;
+
 
     @InjectMocks
     private TransactionServiceImpl service;
@@ -63,19 +63,19 @@ public class TransactionServiceImplTest {
     void setUp() {
         // Initialize test data
         transactionDTO = new TransactionDTO();
-        transactionDTO.setTransactionId(1L);
-        transactionDTO.setTotalAmount(new BigDecimal("100.00"));
+        transactionDTO.setTransactionId(UUID.randomUUID());
+        transactionDTO.setTotalAmount(new BigDecimal("1000.00"));
         transactionDTO.setDescription("Test Transaction");
         transactionDTO.setTransactionDate(LocalDateTime.now());
         transactionDTO.setValueDate(LocalDateTime.now());
         transactionDTO.setTransactionType(TransactionTypeEnum.TRANSFER);
         transactionDTO.setTransactionStatus(TransactionStatusEnum.POSTED);
         transactionDTO.setCurrency("EUR");
-        transactionDTO.setAccountId(100L);
+        transactionDTO.setAccountId(UUID.randomUUID());
 
         transaction = new Transaction();
-        transaction.setTransactionId(1L);
-        transaction.setTotalAmount(new BigDecimal("100.00"));
+        transaction.setTransactionId(UUID.randomUUID());
+        transaction.setTotalAmount(new BigDecimal("1000.00"));
         transaction.setDescription("Test Transaction");
         transaction.setTransactionDate(LocalDateTime.now());
 
@@ -84,20 +84,20 @@ public class TransactionServiceImplTest {
         transaction.setTransactionType(TransactionTypeEnum.TRANSFER);
         transaction.setTransactionStatus(TransactionStatusEnum.POSTED);
         transaction.setCurrency("EUR");
-        transaction.setAccountId(100L);
+        transaction.setAccountId(UUID.randomUUID());
     }
 
     @Test
     void createTransaction_Success() {
         // Arrange
         TransactionStatusHistory statusHistory = new TransactionStatusHistory();
-        statusHistory.setTransactionId(1L);
+        statusHistory.setTransactionId(UUID.randomUUID());
         statusHistory.setStatusCode(TransactionStatusEnum.POSTED);
 
         when(mapper.toEntity(any(TransactionDTO.class))).thenReturn(transaction);
         when(repository.save(any(Transaction.class))).thenReturn(Mono.just(transaction));
         when(statusHistoryRepository.save(any(TransactionStatusHistory.class))).thenReturn(Mono.just(statusHistory));
-        when(eventOutboxService.publishEvent(anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
+
         when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
 
         // Act & Assert
@@ -108,69 +108,73 @@ public class TransactionServiceImplTest {
         verify(mapper).toEntity(transactionDTO);
         verify(repository).save(transaction);
         verify(statusHistoryRepository).save(any(TransactionStatusHistory.class));
-        verify(eventOutboxService).publishEvent(anyString(), anyString(), anyString(), any());
-        verify(mapper, times(2)).toDTO(transaction);
+
+        verify(mapper).toDTO(transaction);
     }
 
     @Test
     void getTransaction_Success() {
         // Arrange
-        when(repository.findById(1L)).thenReturn(Mono.just(transaction));
+        UUID testId = UUID.randomUUID();
+        when(repository.findById(testId)).thenReturn(Mono.just(transaction));
         when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
 
         // Act & Assert
-        StepVerifier.create(service.getTransaction(1L))
+        StepVerifier.create(service.getTransaction(testId))
                 .expectNext(transactionDTO)
                 .verifyComplete();
 
-        verify(repository).findById(1L);
+        verify(repository).findById(testId);
         verify(mapper).toDTO(transaction);
     }
 
     @Test
     void getTransaction_NotFound() {
         // Arrange
-        when(repository.findById(1L)).thenReturn(Mono.empty());
+        UUID testId = UUID.randomUUID();
+        when(repository.findById(testId)).thenReturn(Mono.empty());
 
         // Act & Assert
-        StepVerifier.create(service.getTransaction(1L))
+        StepVerifier.create(service.getTransaction(testId))
                 .verifyComplete();
 
-        verify(repository).findById(1L);
+        verify(repository).findById(testId);
         verify(mapper, never()).toDTO(any(Transaction.class));
     }
 
     @Test
     void updateTransaction_Success() {
         // Arrange
-        when(repository.findById(1L)).thenReturn(Mono.just(transaction));
+        UUID testId = UUID.randomUUID();
+        when(repository.findById(testId)).thenReturn(Mono.just(transaction));
         when(mapper.toEntity(any(TransactionDTO.class))).thenReturn(transaction);
         when(repository.save(any(Transaction.class))).thenReturn(Mono.just(transaction));
-        when(eventOutboxService.publishEvent(anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
+
         when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
 
         // Act & Assert
-        StepVerifier.create(service.updateTransaction(1L, transactionDTO))
+        StepVerifier.create(service.updateTransaction(testId, transactionDTO))
                 .expectNext(transactionDTO)
                 .verifyComplete();
 
-        verify(repository).findById(1L);
+        verify(repository).findById(testId);
         verify(mapper).toEntity(transactionDTO);
         verify(repository).save(transaction);
-        verify(eventOutboxService).publishEvent(anyString(), anyString(), anyString(), any());
-        verify(mapper, times(2)).toDTO(transaction);
+
+        verify(mapper).toDTO(transaction);
     }
 
     @Test
     void updateTransaction_NotFound() {
         // Arrange
-        when(repository.findById(1L)).thenReturn(Mono.empty());
+        UUID testId = UUID.randomUUID();
+        when(repository.findById(testId)).thenReturn(Mono.empty());
 
         // Act & Assert
-        StepVerifier.create(service.updateTransaction(1L, transactionDTO))
+        StepVerifier.create(service.updateTransaction(testId, transactionDTO))
                 .verifyComplete();
 
-        verify(repository).findById(1L);
+        verify(repository).findById(testId);
         verify(mapper, never()).toEntity(any(TransactionDTO.class));
         verify(repository, never()).save(any(Transaction.class));
         verify(mapper, never()).toDTO(any(Transaction.class));
@@ -179,30 +183,31 @@ public class TransactionServiceImplTest {
     @Test
     void deleteTransaction_Success() {
         // Arrange
-        when(repository.findById(1L)).thenReturn(Mono.just(transaction));
+        UUID testId = UUID.randomUUID();
+        when(repository.findById(testId)).thenReturn(Mono.just(transaction));
         when(repository.delete(transaction)).thenReturn(Mono.empty());
-        when(mapper.toDTO(any(Transaction.class))).thenReturn(transactionDTO);
-        when(eventOutboxService.publishEvent(anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
+
 
         // Act & Assert
-        StepVerifier.create(service.deleteTransaction(1L))
+        StepVerifier.create(service.deleteTransaction(testId))
                 .verifyComplete();
 
-        verify(repository).findById(1L);
-        verify(eventOutboxService).publishEvent(anyString(), anyString(), anyString(), any());
+        verify(repository).findById(testId);
+
         verify(repository).delete(transaction);
     }
 
     @Test
     void deleteTransaction_NotFound() {
         // Arrange
-        when(repository.findById(1L)).thenReturn(Mono.empty());
+        UUID testId = UUID.randomUUID();
+        when(repository.findById(testId)).thenReturn(Mono.empty());
 
         // Act & Assert
-        StepVerifier.create(service.deleteTransaction(1L))
+        StepVerifier.create(service.deleteTransaction(testId))
                 .verifyComplete();
 
-        verify(repository).findById(1L);
+        verify(repository).findById(testId);
         verify(repository, never()).delete(any(Transaction.class));
     }
 

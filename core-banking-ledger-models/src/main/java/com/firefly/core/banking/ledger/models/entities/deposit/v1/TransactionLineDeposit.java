@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing detailed information about a deposit transaction.
  */
@@ -23,10 +24,10 @@ import java.time.LocalDateTime;
 public class TransactionLineDeposit extends BaseEntity {
     @Id
     @Column("transaction_line_deposit_id")
-    private Long transactionLineDepositId;
+    private UUID transactionLineDepositId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("deposit_method")
     private String depositMethod;

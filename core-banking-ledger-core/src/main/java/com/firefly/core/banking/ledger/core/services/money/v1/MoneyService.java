@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.money.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.interfaces.dtos.money.v1.MoneyDTO;
@@ -23,7 +25,7 @@ public interface MoneyService {
      * @param moneyId The ID of the money value.
      * @return The money value.
      */
-    Mono<MoneyDTO> getMoney(Long moneyId);
+    Mono<MoneyDTO> getMoney(UUID moneyId);
 
     /**
      * List all money values.

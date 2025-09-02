@@ -10,6 +10,7 @@ import com.firefly.core.banking.ledger.models.entities.core.v1.TransactionStatus
 import com.firefly.core.banking.ledger.models.repositories.core.v1.TransactionStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,8 +43,8 @@ public class TransactionStatusHistoryServiceImplTest {
 
     private TransactionStatusHistoryDTO historyDTO;
     private TransactionStatusHistory historyEntity;
-    private final Long transactionId = 1L;
-    private final Long historyId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID historyId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -131,7 +132,7 @@ public class TransactionStatusHistoryServiceImplTest {
     @Test
     void getStatusHistory_WrongTransactionId() {
         // Arrange
-        Long wrongTransactionId = 999L;
+        UUID wrongTransactionId = UUID.randomUUID();
         when(repository.findById(historyId)).thenReturn(Mono.just(historyEntity));
 
         // Act & Assert
@@ -179,7 +180,7 @@ public class TransactionStatusHistoryServiceImplTest {
     @Test
     void updateStatusHistory_WrongTransactionId() {
         // Arrange
-        Long wrongTransactionId = 999L;
+        UUID wrongTransactionId = UUID.randomUUID();
         when(repository.findById(historyId)).thenReturn(Mono.just(historyEntity));
 
         // Act & Assert
@@ -222,7 +223,7 @@ public class TransactionStatusHistoryServiceImplTest {
     @Test
     void deleteStatusHistory_WrongTransactionId() {
         // Arrange
-        Long wrongTransactionId = 999L;
+        UUID wrongTransactionId = UUID.randomUUID();
         when(repository.findById(historyId)).thenReturn(Mono.just(historyEntity));
 
         // Act & Assert

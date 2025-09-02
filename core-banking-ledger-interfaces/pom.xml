@@ -30,6 +30,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.firefly</groupId>
+            <artifactId>lib-commons-validators</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- OpenAPI -->
         <dependency>

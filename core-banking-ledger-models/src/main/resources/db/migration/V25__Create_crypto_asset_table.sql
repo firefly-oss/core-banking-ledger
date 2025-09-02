@@ -27,6 +27,7 @@ ALTER TABLE crypto_asset
 ADD CONSTRAINT uq_crypto_asset_symbol_network UNIQUE (asset_symbol, blockchain_network_id);
 
 -- Add unique constraint on contract_address and blockchain_network_id for tokens
-ALTER TABLE crypto_asset
-ADD CONSTRAINT uq_crypto_asset_contract_network UNIQUE (contract_address, blockchain_network_id)
+-- Using partial unique index since PostgreSQL doesn't support WHERE in ALTER TABLE ADD CONSTRAINT
+CREATE UNIQUE INDEX uq_crypto_asset_contract_network
+ON crypto_asset (contract_address, blockchain_network_id)
 WHERE contract_address IS NOT NULL;

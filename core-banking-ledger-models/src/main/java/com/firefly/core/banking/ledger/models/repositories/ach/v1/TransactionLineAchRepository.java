@@ -7,20 +7,22 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * Repository interface for TransactionLineAch entity.
  */
-public interface TransactionLineAchRepository extends BaseRepository<TransactionLineAch, Long> {
+public interface TransactionLineAchRepository extends BaseRepository<TransactionLineAch, UUID> {
     /**
      * Find ACH transaction line by transaction ID.
      *
      * @param transactionId The transaction ID
      * @return A Mono containing the ACH transaction line if found
      */
-    Mono<TransactionLineAch> findByTransactionId(Long transactionId);
+    Mono<TransactionLineAch> findByTransactionId(UUID transactionId);
 
     /**
      * Find ACH transaction lines by source account ID.

@@ -7,20 +7,22 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * Repository interface for TransactionLineTransfer entity.
  */
-public interface TransactionLineTransferRepository extends BaseRepository<TransactionLineTransfer, Long> {
+public interface TransactionLineTransferRepository extends BaseRepository<TransactionLineTransfer, UUID> {
     /**
      * Find transfer transaction line by transaction ID.
      *
      * @param transactionId The transaction ID
      * @return A Mono containing the transfer transaction line if found
      */
-    Mono<TransactionLineTransfer> findByTransactionId(Long transactionId);
+    Mono<TransactionLineTransfer> findByTransactionId(UUID transactionId);
 
     /**
      * Find transfer transaction lines by source account ID.

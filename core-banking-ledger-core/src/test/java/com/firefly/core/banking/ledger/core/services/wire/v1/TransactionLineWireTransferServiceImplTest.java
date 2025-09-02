@@ -7,6 +7,7 @@ import com.firefly.core.banking.ledger.models.entities.wire.v1.TransactionLineWi
 import com.firefly.core.banking.ledger.models.repositories.wire.v1.TransactionLineWireRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,8 +35,8 @@ public class TransactionLineWireTransferServiceImplTest {
 
     private TransactionLineWireTransferDTO wireDTO;
     private TransactionLineWireTransfer wireEntity;
-    private final Long transactionId = 1L;
-    private final Long wireId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID wireId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -50,8 +51,8 @@ public class TransactionLineWireTransferServiceImplTest {
         wireDTO.setWireDestinationAccountNumber("987654321");
         wireDTO.setWireTransferPurpose("Business payment");
         wireDTO.setWireTransferPriority(WireTransferPriorityEnum.HIGH);
-        wireDTO.setWireExchangeRate(new BigDecimal("1.05"));
-        wireDTO.setWireFeeAmount(new BigDecimal("25.00"));
+        wireDTO.setWireExchangeRate(new BigDecimal("1.25"));
+        wireDTO.setWireFeeAmount(new BigDecimal("15.00"));
         wireDTO.setWireFeeCurrency("USD");
         wireDTO.setWireInstructingParty("ABC Corporation");
         wireDTO.setWireBeneficiaryName("XYZ Inc.");
@@ -73,8 +74,8 @@ public class TransactionLineWireTransferServiceImplTest {
         wireEntity.setWireDestinationAccountNumber("987654321");
         wireEntity.setWireTransferPurpose("Business payment");
         wireEntity.setWireTransferPriority(WireTransferPriorityEnum.HIGH);
-        wireEntity.setWireExchangeRate(new BigDecimal("1.05"));
-        wireEntity.setWireFeeAmount(new BigDecimal("25.00"));
+        wireEntity.setWireExchangeRate(new BigDecimal("1.25"));
+        wireEntity.setWireFeeAmount(new BigDecimal("15.00"));
         wireEntity.setWireFeeCurrency("USD");
         wireEntity.setWireInstructingParty("ABC Corporation");
         wireEntity.setWireBeneficiaryName("XYZ Inc.");

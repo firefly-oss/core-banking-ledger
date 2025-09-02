@@ -6,6 +6,7 @@ import com.firefly.core.banking.ledger.models.entities.deposit.v1.TransactionLin
 import com.firefly.core.banking.ledger.models.repositories.deposit.v1.TransactionLineDepositRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,16 +33,16 @@ class TransactionLineDepositServiceImplTest {
     @InjectMocks
     private TransactionLineDepositServiceImpl service;
 
-    private Long transactionId;
+    private UUID transactionId;
     private TransactionLineDeposit depositEntity;
     private TransactionLineDepositDTO depositDTO;
 
     @BeforeEach
     void setUp() {
-        transactionId = 1L;
+        transactionId = UUID.randomUUID();
         
         depositEntity = new TransactionLineDeposit();
-        depositEntity.setTransactionLineDepositId(1L);
+        depositEntity.setTransactionLineDepositId(UUID.randomUUID());
         depositEntity.setTransactionId(transactionId);
         depositEntity.setDepositMethod("ATM");
         depositEntity.setDepositReference("DEP123456");
@@ -57,7 +58,7 @@ class TransactionLineDepositServiceImplTest {
         depositEntity.setDepositProcessedBy("John Doe");
         
         depositDTO = TransactionLineDepositDTO.builder()
-                .transactionLineDepositId(1L)
+                .transactionLineDepositId(UUID.randomUUID())
                 .transactionId(transactionId)
                 .depositMethod("ATM")
                 .depositReference("DEP123456")

@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.wire.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.wire.v1.TransactionLineWireTransferMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.wire.v1.TransactionLineWireTransferDTO;
 import com.firefly.core.banking.ledger.models.entities.wire.v1.TransactionLineWireTransfer;
@@ -20,13 +22,13 @@ public class TransactionLineWireTransferServiceImpl implements TransactionLineWi
     private TransactionLineWireTransferMapper mapper;
 
     @Override
-    public Mono<TransactionLineWireTransferDTO> getWireTransferLine(Long transactionId) {
+    public Mono<TransactionLineWireTransferDTO> getWireTransferLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO);
     }
 
     @Override
-    public Mono<TransactionLineWireTransferDTO> createWireTransferLine(Long transactionId, TransactionLineWireTransferDTO wireDTO) {
+    public Mono<TransactionLineWireTransferDTO> createWireTransferLine(UUID transactionId, TransactionLineWireTransferDTO wireDTO) {
         wireDTO.setTransactionId(transactionId);
         TransactionLineWireTransfer entity = mapper.toEntity(wireDTO);
         return repository.save(entity)
@@ -34,7 +36,7 @@ public class TransactionLineWireTransferServiceImpl implements TransactionLineWi
     }
 
     @Override
-    public Mono<TransactionLineWireTransferDTO> updateWireTransferLine(Long transactionId, TransactionLineWireTransferDTO wireDTO) {
+    public Mono<TransactionLineWireTransferDTO> updateWireTransferLine(UUID transactionId, TransactionLineWireTransferDTO wireDTO) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(existingEntity -> {
                     TransactionLineWireTransfer updatedEntity = mapper.toEntity(wireDTO);
@@ -45,7 +47,7 @@ public class TransactionLineWireTransferServiceImpl implements TransactionLineWi
     }
 
     @Override
-    public Mono<Void> deleteWireTransferLine(Long transactionId) {
+    public Mono<Void> deleteWireTransferLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(repository::delete);
     }

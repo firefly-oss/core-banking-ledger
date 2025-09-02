@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.interest.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.interest.v1.TransactionLineInterestMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.interest.v1.TransactionLineInterestDTO;
 import com.firefly.core.banking.ledger.models.entities.interest.v1.TransactionLineInterest;
@@ -24,14 +26,14 @@ public class TransactionLineInterestServiceImpl implements TransactionLineIntere
     private TransactionLineInterestMapper mapper;
 
     @Override
-    public Mono<TransactionLineInterestDTO> getInterestLine(Long transactionId) {
+    public Mono<TransactionLineInterestDTO> getInterestLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Interest not found")));
     }
 
     @Override
-    public Mono<TransactionLineInterestDTO> createInterestLine(Long transactionId, TransactionLineInterestDTO interestDTO) {
+    public Mono<TransactionLineInterestDTO> createInterestLine(UUID transactionId, TransactionLineInterestDTO interestDTO) {
         interestDTO.setTransactionId(transactionId);
         TransactionLineInterest entity = mapper.toEntity(interestDTO);
         return repository.save(entity)
@@ -40,7 +42,7 @@ public class TransactionLineInterestServiceImpl implements TransactionLineIntere
     }
 
     @Override
-    public Mono<TransactionLineInterestDTO> updateInterestLine(Long transactionId, TransactionLineInterestDTO interestDTO) {
+    public Mono<TransactionLineInterestDTO> updateInterestLine(UUID transactionId, TransactionLineInterestDTO interestDTO) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(existingEntity -> {
                     TransactionLineInterest updatedEntity = mapper.toEntity(interestDTO);
@@ -53,7 +55,7 @@ public class TransactionLineInterestServiceImpl implements TransactionLineIntere
     }
 
     @Override
-    public Mono<Void> deleteInterestLine(Long transactionId) {
+    public Mono<Void> deleteInterestLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(entity -> repository.delete(entity))
                 .switchIfEmpty(Mono.empty());

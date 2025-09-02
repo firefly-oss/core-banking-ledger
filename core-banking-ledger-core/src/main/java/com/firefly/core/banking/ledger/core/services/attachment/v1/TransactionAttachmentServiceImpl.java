@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.attachment.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.common.core.queries.PaginationUtils;
@@ -27,7 +29,7 @@ public class TransactionAttachmentServiceImpl implements TransactionAttachmentSe
     private TransactionAttachmentMapper mapper;
 
     @Override
-    public Mono<TransactionAttachmentDTO> createAttachment(Long transactionId, TransactionAttachmentDTO attachmentDTO) {
+    public Mono<TransactionAttachmentDTO> createAttachment(UUID transactionId, TransactionAttachmentDTO attachmentDTO) {
         attachmentDTO.setTransactionId(transactionId);
         TransactionAttachment entity = mapper.toEntity(attachmentDTO);
         return repository.save(entity)
@@ -35,14 +37,14 @@ public class TransactionAttachmentServiceImpl implements TransactionAttachmentSe
     }
 
     @Override
-    public Mono<TransactionAttachmentDTO> getAttachment(Long transactionId, Long attachmentId) {
+    public Mono<TransactionAttachmentDTO> getAttachment(UUID transactionId, UUID attachmentId) {
         return repository.findById(attachmentId)
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .map(mapper::toDTO);
     }
 
     @Override
-    public Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachments(Long transactionId, PaginationRequest paginationRequest) {
+    public Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachments(UUID transactionId, PaginationRequest paginationRequest) {
         return PaginationUtils.paginateQuery(
                 paginationRequest,
                 mapper::toDTO,
@@ -53,7 +55,7 @@ public class TransactionAttachmentServiceImpl implements TransactionAttachmentSe
 
     @Override
     public Mono<PaginationResponse<TransactionAttachmentDTO>> listAttachmentsByType(
-            Long transactionId,
+            UUID transactionId,
             AttachmentTypeEnum attachmentType,
             PaginationRequest paginationRequest
     ) {

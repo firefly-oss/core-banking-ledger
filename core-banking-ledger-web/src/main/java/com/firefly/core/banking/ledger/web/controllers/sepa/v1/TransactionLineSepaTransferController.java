@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.sepa.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.sepa.v1.TransactionLineSepaTransferServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.sepa.v1.TransactionLineSepaTransferDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineSepaTransferController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineSepaTransferDTO>> getSepaTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getSepaTransferLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineSepaTransferController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineSepaTransferDTO>> createSepaTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new SEPA transfer line record", required = true,
                     schema = @Schema(implementation = TransactionLineSepaTransferDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineSepaTransferController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineSepaTransferDTO>> updateSepaTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the SEPA transfer line record", required = true,
                     schema = @Schema(implementation = TransactionLineSepaTransferDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineSepaTransferController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteSepaTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteSepaTransferLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

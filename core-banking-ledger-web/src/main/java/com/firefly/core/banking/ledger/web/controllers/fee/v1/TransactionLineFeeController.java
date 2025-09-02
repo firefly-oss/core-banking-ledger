@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.fee.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.fee.v1.TransactionLineFeeServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.fee.v1.TransactionLineFeeDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineFeeController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineFeeDTO>> getFeeLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getFeeLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineFeeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineFeeDTO>> createFeeLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new fee line record", required = true,
                     schema = @Schema(implementation = TransactionLineFeeDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineFeeController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineFeeDTO>> updateFeeLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the fee line record", required = true,
                     schema = @Schema(implementation = TransactionLineFeeDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineFeeController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteFeeLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteFeeLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

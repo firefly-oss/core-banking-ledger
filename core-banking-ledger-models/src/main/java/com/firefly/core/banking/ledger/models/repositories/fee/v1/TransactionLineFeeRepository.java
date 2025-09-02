@@ -7,20 +7,22 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * Repository interface for TransactionLineFee entity.
  */
-public interface TransactionLineFeeRepository extends BaseRepository<TransactionLineFee, Long> {
+public interface TransactionLineFeeRepository extends BaseRepository<TransactionLineFee, UUID> {
     /**
      * Find fee transaction line by transaction ID.
      *
      * @param transactionId The transaction ID
      * @return A Mono containing the fee transaction line if found
      */
-    Mono<TransactionLineFee> findByTransactionId(Long transactionId);
+    Mono<TransactionLineFee> findByTransactionId(UUID transactionId);
 
     /**
      * Find fee transaction lines by fee type.

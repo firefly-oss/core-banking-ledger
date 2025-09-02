@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * REST controller for managing account-based transaction leg queries.
  */
@@ -42,7 +43,7 @@ public class AccountLegController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<TransactionLegDTO>>> listAccountLegs(
             @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
+            @PathVariable UUID accountId,
 
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
@@ -74,7 +75,7 @@ public class AccountLegController {
     @GetMapping(value = "/date-range", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<TransactionLegDTO>>> listAccountLegsByDateRange(
             @Parameter(description = "Account ID", required = true)
-            @PathVariable Long accountId,
+            @PathVariable UUID accountId,
 
             @Parameter(description = "Start date (ISO format)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,

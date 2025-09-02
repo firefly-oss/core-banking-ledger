@@ -13,6 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,10 +22,10 @@ import java.time.LocalDateTime;
 public class TransactionLineStandingOrder extends BaseEntity {
     @Id
     @Column("transaction_line_standing_order_id")
-    private Long transactionLineStandingOrderId;
+    private UUID transactionLineStandingOrderId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("standing_order_id")
     private String standingOrderId;

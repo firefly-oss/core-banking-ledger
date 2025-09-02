@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing detailed information about an internal transfer transaction.
  */
@@ -23,19 +24,19 @@ import java.time.LocalDateTime;
 public class TransactionLineTransfer extends BaseEntity {
     @Id
     @Column("transaction_line_transfer_id")
-    private Long transactionLineTransferId;
+    private UUID transactionLineTransferId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("transfer_reference")
     private String transferReference;
 
     @Column("transfer_source_account_id")
-    private Long transferSourceAccountId;
+    private UUID transferSourceAccountId;
 
     @Column("transfer_destination_account_id")
-    private Long transferDestinationAccountId;
+    private UUID transferDestinationAccountId;
 
     @Column("transfer_source_account_number")
     private String transferSourceAccountNumber;

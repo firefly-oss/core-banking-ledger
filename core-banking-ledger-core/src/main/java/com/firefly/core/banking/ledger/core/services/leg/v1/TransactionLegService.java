@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Service interface for managing transaction legs.
  */
@@ -18,7 +19,7 @@ public interface TransactionLegService {
      * @param legDTO The transaction leg data.
      * @return The created transaction leg.
      */
-    Mono<TransactionLegDTO> createTransactionLeg(Long transactionId, TransactionLegDTO legDTO);
+    Mono<TransactionLegDTO> createTransactionLeg(UUID transactionId, TransactionLegDTO legDTO);
 
     /**
      * Get a specific transaction leg by ID.
@@ -27,7 +28,7 @@ public interface TransactionLegService {
      * @param legId The ID of the transaction leg.
      * @return The transaction leg.
      */
-    Mono<TransactionLegDTO> getTransactionLeg(Long transactionId, Long legId);
+    Mono<TransactionLegDTO> getTransactionLeg(UUID transactionId, UUID legId);
 
     /**
      * List all legs for a specific transaction.
@@ -36,7 +37,7 @@ public interface TransactionLegService {
      * @param paginationRequest Pagination parameters.
      * @return A paginated list of transaction legs.
      */
-    Mono<PaginationResponse<TransactionLegDTO>> listTransactionLegs(Long transactionId, PaginationRequest paginationRequest);
+    Mono<PaginationResponse<TransactionLegDTO>> listTransactionLegs(UUID transactionId, PaginationRequest paginationRequest);
 
     /**
      * List all legs for a specific account.
@@ -45,7 +46,7 @@ public interface TransactionLegService {
      * @param paginationRequest Pagination parameters.
      * @return A paginated list of transaction legs.
      */
-    Mono<PaginationResponse<TransactionLegDTO>> listAccountLegs(Long accountId, PaginationRequest paginationRequest);
+    Mono<PaginationResponse<TransactionLegDTO>> listAccountLegs(UUID accountId, PaginationRequest paginationRequest);
 
     /**
      * List all legs for a specific account within a date range.
@@ -57,7 +58,7 @@ public interface TransactionLegService {
      * @return A paginated list of transaction legs.
      */
     Mono<PaginationResponse<TransactionLegDTO>> listAccountLegsByDateRange(
-            Long accountId, 
+            UUID accountId, 
             LocalDateTime startDate, 
             LocalDateTime endDate, 
             PaginationRequest paginationRequest

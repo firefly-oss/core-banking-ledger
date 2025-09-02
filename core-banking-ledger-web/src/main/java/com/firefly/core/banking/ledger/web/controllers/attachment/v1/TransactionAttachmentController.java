@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.attachment.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.attachment.v1.TransactionAttachmentService;
@@ -40,7 +42,7 @@ public class TransactionAttachmentController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionAttachmentDTO>> createAttachment(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Attachment data", required = true,
                     schema = @Schema(implementation = TransactionAttachmentDTO.class))
@@ -63,10 +65,10 @@ public class TransactionAttachmentController {
     @GetMapping(value = "/{attachmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionAttachmentDTO>> getAttachment(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Attachment ID", required = true)
-            @PathVariable Long attachmentId
+            @PathVariable UUID attachmentId
     ) {
         return service.getAttachment(transactionId, attachmentId)
                 .map(ResponseEntity::ok)
@@ -85,7 +87,7 @@ public class TransactionAttachmentController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<TransactionAttachmentDTO>>> listAttachments(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
@@ -117,7 +119,7 @@ public class TransactionAttachmentController {
     @GetMapping(value = "/type/{attachmentType}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<TransactionAttachmentDTO>>> listAttachmentsByType(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Attachment type", required = true, schema = @Schema(implementation = AttachmentTypeEnum.class))
             @PathVariable AttachmentTypeEnum attachmentType,

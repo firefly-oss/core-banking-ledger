@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.sepa.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.sepa.v1.TransactionLineSepaTransferMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.sepa.v1.TransactionLineSepaTransferDTO;
 import com.firefly.core.banking.ledger.models.entities.sepa.v1.TransactionLineSepaTransfer;
@@ -20,14 +22,14 @@ public class TransactionLineSepaTransferServiceImpl implements TransactionLineSe
     private TransactionLineSepaTransferMapper mapper;
 
     @Override
-    public Mono<TransactionLineSepaTransferDTO> getSepaTransferLine(Long transactionId) {
+    public Mono<TransactionLineSepaTransferDTO> getSepaTransferLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("SEPA transfer line not found for transactionId: " + transactionId)));
     }
 
     @Override
-    public Mono<TransactionLineSepaTransferDTO> createSepaTransferLine(Long transactionId, TransactionLineSepaTransferDTO sepaDTO) {
+    public Mono<TransactionLineSepaTransferDTO> createSepaTransferLine(UUID transactionId, TransactionLineSepaTransferDTO sepaDTO) {
         sepaDTO.setTransactionId(transactionId);
         TransactionLineSepaTransfer entity = mapper.toEntity(sepaDTO);
         return repository.save(entity)
@@ -35,7 +37,7 @@ public class TransactionLineSepaTransferServiceImpl implements TransactionLineSe
     }
 
     @Override
-    public Mono<TransactionLineSepaTransferDTO> updateSepaTransferLine(Long transactionId, TransactionLineSepaTransferDTO sepaDTO) {
+    public Mono<TransactionLineSepaTransferDTO> updateSepaTransferLine(UUID transactionId, TransactionLineSepaTransferDTO sepaDTO) {
         return repository.findByTransactionId(transactionId)
                 .switchIfEmpty(Mono.error(new RuntimeException("SEPA transfer line not found for transactionId: " + transactionId)))
                 .flatMap(existingEntity -> {
@@ -47,7 +49,7 @@ public class TransactionLineSepaTransferServiceImpl implements TransactionLineSe
     }
 
     @Override
-    public Mono<Void> deleteSepaTransferLine(Long transactionId) {
+    public Mono<Void> deleteSepaTransferLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .switchIfEmpty(Mono.error(new RuntimeException("SEPA transfer line not found for transactionId: " + transactionId)))
                 .flatMap(repository::delete);

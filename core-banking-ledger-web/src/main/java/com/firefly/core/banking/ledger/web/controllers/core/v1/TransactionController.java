@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.core.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.filters.FilterRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.core.v1.TransactionServiceImpl;
@@ -84,7 +86,7 @@ public class TransactionController {
     @GetMapping(value = "/{transactionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionDTO>> getTransaction(
             @Parameter(description = "Unique identifier of the transaction to retrieve", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getTransaction(transactionId)
                 .map(ResponseEntity::ok)
@@ -105,7 +107,7 @@ public class TransactionController {
     @PutMapping(value = "/{transactionId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionDTO>> updateTransaction(
             @Parameter(description = "Unique identifier of the transaction to update", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated transaction data", required = true,
                     schema = @Schema(implementation = TransactionDTO.class))
@@ -129,7 +131,7 @@ public class TransactionController {
     @DeleteMapping(value = "/{transactionId}")
     public Mono<ResponseEntity<Void>> deleteTransaction(
             @Parameter(description = "Unique identifier of the transaction to delete", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteTransaction(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));
@@ -149,7 +151,7 @@ public class TransactionController {
     @PatchMapping(value = "/{transactionId}/status", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionDTO>> updateTransactionStatus(
             @Parameter(description = "Unique identifier of the transaction to update", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "New status to set", required = true)
             @RequestParam TransactionStatusEnum newStatus,
@@ -162,29 +164,7 @@ public class TransactionController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @Operation(
-            summary = "Create Reversal Transaction",
-            description = "Create a reversal transaction for an existing transaction."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Reversal transaction created successfully",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TransactionDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Original transaction not found",
-                    content = @Content)
-    })
-    @PostMapping(value = "/{transactionId}/reversal", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<TransactionDTO>> createReversalTransaction(
-            @Parameter(description = "Unique identifier of the original transaction", required = true)
-            @PathVariable Long transactionId,
 
-            @Parameter(description = "Reason for the reversal", required = true)
-            @RequestParam String reason
-    ) {
-        return service.createReversalTransaction(transactionId, reason)
-                .map(createdTxn -> ResponseEntity.status(201).body(createdTxn))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
 
     @Operation(
             summary = "Find Transaction by External Reference",

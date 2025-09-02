@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.wire.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.wire.v1.TransactionLineWireTransferServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.wire.v1.TransactionLineWireTransferDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineWireTransferController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineWireTransferDTO>> getWireTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getWireTransferLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineWireTransferController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineWireTransferDTO>> createWireTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new wire transfer line record", required = true,
                     schema = @Schema(implementation = TransactionLineWireTransferDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineWireTransferController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineWireTransferDTO>> updateWireTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the wire transfer line record", required = true,
                     schema = @Schema(implementation = TransactionLineWireTransferDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineWireTransferController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteWireTransferLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteWireTransferLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

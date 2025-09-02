@@ -27,7 +27,7 @@ CREATE INDEX idx_transaction_blockchain_network ON transaction(blockchain_networ
 -- Add index for blockchain_transaction_hash for faster lookups
 CREATE INDEX idx_transaction_blockchain_hash ON transaction(blockchain_transaction_hash);
 
--- Add unique constraint on blockchain_transaction_hash to prevent duplicates
-ALTER TABLE transaction
-ADD CONSTRAINT uq_transaction_blockchain_hash UNIQUE (blockchain_transaction_hash)
+-- Add partial unique index on blockchain_transaction_hash to prevent duplicates (only for non-null values)
+CREATE UNIQUE INDEX uq_transaction_blockchain_hash
+ON transaction(blockchain_transaction_hash)
 WHERE blockchain_transaction_hash IS NOT NULL;

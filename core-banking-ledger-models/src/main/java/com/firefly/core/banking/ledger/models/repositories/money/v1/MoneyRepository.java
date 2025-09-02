@@ -6,10 +6,12 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 /**
  * Repository interface for money values.
  */
-public interface MoneyRepository extends BaseRepository<Money, Long> {
+public interface MoneyRepository extends BaseRepository<Money, UUID> {
     /**
      * Find all money values with a specific currency.
      */

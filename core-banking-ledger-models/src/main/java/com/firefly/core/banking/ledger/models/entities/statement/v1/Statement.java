@@ -13,6 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing a statement record.
  */
@@ -24,13 +25,13 @@ import java.time.LocalDateTime;
 public class Statement extends BaseEntity {
     @Id
     @Column("statement_id")
-    private Long statementId;
+    private UUID statementId;
 
     @Column("account_id")
-    private Long accountId;
+    private UUID accountId;
 
     @Column("account_space_id")
-    private Long accountSpaceId;
+    private UUID accountSpaceId;
 
     @Column("period_type")
     private StatementPeriodEnum periodType;

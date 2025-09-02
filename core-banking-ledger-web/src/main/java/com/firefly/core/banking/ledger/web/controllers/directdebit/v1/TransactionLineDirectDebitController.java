@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.directdebit.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.directdebit.v1.TransactionLineDirectDebitServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.directdebit.v1.TransactionLineDirectDebitDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineDirectDebitController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> getDirectDebitLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getDirectDebitLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineDirectDebitController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> createDirectDebitLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new direct debit line record", required = true,
                     schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineDirectDebitController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineDirectDebitDTO>> updateDirectDebitLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the direct debit line record", required = true,
                     schema = @Schema(implementation = TransactionLineDirectDebitDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineDirectDebitController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteDirectDebitLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable("transactionId") Long transactionId
+            @PathVariable("transactionId") UUID transactionId
     ) {
         return service.deleteDirectDebitLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

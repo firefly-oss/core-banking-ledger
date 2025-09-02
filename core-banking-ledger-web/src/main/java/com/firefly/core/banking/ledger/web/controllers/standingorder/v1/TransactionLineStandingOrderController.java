@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.standingorder.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.standingorder.v1.TransactionLineStandingOrderServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.standingorder.v1.TransactionLineStandingOrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineStandingOrderController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> getStandingOrderLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getStandingOrderLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineStandingOrderController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> createStandingOrderLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new standing order line record", required = true,
                     schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineStandingOrderController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineStandingOrderDTO>> updateStandingOrderLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the standing order line record", required = true,
                     schema = @Schema(implementation = TransactionLineStandingOrderDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineStandingOrderController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteStandingOrderLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteStandingOrderLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing detailed information about an interest transaction.
  */
@@ -23,10 +24,10 @@ import java.time.LocalDateTime;
 public class TransactionLineInterest extends BaseEntity {
     @Id
     @Column("transaction_line_interest_id")
-    private Long transactionLineInterestId;
+    private UUID transactionLineInterestId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("interest_type")
     private String interestType;
@@ -38,7 +39,7 @@ public class TransactionLineInterest extends BaseEntity {
     private String interestReference;
 
     @Column("interest_related_account_id")
-    private Long interestRelatedAccountId;
+    private UUID interestRelatedAccountId;
 
     @Column("interest_calculation_method")
     private String interestCalculationMethod;

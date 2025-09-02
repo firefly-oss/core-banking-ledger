@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing detailed information about a withdrawal transaction.
  */
@@ -22,10 +23,10 @@ import java.time.LocalDateTime;
 public class TransactionLineWithdrawal extends BaseEntity {
     @Id
     @Column("transaction_line_withdrawal_id")
-    private Long transactionLineWithdrawalId;
+    private UUID transactionLineWithdrawalId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("withdrawal_method")
     private String withdrawalMethod;

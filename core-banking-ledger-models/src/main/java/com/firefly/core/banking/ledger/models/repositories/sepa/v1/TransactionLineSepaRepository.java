@@ -8,11 +8,13 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public interface TransactionLineSepaRepository extends BaseRepository<TransactionLineSepaTransfer, Long> {
-    Mono<TransactionLineSepaTransfer> findByTransactionId(Long transactionId);
+public interface TransactionLineSepaRepository extends BaseRepository<TransactionLineSepaTransfer, UUID> {
+    Mono<TransactionLineSepaTransfer> findByTransactionId(UUID transactionId);
 
     Mono<TransactionLineSepaTransfer> findBySepaEndToEndId(String endToEndId);
 

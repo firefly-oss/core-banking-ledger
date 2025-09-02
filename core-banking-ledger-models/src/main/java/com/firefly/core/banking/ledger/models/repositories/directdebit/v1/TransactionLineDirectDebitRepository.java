@@ -9,12 +9,14 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public interface TransactionLineDirectDebitRepository extends BaseRepository<TransactionLineDirectDebit, Long> {
+public interface TransactionLineDirectDebitRepository extends BaseRepository<TransactionLineDirectDebit, UUID> {
 
-    Mono<TransactionLineDirectDebit> findByTransactionId(Long transactionId);
+    Mono<TransactionLineDirectDebit> findByTransactionId(UUID transactionId);
 
     @Query("SELECT * FROM transaction_line_direct_debit " +
             "WHERE direct_debit_mandate_id = :mandateId " +

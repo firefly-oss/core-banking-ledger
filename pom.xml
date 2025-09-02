@@ -18,6 +18,7 @@
         <module>core-banking-ledger-interfaces</module>
         <module>core-banking-ledger-models</module>
         <module>core-banking-ledger-web</module>
+        <module>core-banking-ledger-sdk</module>
     </modules>
 
     <properties>
@@ -37,6 +38,11 @@
             <dependency>
                 <groupId>com.firefly</groupId>
                 <artifactId>core-banking-ledger-models</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.firefly</groupId>
+                <artifactId>core-banking-ledger-sdk</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

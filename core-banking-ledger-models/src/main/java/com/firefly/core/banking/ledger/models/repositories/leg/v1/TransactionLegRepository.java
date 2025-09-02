@@ -7,51 +7,53 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.time.LocalDateTime;
 
 /**
  * Repository interface for transaction legs.
  */
-public interface TransactionLegRepository extends BaseRepository<TransactionLeg, Long> {
+public interface TransactionLegRepository extends BaseRepository<TransactionLeg, UUID> {
     /**
      * Find all legs for a specific transaction.
      */
-    Flux<TransactionLeg> findByTransactionId(Long transactionId, Pageable pageable);
+    Flux<TransactionLeg> findByTransactionId(UUID transactionId, Pageable pageable);
     
     /**
      * Count all legs for a specific transaction.
      */
-    Mono<Long> countByTransactionId(Long transactionId);
+    Mono<Long> countByTransactionId(UUID transactionId);
     
     /**
      * Find all legs for a specific account.
      */
-    Flux<TransactionLeg> findByAccountId(Long accountId, Pageable pageable);
+    Flux<TransactionLeg> findByAccountId(UUID accountId, Pageable pageable);
     
     /**
      * Count all legs for a specific account.
      */
-    Mono<Long> countByAccountId(Long accountId);
+    Mono<Long> countByAccountId(UUID accountId);
     
     /**
      * Find all legs for a specific account space.
      */
-    Flux<TransactionLeg> findByAccountSpaceId(Long accountSpaceId, Pageable pageable);
+    Flux<TransactionLeg> findByAccountSpaceId(UUID accountSpaceId, Pageable pageable);
     
     /**
      * Count all legs for a specific account space.
      */
-    Mono<Long> countByAccountSpaceId(Long accountSpaceId);
+    Mono<Long> countByAccountSpaceId(UUID accountSpaceId);
     
     /**
      * Find all legs for a specific account within a date range.
      */
     @Query("SELECT * FROM transaction_leg WHERE account_id = :accountId AND booking_date BETWEEN :startDate AND :endDate ORDER BY booking_date DESC")
-    Flux<TransactionLeg> findByAccountIdAndBookingDateBetween(Long accountId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Flux<TransactionLeg> findByAccountIdAndBookingDateBetween(UUID accountId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     
     /**
      * Count all legs for a specific account within a date range.
      */
     @Query("SELECT COUNT(*) FROM transaction_leg WHERE account_id = :accountId AND booking_date BETWEEN :startDate AND :endDate")
-    Mono<Long> countByAccountIdAndBookingDateBetween(Long accountId, LocalDateTime startDate, LocalDateTime endDate);
+    Mono<Long> countByAccountIdAndBookingDateBetween(UUID accountId, LocalDateTime startDate, LocalDateTime endDate);
 }

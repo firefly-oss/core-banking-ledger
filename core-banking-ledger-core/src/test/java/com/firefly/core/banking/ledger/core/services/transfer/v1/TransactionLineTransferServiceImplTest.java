@@ -6,6 +6,7 @@ import com.firefly.core.banking.ledger.models.entities.transfer.v1.TransactionLi
 import com.firefly.core.banking.ledger.models.repositories.transfer.v1.TransactionLineTransferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,8 +34,8 @@ public class TransactionLineTransferServiceImplTest {
 
     private TransactionLineTransferDTO transferDTO;
     private TransactionLineTransfer transferEntity;
-    private final Long transactionId = 1L;
-    private final Long transferId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID transferId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -42,8 +43,8 @@ public class TransactionLineTransferServiceImplTest {
         transferDTO = new TransactionLineTransferDTO();
         transferDTO.setTransactionLineTransferId(transferId);
         transferDTO.setTransactionId(transactionId);
-        transferDTO.setTransferSourceAccountId(101L);
-        transferDTO.setTransferDestinationAccountId(102L);
+        transferDTO.setTransferSourceAccountId(UUID.randomUUID());
+        transferDTO.setTransferDestinationAccountId(UUID.randomUUID());
         transferDTO.setTransferFeeAmount(BigDecimal.valueOf(100.00));
         transferDTO.setTransferTimestamp(LocalDateTime.now());
         transferDTO.setTransferPurpose("Test Transfer");
@@ -52,8 +53,8 @@ public class TransactionLineTransferServiceImplTest {
         transferEntity = new TransactionLineTransfer();
         transferEntity.setTransactionLineTransferId(transferId);
         transferEntity.setTransactionId(transactionId);
-        transferEntity.setTransferSourceAccountId(101L);
-        transferEntity.setTransferDestinationAccountId(102L);
+        transferEntity.setTransferSourceAccountId(UUID.randomUUID());
+        transferEntity.setTransferDestinationAccountId(UUID.randomUUID());
         transferEntity.setTransferFeeAmount(BigDecimal.valueOf(100.00));
         transferEntity.setTransferTimestamp(LocalDateTime.now());
         transferEntity.setTransferPurpose("Test Transfer");

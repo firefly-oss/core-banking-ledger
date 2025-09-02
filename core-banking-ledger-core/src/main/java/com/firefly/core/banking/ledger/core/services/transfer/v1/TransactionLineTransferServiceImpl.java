@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.transfer.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.transfer.v1.TransactionLineTransferMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.transfer.v1.TransactionLineTransferDTO;
 import com.firefly.core.banking.ledger.models.entities.transfer.v1.TransactionLineTransfer;
@@ -24,14 +26,14 @@ public class TransactionLineTransferServiceImpl implements TransactionLineTransf
     private TransactionLineTransferMapper mapper;
 
     @Override
-    public Mono<TransactionLineTransferDTO> getTransferLine(Long transactionId) {
+    public Mono<TransactionLineTransferDTO> getTransferLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Transfer not found")));
     }
 
     @Override
-    public Mono<TransactionLineTransferDTO> createTransferLine(Long transactionId, TransactionLineTransferDTO transferDTO) {
+    public Mono<TransactionLineTransferDTO> createTransferLine(UUID transactionId, TransactionLineTransferDTO transferDTO) {
         transferDTO.setTransactionId(transactionId);
         TransactionLineTransfer entity = mapper.toEntity(transferDTO);
         return repository.save(entity)
@@ -40,7 +42,7 @@ public class TransactionLineTransferServiceImpl implements TransactionLineTransf
     }
 
     @Override
-    public Mono<TransactionLineTransferDTO> updateTransferLine(Long transactionId, TransactionLineTransferDTO transferDTO) {
+    public Mono<TransactionLineTransferDTO> updateTransferLine(UUID transactionId, TransactionLineTransferDTO transferDTO) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(existingEntity -> {
                     TransactionLineTransfer updatedEntity = mapper.toEntity(transferDTO);
@@ -53,7 +55,7 @@ public class TransactionLineTransferServiceImpl implements TransactionLineTransf
     }
 
     @Override
-    public Mono<Void> deleteTransferLine(Long transactionId) {
+    public Mono<Void> deleteTransferLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(entity -> repository.delete(entity))
                 .switchIfEmpty(Mono.empty());

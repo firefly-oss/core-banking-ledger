@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.deposit.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.deposit.v1.TransactionLineDepositServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.deposit.v1.TransactionLineDepositDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineDepositController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineDepositDTO>> getDepositLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getDepositLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineDepositController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineDepositDTO>> createDepositLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new deposit line record", required = true,
                     schema = @Schema(implementation = TransactionLineDepositDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineDepositController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineDepositDTO>> updateDepositLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated data for the deposit line record", required = true,
                     schema = @Schema(implementation = TransactionLineDepositDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineDepositController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteDepositLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.deleteDepositLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

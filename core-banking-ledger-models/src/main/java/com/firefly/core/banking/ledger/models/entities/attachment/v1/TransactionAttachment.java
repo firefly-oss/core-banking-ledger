@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Entity representing an attachment related to a transaction.
@@ -23,10 +24,10 @@ import java.time.LocalDateTime;
 public class TransactionAttachment extends BaseEntity {
     @Id
     @Column("transaction_attachment_id")
-    private Long transactionAttachmentId;
+    private UUID transactionAttachmentId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     /**
      * Type of attachment (INVOICE, RECEIPT, CONTRACT, etc.)

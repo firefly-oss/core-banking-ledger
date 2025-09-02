@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.money.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.common.core.queries.PaginationUtils;
@@ -33,7 +35,7 @@ public class MoneyServiceImpl implements MoneyService {
     }
 
     @Override
-    public Mono<MoneyDTO> getMoney(Long moneyId) {
+    public Mono<MoneyDTO> getMoney(UUID moneyId) {
         return repository.findById(moneyId)
                 .map(mapper::toDTO);
     }

@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.card.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.services.card.v1.TransactionLineCardServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.card.v1.TransactionLineCardDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public class TransactionLineCardController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineCardDTO>> getCardLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId
+            @PathVariable UUID transactionId
     ) {
         return service.getCardLine(transactionId)
                 .map(ResponseEntity::ok)
@@ -58,7 +60,7 @@ public class TransactionLineCardController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineCardDTO>> createCardLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new card line record", required = true,
                     schema = @Schema(implementation = TransactionLineCardDTO.class))
@@ -83,7 +85,7 @@ public class TransactionLineCardController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLineCardDTO>> updateCardLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Updated card line data", required = true,
                     schema = @Schema(implementation = TransactionLineCardDTO.class))
@@ -107,7 +109,7 @@ public class TransactionLineCardController {
     @DeleteMapping
     public Mono<ResponseEntity<Void>> deleteCardLine(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable("transactionId") Long transactionId
+            @PathVariable("transactionId") UUID transactionId
     ) {
         return service.deleteCardLine(transactionId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.core.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryServiceImpl;
@@ -40,7 +42,7 @@ public class TransactionStatusHistoryController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<TransactionStatusHistoryDTO>>> getAllStatusHistory(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @ParameterObject
             @ModelAttribute PaginationRequest paginationRequest
@@ -64,7 +66,7 @@ public class TransactionStatusHistoryController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionStatusHistoryDTO>> createStatusHistory(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Data for the new transaction status history record", required = true,
                     schema = @Schema(implementation = TransactionStatusHistoryDTO.class))
@@ -89,10 +91,10 @@ public class TransactionStatusHistoryController {
     @GetMapping(value = "/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionStatusHistoryDTO>> getStatusHistory(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Unique identifier of the status history record", required = true)
-            @PathVariable Long historyId
+            @PathVariable UUID historyId
     ) {
         return service.getStatusHistory(transactionId, historyId)
                 .map(ResponseEntity::ok)
@@ -113,10 +115,10 @@ public class TransactionStatusHistoryController {
     @PutMapping(value = "/{historyId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionStatusHistoryDTO>> updateStatusHistory(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Unique identifier of the status history record to update", required = true)
-            @PathVariable Long historyId,
+            @PathVariable UUID historyId,
 
             @Parameter(description = "Updated status history data", required = true,
                     schema = @Schema(implementation = TransactionStatusHistoryDTO.class))
@@ -140,10 +142,10 @@ public class TransactionStatusHistoryController {
     @DeleteMapping(value = "/{historyId}")
     public Mono<ResponseEntity<Void>> deleteStatusHistory(
             @Parameter(description = "Unique identifier of the transaction", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Unique identifier of the status history record to delete", required = true)
-            @PathVariable Long historyId
+            @PathVariable UUID historyId
     ) {
         return service.deleteStatusHistory(transactionId, historyId)
                 .then(Mono.just(ResponseEntity.noContent().build()));

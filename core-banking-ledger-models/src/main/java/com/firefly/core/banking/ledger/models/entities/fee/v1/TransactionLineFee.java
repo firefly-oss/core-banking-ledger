@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing detailed information about a fee transaction.
  */
@@ -22,10 +23,10 @@ import java.time.LocalDateTime;
 public class TransactionLineFee extends BaseEntity {
     @Id
     @Column("transaction_line_fee_id")
-    private Long transactionLineFeeId;
+    private UUID transactionLineFeeId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("fee_type")
     private String feeType;
@@ -37,7 +38,7 @@ public class TransactionLineFee extends BaseEntity {
     private String feeReference;
 
     @Column("fee_related_transaction_id")
-    private Long feeRelatedTransactionId;
+    private UUID feeRelatedTransactionId;
 
     @Column("fee_related_service")
     private String feeRelatedService;

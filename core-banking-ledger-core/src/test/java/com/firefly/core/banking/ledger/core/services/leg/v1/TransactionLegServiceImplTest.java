@@ -9,6 +9,7 @@ import com.firefly.core.banking.ledger.models.entities.leg.v1.TransactionLeg;
 import com.firefly.core.banking.ledger.models.repositories.leg.v1.TransactionLegRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,9 +42,9 @@ public class TransactionLegServiceImplTest {
 
     private TransactionLegDTO legDTO;
     private TransactionLeg legEntity;
-    private final Long transactionId = 1L;
-    private final Long legId = 1L;
-    private final Long accountId = 100L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID legId = UUID.randomUUID();
+    private final UUID accountId = UUID.randomUUID();
     private final LocalDateTime startDate = LocalDateTime.now().minusDays(30);
     private final LocalDateTime endDate = LocalDateTime.now();
 
@@ -55,7 +56,7 @@ public class TransactionLegServiceImplTest {
         legDTO.setTransactionId(transactionId);
         legDTO.setAccountId(accountId);
         legDTO.setLegType("DEBIT");
-        legDTO.setAmount(new BigDecimal("100.00"));
+        legDTO.setAmount(new BigDecimal("1000.00"));
         legDTO.setCurrency("EUR");
         legDTO.setDescription("Test leg");
         legDTO.setValueDate(LocalDateTime.now());
@@ -66,7 +67,7 @@ public class TransactionLegServiceImplTest {
         legEntity.setTransactionId(transactionId);
         legEntity.setAccountId(accountId);
         legEntity.setLegType("DEBIT");
-        legEntity.setAmount(new BigDecimal("100.00"));
+        legEntity.setAmount(new BigDecimal("1000.00"));
         legEntity.setCurrency("EUR");
         legEntity.setDescription("Test leg");
         legEntity.setValueDate(LocalDateTime.now());
@@ -108,7 +109,7 @@ public class TransactionLegServiceImplTest {
     @Test
     void getTransactionLeg_WrongTransactionId_EmptyResult() {
         // Arrange
-        legEntity.setTransactionId(999L); // Different transaction ID
+        legEntity.setTransactionId(UUID.randomUUID()); // Different transaction ID
         when(repository.findById(legId)).thenReturn(Mono.just(legEntity));
 
         // Act & Assert

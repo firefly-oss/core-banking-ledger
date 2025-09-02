@@ -8,11 +8,13 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public interface TransactionLineWireRepository extends BaseRepository<TransactionLineWireTransfer, Long> {
-    Mono<TransactionLineWireTransfer> findByTransactionId(Long transactionId);
+public interface TransactionLineWireRepository extends BaseRepository<TransactionLineWireTransfer, UUID> {
+    Mono<TransactionLineWireTransfer> findByTransactionId(UUID transactionId);
 
     Mono<TransactionLineWireTransfer> findByWireTransferReference(String reference);
 

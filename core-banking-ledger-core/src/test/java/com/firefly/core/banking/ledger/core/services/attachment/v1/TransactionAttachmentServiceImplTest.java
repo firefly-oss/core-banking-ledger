@@ -10,6 +10,7 @@ import com.firefly.core.banking.ledger.models.entities.attachment.v1.Transaction
 import com.firefly.core.banking.ledger.models.repositories.attachment.v1.TransactionAttachmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,8 +41,8 @@ public class TransactionAttachmentServiceImplTest {
 
     private TransactionAttachmentDTO attachmentDTO;
     private TransactionAttachment attachmentEntity;
-    private final Long transactionId = 1L;
-    private final Long attachmentId = 1L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID attachmentId = UUID.randomUUID();
     private final AttachmentTypeEnum attachmentType = AttachmentTypeEnum.INVOICE;
 
     @BeforeEach
@@ -55,7 +56,7 @@ public class TransactionAttachmentServiceImplTest {
         attachmentDTO.setAttachmentDescription("Test invoice");
         attachmentDTO.setDocumentId("ECM-DOC-123456");
         attachmentDTO.setContentType("application/pdf");
-        attachmentDTO.setSizeBytes(1024L * 1024L);
+        attachmentDTO.setSizeBytes(1024L);
         attachmentDTO.setHashSha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         attachmentDTO.setUploadedBy("John Doe");
         attachmentDTO.setUploadDate(LocalDateTime.now());
@@ -68,7 +69,7 @@ public class TransactionAttachmentServiceImplTest {
         attachmentEntity.setAttachmentDescription("Test invoice");
         attachmentEntity.setDocumentId("ECM-DOC-123456");
         attachmentEntity.setContentType("application/pdf");
-        attachmentEntity.setSizeBytes(1024L * 1024L);
+        attachmentEntity.setSizeBytes(1024L);
         attachmentEntity.setHashSha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         attachmentEntity.setUploadedBy("John Doe");
         attachmentEntity.setUploadDate(LocalDateTime.now());
@@ -109,7 +110,7 @@ public class TransactionAttachmentServiceImplTest {
     @Test
     void getAttachment_WrongTransactionId_EmptyResult() {
         // Arrange
-        attachmentEntity.setTransactionId(999L); // Different transaction ID
+        attachmentEntity.setTransactionId(UUID.randomUUID()); // Different transaction ID
         when(repository.findById(attachmentId)).thenReturn(Mono.just(attachmentEntity));
 
         // Act & Assert

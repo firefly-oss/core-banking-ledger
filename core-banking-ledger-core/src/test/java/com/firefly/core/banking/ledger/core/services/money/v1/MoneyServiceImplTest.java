@@ -9,6 +9,7 @@ import com.firefly.core.banking.ledger.models.entities.money.v1.Money;
 import com.firefly.core.banking.ledger.models.repositories.money.v1.MoneyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,7 +41,7 @@ public class MoneyServiceImplTest {
 
     private MoneyDTO moneyDTO;
     private Money moneyEntity;
-    private final Long moneyId = 1L;
+    private final UUID moneyId = UUID.randomUUID();
     private final String currency = "EUR";
 
     @BeforeEach
@@ -48,12 +49,12 @@ public class MoneyServiceImplTest {
         // Initialize test data
         moneyDTO = new MoneyDTO();
         moneyDTO.setMoneyId(moneyId);
-        moneyDTO.setAmount(new BigDecimal("100.00"));
+        moneyDTO.setAmount(new BigDecimal("1000.00"));
         moneyDTO.setCurrency(currency);
 
         moneyEntity = new Money();
         moneyEntity.setMoneyId(moneyId);
-        moneyEntity.setAmount(new BigDecimal("100.00"));
+        moneyEntity.setAmount(new BigDecimal("1000.00"));
         moneyEntity.setCurrency(currency);
     }
 

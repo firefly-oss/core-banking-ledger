@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.deposit.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.interfaces.dtos.deposit.v1.TransactionLineDepositDTO;
 import reactor.core.publisher.Mono;
 
@@ -14,7 +16,7 @@ public interface TransactionLineDepositService {
      * @param transactionId The transaction ID
      * @return A Mono containing the deposit transaction line if found
      */
-    Mono<TransactionLineDepositDTO> getDepositLine(Long transactionId);
+    Mono<TransactionLineDepositDTO> getDepositLine(UUID transactionId);
 
     /**
      * Create a new deposit line record for the specified transaction.
@@ -23,7 +25,7 @@ public interface TransactionLineDepositService {
      * @param depositDTO The deposit transaction line data
      * @return A Mono containing the created deposit transaction line
      */
-    Mono<TransactionLineDepositDTO> createDepositLine(Long transactionId, TransactionLineDepositDTO depositDTO);
+    Mono<TransactionLineDepositDTO> createDepositLine(UUID transactionId, TransactionLineDepositDTO depositDTO);
 
     /**
      * Update an existing deposit line for the specified transaction.
@@ -32,7 +34,7 @@ public interface TransactionLineDepositService {
      * @param depositDTO The updated deposit transaction line data
      * @return A Mono containing the updated deposit transaction line
      */
-    Mono<TransactionLineDepositDTO> updateDepositLine(Long transactionId, TransactionLineDepositDTO depositDTO);
+    Mono<TransactionLineDepositDTO> updateDepositLine(UUID transactionId, TransactionLineDepositDTO depositDTO);
 
     /**
      * Delete the deposit line record for the specified transaction.
@@ -40,5 +42,5 @@ public interface TransactionLineDepositService {
      * @param transactionId The transaction ID
      * @return A Mono that completes when the deletion is done
      */
-    Mono<Void> deleteDepositLine(Long transactionId);
+    Mono<Void> deleteDepositLine(UUID transactionId);
 }

@@ -14,6 +14,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 public class Transaction extends BaseEntity {
     @Id
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("external_reference")
     private String externalReference;
@@ -57,14 +58,14 @@ public class Transaction extends BaseEntity {
      * This is a logical reference to an account managed in a separate microservice.
      */
     @Column("account_id")
-    private Long accountId;
+    private UUID accountId;
 
     /**
      * Reference to account space ID in external account microservice.
      * This is a logical reference to an account space managed in a separate microservice.
      */
     @Column("account_space_id")
-    private Long accountSpaceId;
+    private UUID accountSpaceId;
 
     /**
      * Reference to category ID in external master data microservice.
@@ -72,7 +73,7 @@ public class Transaction extends BaseEntity {
      * to a category managed in a separate microservice.
      */
     @Column("transaction_category_id")
-    private Long transactionCategoryId;
+    private UUID transactionCategoryId;
 
     @Column("branch_office_code")
     private String branchOfficeCode;
@@ -101,7 +102,7 @@ public class Transaction extends BaseEntity {
 
     // Relation fields
     @Column("related_transaction_id")
-    private Long relatedTransactionId;
+    private UUID relatedTransactionId;
 
     @Column("relation_type")
     private String relationType;
@@ -154,7 +155,7 @@ public class Transaction extends BaseEntity {
      * Only populated when assetType is not FIAT
      */
     @Column("blockchain_network_id")
-    private Long blockchainNetworkId;
+    private UUID blockchainNetworkId;
 
     /**
      * Transaction hash on the blockchain

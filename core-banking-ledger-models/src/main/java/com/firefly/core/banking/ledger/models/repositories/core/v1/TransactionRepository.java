@@ -9,19 +9,21 @@ import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TransactionRepository extends BaseRepository<Transaction, Long> {
-    Flux<Transaction> findByAccountId(Long accountId, Pageable pageable);
-    Mono<Long> countByAccountId(Long accountId);
+public interface TransactionRepository extends BaseRepository<Transaction, UUID> {
+    Flux<Transaction> findByAccountId(UUID accountId, Pageable pageable);
+    Mono<Long> countByAccountId(UUID accountId);
 
-    Flux<Transaction> findByAccountSpaceId(Long accountSpaceId, Pageable pageable);
-    Mono<Long> countByAccountSpaceId(Long accountSpaceId);
+    Flux<Transaction> findByAccountSpaceId(UUID accountSpaceId, Pageable pageable);
+    Mono<Long> countByAccountSpaceId(UUID accountSpaceId);
 
-    Flux<Transaction> findByTransactionCategoryId(Long categoryId, Pageable pageable);
-    Mono<Long> countByTransactionCategoryId(Long categoryId);
+    Flux<Transaction> findByTransactionCategoryId(UUID categoryId, Pageable pageable);
+    Mono<Long> countByTransactionCategoryId(UUID categoryId);
 
     // Geotag query methods
     @Query("SELECT t.* FROM transaction t " +
@@ -50,12 +52,20 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
     Mono<Transaction> findByExternalReference(String externalReference);
 
     /**
+     * Find a transaction by blockchain transaction hash.
+     *
+     * @param blockchainTransactionHash The blockchain transaction hash
+     * @return A Mono emitting the transaction if found, or an empty Mono if not found
+     */
+    Mono<Transaction> findByBlockchainTransactionHash(String blockchainTransactionHash);
+
+    /**
      * Find all transactions for an account.
      *
      * @param accountId The account ID
      * @return A Flux emitting all transactions for the account
      */
-    Flux<Transaction> findByAccountId(Long accountId);
+    Flux<Transaction> findByAccountId(UUID accountId);
 
     /**
      * Find all transactions for an account space.
@@ -63,7 +73,7 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
      * @param accountSpaceId The account space ID
      * @return A Flux emitting all transactions for the account space
      */
-    Flux<Transaction> findByAccountSpaceId(Long accountSpaceId);
+    Flux<Transaction> findByAccountSpaceId(UUID accountSpaceId);
 
     Flux<Transaction> findByLocationNameContainingIgnoreCase(String locationName, Pageable pageable);
     Mono<Long> countByLocationNameContainingIgnoreCase(String locationName);
@@ -116,8 +126,8 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
             List<String> currencies,
             List<TransactionTypeEnum> types,
             List<TransactionStatusEnum> statuses,
-            List<Long> categoryIds,
-            List<Long> accountIds,
+            List<UUID> categoryIds,
+            List<UUID> accountIds,
             String referenceNumber,
             String description,
             String initiatingParty,
@@ -153,8 +163,8 @@ public interface TransactionRepository extends BaseRepository<Transaction, Long>
             List<String> currencies,
             List<TransactionTypeEnum> types,
             List<TransactionStatusEnum> statuses,
-            List<Long> categoryIds,
-            List<Long> accountIds,
+            List<UUID> categoryIds,
+            List<UUID> accountIds,
             String referenceNumber,
             String description,
             String initiatingParty,

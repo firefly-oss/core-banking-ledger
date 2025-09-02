@@ -1,0 +1,4404 @@
+openapi: 3.0.1
+info:
+  title: core-banking-ledger
+  description: Banking Ledger Core Application
+  contact:
+    name: Firefly Software Solutions Inc
+    email: dev@getfirefly.io
+  version: 1.0.0
+servers:
+  - url: http://core.catalis.vc/ledger
+    description: Development Environment
+  - url: /
+    description: Local Development Environment
+tags:
+  - name: Transaction Line Direct Debit
+    description: APIs for managing direct debit lines associated with a specific transaction
+  - name: Transaction Legs
+    description: API endpoints for managing transaction legs
+  - name: Transaction Line ACH
+    description: APIs for managing ACH lines associated with a specific transaction
+  - name: Transaction Line Deposit
+    description: APIs for managing deposit lines associated with a specific transaction
+  - name: Transaction Line Transfer
+    description: APIs for managing transfer lines associated with a specific transaction
+  - name: Transaction Attachments
+    description: API endpoints for managing transaction attachments
+  - name: Transaction Line Card
+    description: APIs for managing card line records associated with a specific transaction
+  - name: Transaction Line Wire Transfer
+    description: APIs for managing wire transfer lines associated with a specific transaction
+  - name: Transactions
+    description: APIs for managing transaction records in the ledger system
+  - name: Transaction Line Fee
+    description: APIs for managing fee lines associated with a specific transaction
+  - name: Transaction Line Standing Order
+    description: APIs for managing standing order line records associated with a specific transaction
+  - name: Account Space Statements
+    description: API endpoints for managing account space statement records
+  - name: Transaction Line SEPA Transfer
+    description: APIs for managing SEPA transfer lines associated with a specific transaction
+  - name: Money
+    description: Money management API
+  - name: Transaction Line Interest
+    description: APIs for managing interest lines associated with a specific transaction
+  - name: Account Legs
+    description: API endpoints for querying transaction legs by account
+  - name: Transaction Line Withdrawal
+    description: APIs for managing withdrawal lines associated with a specific transaction
+  - name: Transaction Status History
+    description: APIs for managing the status history of a specific transaction in the ledger
+  - name: Account Statements
+    description: API endpoints for managing account statement records
+paths:
+  /api/v1/transactions/{transactionId}/status-history/{historyId}:
+    get:
+      tags:
+        - Transaction Status History
+      summary: Get Transaction Status History by ID
+      description: Retrieve a specific status history record by its unique identifier, ensuring it is tied to the specified transaction.
+      operationId: getStatusHistory
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: historyId
+          in: path
+          description: Unique identifier of the status history record
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the transaction status history record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionStatusHistoryDTO'
+        '404':
+          description: Transaction status history record not found
+    put:
+      tags:
+        - Transaction Status History
+      summary: Update Transaction Status History
+      description: Update an existing status history record associated with the specified transaction.
+      operationId: updateStatusHistory
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: historyId
+          in: path
+          description: Unique identifier of the status history record to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionStatusHistoryDTO'
+        required: true
+      responses:
+        '200':
+          description: Transaction status history record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionStatusHistoryDTO'
+        '404':
+          description: Transaction status history record not found
+    delete:
+      tags:
+        - Transaction Status History
+      summary: Delete Transaction Status History
+      description: Remove an existing status history record by its unique identifier, for the specified transaction.
+      operationId: deleteStatusHistory
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: historyId
+          in: path
+          description: Unique identifier of the status history record to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Transaction status history record deleted successfully
+        '404':
+          description: Transaction status history record not found
+  /api/v1/transactions/{transactionId}/line-withdrawal:
+    get:
+      tags:
+        - Transaction Line Withdrawal
+      summary: Get Withdrawal Line
+      description: Retrieve the withdrawal line record associated with the specified transaction.
+      operationId: getWithdrawalLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the withdrawal line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineWithdrawalDTO'
+        '404':
+          description: Withdrawal line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Withdrawal
+      summary: Update Withdrawal Line
+      description: Update an existing withdrawal line record for the specified transaction.
+      operationId: updateWithdrawalLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineWithdrawalDTO'
+        required: true
+      responses:
+        '200':
+          description: Withdrawal line record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineWithdrawalDTO'
+        '404':
+          description: Withdrawal line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Withdrawal
+      summary: Create Withdrawal Line
+      description: Create a new withdrawal line record associated with the specified transaction.
+      operationId: createWithdrawalLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineWithdrawalDTO'
+        required: true
+      responses:
+        '201':
+          description: Withdrawal line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineWithdrawalDTO'
+        '400':
+          description: Invalid withdrawal line data provided
+    delete:
+      tags:
+        - Transaction Line Withdrawal
+      summary: Delete Withdrawal Line
+      description: Remove an existing withdrawal line record from the specified transaction.
+      operationId: deleteWithdrawalLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Withdrawal line record deleted successfully
+        '404':
+          description: Withdrawal line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-wire-transfer:
+    get:
+      tags:
+        - Transaction Line Wire Transfer
+      summary: Get Wire Transfer Line
+      description: Retrieve the wire transfer line record associated with the specified transaction.
+      operationId: getWireTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the wire transfer line record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineWireTransferDTO'
+        '404':
+          description: Wire transfer line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Wire Transfer
+      summary: Update Wire Transfer Line
+      description: Update an existing wire transfer line record associated with the specified transaction.
+      operationId: updateWireTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineWireTransferDTO'
+        required: true
+      responses:
+        '200':
+          description: Wire transfer line updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineWireTransferDTO'
+        '404':
+          description: Wire transfer line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Wire Transfer
+      summary: Create Wire Transfer Line
+      description: Create a new wire transfer line record associated with the specified transaction.
+      operationId: createWireTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineWireTransferDTO'
+        required: true
+      responses:
+        '201':
+          description: Wire transfer line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineWireTransferDTO'
+        '400':
+          description: Invalid wire transfer line data provided
+    delete:
+      tags:
+        - Transaction Line Wire Transfer
+      summary: Delete Wire Transfer Line
+      description: Remove an existing wire transfer line record from the specified transaction.
+      operationId: deleteWireTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Wire transfer line record deleted successfully
+        '404':
+          description: Wire transfer line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-transfer:
+    get:
+      tags:
+        - Transaction Line Transfer
+      summary: Get Transfer Line
+      description: Retrieve the transfer line record associated with the specified transaction.
+      operationId: getTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the transfer line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineTransferDTO'
+        '404':
+          description: Transfer line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Transfer
+      summary: Update Transfer Line
+      description: Update an existing transfer line record for the specified transaction.
+      operationId: updateTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineTransferDTO'
+        required: true
+      responses:
+        '200':
+          description: Transfer line record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineTransferDTO'
+        '404':
+          description: Transfer line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Transfer
+      summary: Create Transfer Line
+      description: Create a new transfer line record associated with the specified transaction.
+      operationId: createTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineTransferDTO'
+        required: true
+      responses:
+        '201':
+          description: Transfer line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineTransferDTO'
+        '400':
+          description: Invalid transfer line data provided
+    delete:
+      tags:
+        - Transaction Line Transfer
+      summary: Delete Transfer Line
+      description: Remove an existing transfer line record from the specified transaction.
+      operationId: deleteTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Transfer line record deleted successfully
+        '404':
+          description: Transfer line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-standing-order:
+    get:
+      tags:
+        - Transaction Line Standing Order
+      summary: Get Standing Order Line
+      description: Retrieve the standing order line record associated with the specified transaction.
+      operationId: getStandingOrderLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the standing order line record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineStandingOrderDTO'
+        '404':
+          description: Standing order line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Standing Order
+      summary: Update Standing Order Line
+      description: Update an existing standing order line record associated with the specified transaction.
+      operationId: updateStandingOrderLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineStandingOrderDTO'
+        required: true
+      responses:
+        '200':
+          description: Standing order line updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineStandingOrderDTO'
+        '404':
+          description: Standing order line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Standing Order
+      summary: Create Standing Order Line
+      description: Create a new standing order line record associated with the specified transaction.
+      operationId: createStandingOrderLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineStandingOrderDTO'
+        required: true
+      responses:
+        '201':
+          description: Standing order line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineStandingOrderDTO'
+        '400':
+          description: Invalid standing order line data provided
+    delete:
+      tags:
+        - Transaction Line Standing Order
+      summary: Delete Standing Order Line
+      description: Remove an existing standing order line record from the specified transaction.
+      operationId: deleteStandingOrderLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Standing order line record deleted successfully
+        '404':
+          description: Standing order line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-sepa-transfer:
+    get:
+      tags:
+        - Transaction Line SEPA Transfer
+      summary: Get SEPA Transfer Line
+      description: Retrieve the SEPA transfer line record associated with the specified transaction.
+      operationId: getSepaTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the SEPA transfer line record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineSepaTransferDTO'
+        '404':
+          description: SEPA transfer line record not found for this transaction
+    put:
+      tags:
+        - Transaction Line SEPA Transfer
+      summary: Update SEPA Transfer Line
+      description: Update an existing SEPA transfer line record associated with the specified transaction.
+      operationId: updateSepaTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineSepaTransferDTO'
+        required: true
+      responses:
+        '200':
+          description: SEPA transfer line updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineSepaTransferDTO'
+        '404':
+          description: SEPA transfer line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line SEPA Transfer
+      summary: Create SEPA Transfer Line
+      description: Create a new SEPA transfer line record associated with the specified transaction.
+      operationId: createSepaTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineSepaTransferDTO'
+        required: true
+      responses:
+        '201':
+          description: SEPA transfer line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineSepaTransferDTO'
+        '400':
+          description: Invalid SEPA transfer line data provided
+    delete:
+      tags:
+        - Transaction Line SEPA Transfer
+      summary: Delete SEPA Transfer Line
+      description: Remove an existing SEPA transfer line record from the specified transaction.
+      operationId: deleteSepaTransferLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: SEPA transfer line record deleted successfully
+        '404':
+          description: SEPA transfer line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-interest:
+    get:
+      tags:
+        - Transaction Line Interest
+      summary: Get Interest Line
+      description: Retrieve the interest line record associated with the specified transaction.
+      operationId: getInterestLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the interest line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineInterestDTO'
+        '404':
+          description: Interest line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Interest
+      summary: Update Interest Line
+      description: Update an existing interest line record for the specified transaction.
+      operationId: updateInterestLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineInterestDTO'
+        required: true
+      responses:
+        '200':
+          description: Interest line record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineInterestDTO'
+        '404':
+          description: Interest line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Interest
+      summary: Create Interest Line
+      description: Create a new interest line record associated with the specified transaction.
+      operationId: createInterestLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineInterestDTO'
+        required: true
+      responses:
+        '201':
+          description: Interest line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineInterestDTO'
+        '400':
+          description: Invalid interest line data provided
+    delete:
+      tags:
+        - Transaction Line Interest
+      summary: Delete Interest Line
+      description: Remove an existing interest line record from the specified transaction.
+      operationId: deleteInterestLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Interest line record deleted successfully
+        '404':
+          description: Interest line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-fee:
+    get:
+      tags:
+        - Transaction Line Fee
+      summary: Get Fee Line
+      description: Retrieve the fee line record associated with the specified transaction.
+      operationId: getFeeLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the fee line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineFeeDTO'
+        '404':
+          description: Fee line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Fee
+      summary: Update Fee Line
+      description: Update an existing fee line record for the specified transaction.
+      operationId: updateFeeLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineFeeDTO'
+        required: true
+      responses:
+        '200':
+          description: Fee line record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineFeeDTO'
+        '404':
+          description: Fee line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Fee
+      summary: Create Fee Line
+      description: Create a new fee line record associated with the specified transaction.
+      operationId: createFeeLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineFeeDTO'
+        required: true
+      responses:
+        '201':
+          description: Fee line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineFeeDTO'
+        '400':
+          description: Invalid fee line data provided
+    delete:
+      tags:
+        - Transaction Line Fee
+      summary: Delete Fee Line
+      description: Remove an existing fee line record from the specified transaction.
+      operationId: deleteFeeLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Fee line record deleted successfully
+        '404':
+          description: Fee line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-direct-debit:
+    get:
+      tags:
+        - Transaction Line Direct Debit
+      summary: Get Direct Debit Line
+      description: Retrieve the direct debit line record associated with the specified transaction.
+      operationId: getDirectDebitLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the direct debit line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineDirectDebitDTO'
+        '404':
+          description: Direct debit line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Direct Debit
+      summary: Update Direct Debit Line
+      description: Update an existing direct debit line record associated with the specified transaction.
+      operationId: updateDirectDebitLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineDirectDebitDTO'
+        required: true
+      responses:
+        '200':
+          description: Direct debit line updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineDirectDebitDTO'
+        '404':
+          description: Direct debit line not found for this transaction
+    post:
+      tags:
+        - Transaction Line Direct Debit
+      summary: Create Direct Debit Line
+      description: Create a new direct debit line record associated with the specified transaction.
+      operationId: createDirectDebitLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineDirectDebitDTO'
+        required: true
+      responses:
+        '201':
+          description: Direct debit line created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineDirectDebitDTO'
+        '400':
+          description: Invalid direct debit line data provided
+    delete:
+      tags:
+        - Transaction Line Direct Debit
+      summary: Delete Direct Debit Line
+      description: Remove an existing direct debit line record from the specified transaction.
+      operationId: deleteDirectDebitLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Direct debit line record deleted successfully
+        '404':
+          description: Direct debit line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-deposit:
+    get:
+      tags:
+        - Transaction Line Deposit
+      summary: Get Deposit Line
+      description: Retrieve the deposit line record associated with the specified transaction.
+      operationId: getDepositLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the deposit line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineDepositDTO'
+        '404':
+          description: Deposit line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Deposit
+      summary: Update Deposit Line
+      description: Update an existing deposit line record for the specified transaction.
+      operationId: updateDepositLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineDepositDTO'
+        required: true
+      responses:
+        '200':
+          description: Deposit line record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineDepositDTO'
+        '404':
+          description: Deposit line record not found for this transaction
+    post:
+      tags:
+        - Transaction Line Deposit
+      summary: Create Deposit Line
+      description: Create a new deposit line record associated with the specified transaction.
+      operationId: createDepositLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineDepositDTO'
+        required: true
+      responses:
+        '201':
+          description: Deposit line record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineDepositDTO'
+        '400':
+          description: Invalid deposit line data provided
+    delete:
+      tags:
+        - Transaction Line Deposit
+      summary: Delete Deposit Line
+      description: Remove an existing deposit line record from the specified transaction.
+      operationId: deleteDepositLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Deposit line record deleted successfully
+        '404':
+          description: Deposit line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-card:
+    get:
+      tags:
+        - Transaction Line Card
+      summary: Get Card Line
+      description: Retrieve the card line record associated with the specified transaction.
+      operationId: getCardLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the card line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineCardDTO'
+        '404':
+          description: Card line not found for this transaction
+    put:
+      tags:
+        - Transaction Line Card
+      summary: Update Card Line
+      description: Update an existing card line record associated with the specified transaction.
+      operationId: updateCardLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineCardDTO'
+        required: true
+      responses:
+        '200':
+          description: Card line updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineCardDTO'
+        '404':
+          description: Card line not found for this transaction
+    post:
+      tags:
+        - Transaction Line Card
+      summary: Create Card Line
+      description: Create a new card line record associated with the specified transaction.
+      operationId: createCardLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineCardDTO'
+        required: true
+      responses:
+        '201':
+          description: Card line created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineCardDTO'
+        '400':
+          description: Invalid card line data provided
+    delete:
+      tags:
+        - Transaction Line Card
+      summary: Delete Card Line
+      description: Remove an existing card line record from a specific transaction.
+      operationId: deleteCardLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Card line record deleted successfully
+        '404':
+          description: Card line record not found for this transaction
+  /api/v1/transactions/{transactionId}/line-ach:
+    get:
+      tags:
+        - Transaction Line ACH
+      summary: Get ACH Line
+      description: Retrieve the ACH line record associated with the specified transaction.
+      operationId: getAchLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ACH line retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineAchDTO'
+    put:
+      tags:
+        - Transaction Line ACH
+      summary: Update ACH Line
+      description: Update an existing ACH line for the specified transaction.
+      operationId: updateAchLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineAchDTO'
+        required: true
+      responses:
+        '200':
+          description: ACH line updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineAchDTO'
+    post:
+      tags:
+        - Transaction Line ACH
+      summary: Create ACH Line
+      description: Create a new ACH line record for the specified transaction.
+      operationId: createAchLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLineAchDTO'
+        required: true
+      responses:
+        '201':
+          description: ACH line created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLineAchDTO'
+    delete:
+      tags:
+        - Transaction Line ACH
+      summary: Delete ACH Line
+      description: Delete the ACH line record for the specified transaction.
+      operationId: deleteAchLine
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: ACH line deleted successfully
+  /api/v1/transactions/{transactionId}:
+    get:
+      tags:
+        - Transactions
+      summary: Get Transaction by ID
+      description: Retrieve a specific transaction record by its unique identifier.
+      operationId: getTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction to retrieve
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDTO'
+        '404':
+          description: Transaction not found
+    put:
+      tags:
+        - Transactions
+      summary: Update Transaction
+      description: Update an existing transaction record by its unique identifier.
+      operationId: updateTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDTO'
+        required: true
+      responses:
+        '200':
+          description: Transaction updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDTO'
+        '404':
+          description: Transaction not found
+    delete:
+      tags:
+        - Transactions
+      summary: Delete Transaction
+      description: Remove an existing transaction record from the ledger by its unique identifier.
+      operationId: deleteTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Transaction deleted successfully
+        '404':
+          description: Transaction not found
+  /api/v1/transactions/{transactionId}/status-history:
+    get:
+      tags:
+        - Transaction Status History
+      summary: List Transaction Status History
+      description: Retrieve a paginated list of status history records for the specified transaction.
+      operationId: getAllStatusHistory
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: pageNumber
+          in: query
+          description: The zero-based page number to retrieve.
+          required: false
+          schema:
+            type: string
+            description: The zero-based page number to retrieve.
+            example: 0
+            default: '0'
+          example: 0
+        - name: pageSize
+          in: query
+          description: The number of items per page.
+          required: false
+          schema:
+            type: string
+            description: The number of items per page.
+            example: 10
+            default: '10'
+          example: 10
+        - name: sortBy
+          in: query
+          description: The field to sort the results by.
+          required: false
+          schema:
+            type: string
+            description: The field to sort the results by.
+            example: name
+          example: name
+        - name: sortDirection
+          in: query
+          description: The direction of sorting, either ASC or DESC.
+          required: false
+          schema:
+            type: string
+            description: The direction of sorting, either ASC or DESC.
+            example: DESC
+            default: DESC
+          example: DESC
+      responses:
+        '200':
+          description: Successfully retrieved transaction status history records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+        '404':
+          description: No status history records found for the specified transaction
+    post:
+      tags:
+        - Transaction Status History
+      summary: Create Transaction Status History
+      description: Create a new status history record tied to the specified transaction.
+      operationId: createStatusHistory
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionStatusHistoryDTO'
+        required: true
+      responses:
+        '201':
+          description: Transaction status history record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionStatusHistoryDTO'
+        '400':
+          description: Invalid status history data provided
+  /api/v1/transactions/{transactionId}/legs:
+    get:
+      tags:
+        - Transaction Legs
+      summary: List Transaction Legs
+      description: Retrieve a paginated list of legs for a specific transaction.
+      operationId: listTransactionLegs
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction (ASC or DESC)
+          required: false
+          schema:
+            type: string
+            default: DESC
+      responses:
+        '200':
+          description: Transaction legs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+    post:
+      tags:
+        - Transaction Legs
+      summary: Create Transaction Leg
+      description: Create a new transaction leg for a specific transaction.
+      operationId: createTransactionLeg
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLegDTO'
+        required: true
+      responses:
+        '201':
+          description: Transaction leg created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLegDTO'
+  /api/v1/transactions/{transactionId}/attachments:
+    get:
+      tags:
+        - Transaction Attachments
+      summary: List Transaction Attachments
+      description: Retrieve a paginated list of attachments for a specific transaction.
+      operationId: listAttachments
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction (ASC or DESC)
+          required: false
+          schema:
+            type: string
+            default: DESC
+      responses:
+        '200':
+          description: Attachments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+    post:
+      tags:
+        - Transaction Attachments
+      summary: Create Transaction Attachment
+      description: Create a new attachment for a specific transaction.
+      operationId: createAttachment
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionAttachmentDTO'
+        required: true
+      responses:
+        '201':
+          description: Attachment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionAttachmentDTO'
+  /api/v1/transactions:
+    post:
+      tags:
+        - Transactions
+      summary: Create Transaction
+      description: Create a new transaction record in the ledger.
+      operationId: createTransaction
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDTO'
+        required: true
+      responses:
+        '201':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDTO'
+        '400':
+          description: Invalid transaction data provided
+  /api/v1/money:
+    get:
+      tags:
+        - Money
+      summary: List money
+      description: Lists all money values
+      operationId: listMoney
+      parameters:
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Money list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PaginationResponseMoneyDTO'
+    post:
+      tags:
+        - Money
+      summary: Create money
+      description: Creates a new money value
+      operationId: createMoney
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoneyDTO'
+        required: true
+      responses:
+        '200':
+          description: Money created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoneyDTO'
+        '400':
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MoneyDTO'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MoneyDTO'
+  /api/v1/transactions/{transactionId}/status:
+    patch:
+      tags:
+        - Transactions
+      summary: Update Transaction Status
+      description: Update the status of an existing transaction and record the status change in the history.
+      operationId: updateTransactionStatus
+      parameters:
+        - name: transactionId
+          in: path
+          description: Unique identifier of the transaction to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: newStatus
+          in: query
+          description: New status to set
+          required: true
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - POSTED
+              - REVERSED
+              - FAILED
+        - name: reason
+          in: query
+          description: Reason for the status change
+          required: true
+          schema:
+            type: string
+        - name: X-Idempotency-Key
+          in: header
+          description: Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDTO'
+        '404':
+          description: Transaction not found
+  /api/v1/transactions/{transactionId}/legs/{legId}:
+    get:
+      tags:
+        - Transaction Legs
+      summary: Get Transaction Leg
+      description: Retrieve a specific transaction leg by its ID.
+      operationId: getTransactionLeg
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: legId
+          in: path
+          description: Transaction leg ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Transaction leg retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionLegDTO'
+  /api/v1/transactions/{transactionId}/attachments/{attachmentId}:
+    get:
+      tags:
+        - Transaction Attachments
+      summary: Get Transaction Attachment
+      description: Retrieve a specific attachment by its ID.
+      operationId: getAttachment
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: attachmentId
+          in: path
+          description: Attachment ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Attachment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionAttachmentDTO'
+  /api/v1/transactions/{transactionId}/attachments/type/{attachmentType}:
+    get:
+      tags:
+        - Transaction Attachments
+      summary: List Transaction Attachments by Type
+      description: Retrieve a paginated list of attachments of a specific type for a transaction.
+      operationId: listAttachmentsByType
+      parameters:
+        - name: transactionId
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: attachmentType
+          in: path
+          description: Attachment type
+          required: true
+          schema:
+            type: string
+            enum:
+              - INVOICE
+              - RECEIPT
+              - CONTRACT
+              - IDENTIFICATION
+              - AUTHORIZATION
+              - STATEMENT
+              - PROOF_OF_PAYMENT
+              - SUPPORTING_DOCUMENT
+              - CORRESPONDENCE
+              - OTHER
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction (ASC or DESC)
+          required: false
+          schema:
+            type: string
+            default: DESC
+      responses:
+        '200':
+          description: Attachments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+  /api/v1/transactions/filter:
+    get:
+      tags:
+        - Transactions
+      summary: Filter Transactions
+      description: Apply custom filters to retrieve a paginated list of transactions from the ledger.
+      operationId: filterProducts
+      parameters:
+        - name: pagination.pageNumber
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pagination.pageSize
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: pagination.sortBy
+          in: query
+          description: Field to sort by
+          required: false
+          schema:
+            type: string
+        - name: pagination.sortDirection
+          in: query
+          description: Sort direction (ASC or DESC)
+          required: false
+          schema:
+            type: string
+            default: DESC
+        - name: options.caseInsensitiveStrings
+          in: query
+          description: Enable case-insensitive string filtering
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: options.includeInheritedFields
+          in: query
+          description: Include fields from parent classes
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: filters.externalReference
+          in: query
+          description: Exact filter for external reference
+          required: false
+          schema:
+            type: string
+        - name: filters.transactionDate
+          in: query
+          description: Exact filter for transaction date
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[transactionDate].from
+          in: query
+          description: Filter transaction date from value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[transactionDate].to
+          in: query
+          description: Filter transaction date to value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: filters.valueDate
+          in: query
+          description: Exact filter for value date
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[valueDate].from
+          in: query
+          description: Filter value date from value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[valueDate].to
+          in: query
+          description: Filter value date to value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: filters.transactionType
+          in: query
+          description: Exact filter for transaction type
+          required: false
+          schema:
+            type: string
+            enum:
+              - DEPOSIT
+              - WITHDRAWAL
+              - TRANSFER
+              - FEE
+              - INTEREST
+              - WIRE_TRANSFER
+              - STANDING_ORDER
+              - ACH
+              - CARD
+              - DIRECT_DEBIT
+              - SEPA_TRANSFER
+              - CRYPTO_DEPOSIT
+              - CRYPTO_WITHDRAWAL
+              - CRYPTO_TRANSFER
+              - CRYPTO_SWAP
+              - TOKEN_MINT
+              - TOKEN_BURN
+              - NFT_TRANSFER
+              - STAKING
+              - UNSTAKING
+              - REWARD
+        - name: filters.transactionStatus
+          in: query
+          description: Exact filter for transaction status
+          required: false
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - POSTED
+              - REVERSED
+              - FAILED
+        - name: filters.totalAmount
+          in: query
+          description: Exact filter for total amount
+          required: false
+          schema:
+            type: string
+        - name: rangeFilters.ranges[totalAmount].from
+          in: query
+          description: Filter total amount from value
+          required: false
+          schema:
+            type: string
+        - name: rangeFilters.ranges[totalAmount].to
+          in: query
+          description: Filter total amount to value
+          required: false
+          schema:
+            type: string
+        - name: filters.currency
+          in: query
+          description: Exact filter for currency
+          required: false
+          schema:
+            type: string
+        - name: filters.description
+          in: query
+          description: Exact filter for description
+          required: false
+          schema:
+            type: string
+        - name: filters.initiatingParty
+          in: query
+          description: Exact filter for initiating party
+          required: false
+          schema:
+            type: string
+        - name: filters.accountId
+          in: query
+          description: Exact filter for account id
+          required: false
+          schema:
+            type: string
+        - name: filters.accountSpaceId
+          in: query
+          description: Exact filter for account space id
+          required: false
+          schema:
+            type: string
+        - name: filters.transactionCategoryId
+          in: query
+          description: Exact filter for transaction category id
+          required: false
+          schema:
+            type: string
+        - name: filters.branchOfficeCode
+          in: query
+          description: Exact filter for branch office code
+          required: false
+          schema:
+            type: string
+        - name: filters.nifInitiatingParty
+          in: query
+          description: Exact filter for nif initiating party
+          required: false
+          schema:
+            type: string
+        - name: filters.latitude
+          in: query
+          description: Exact filter for latitude
+          required: false
+          schema:
+            type: number
+        - name: rangeFilters.ranges[latitude].from
+          in: query
+          description: Filter latitude from value
+          required: false
+          schema:
+            type: number
+        - name: rangeFilters.ranges[latitude].to
+          in: query
+          description: Filter latitude to value
+          required: false
+          schema:
+            type: number
+        - name: filters.longitude
+          in: query
+          description: Exact filter for longitude
+          required: false
+          schema:
+            type: number
+        - name: rangeFilters.ranges[longitude].from
+          in: query
+          description: Filter longitude from value
+          required: false
+          schema:
+            type: number
+        - name: rangeFilters.ranges[longitude].to
+          in: query
+          description: Filter longitude to value
+          required: false
+          schema:
+            type: number
+        - name: filters.locationName
+          in: query
+          description: Exact filter for location name
+          required: false
+          schema:
+            type: string
+        - name: filters.country
+          in: query
+          description: Exact filter for country
+          required: false
+          schema:
+            type: string
+        - name: filters.city
+          in: query
+          description: Exact filter for city
+          required: false
+          schema:
+            type: string
+        - name: filters.postalCode
+          in: query
+          description: Exact filter for postal code
+          required: false
+          schema:
+            type: string
+        - name: filters.relatedTransactionId
+          in: query
+          description: Exact filter for related transaction id
+          required: false
+          schema:
+            type: string
+        - name: filters.relationType
+          in: query
+          description: Exact filter for relation type
+          required: false
+          schema:
+            type: string
+        - name: filters.bookingDate
+          in: query
+          description: Exact filter for booking date
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[bookingDate].from
+          in: query
+          description: Filter booking date from value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[bookingDate].to
+          in: query
+          description: Filter booking date to value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: filters.rowVersion
+          in: query
+          description: Exact filter for row version
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: rangeFilters.ranges[rowVersion].from
+          in: query
+          description: Filter row version from value
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: rangeFilters.ranges[rowVersion].to
+          in: query
+          description: Filter row version to value
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: filters.amlRiskScore
+          in: query
+          description: Exact filter for aml risk score
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: rangeFilters.ranges[amlRiskScore].from
+          in: query
+          description: Filter aml risk score from value
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: rangeFilters.ranges[amlRiskScore].to
+          in: query
+          description: Filter aml risk score to value
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: filters.amlScreeningResult
+          in: query
+          description: Exact filter for aml screening result
+          required: false
+          schema:
+            type: string
+        - name: filters.amlLargeTxnFlag
+          in: query
+          description: Exact filter for aml large txn flag
+          required: false
+          schema:
+            type: boolean
+        - name: filters.scaMethod
+          in: query
+          description: Exact filter for sca method
+          required: false
+          schema:
+            type: string
+        - name: filters.scaResult
+          in: query
+          description: Exact filter for sca result
+          required: false
+          schema:
+            type: string
+        - name: filters.instantFlag
+          in: query
+          description: Exact filter for instant flag
+          required: false
+          schema:
+            type: boolean
+        - name: filters.confirmationOfPayeeResult
+          in: query
+          description: Exact filter for confirmation of payee result
+          required: false
+          schema:
+            type: string
+        - name: filters.dateCreated
+          in: query
+          description: Exact filter for date created
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[dateCreated].from
+          in: query
+          description: Filter date created from value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[dateCreated].to
+          in: query
+          description: Filter date created to value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: filters.dateUpdated
+          in: query
+          description: Exact filter for date updated
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[dateUpdated].from
+          in: query
+          description: Filter date updated from value
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: rangeFilters.ranges[dateUpdated].to
+          in: query
+          description: Filter date updated to value
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Successfully retrieved filtered transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+        '404':
+          description: No filtered results found
+  /api/v1/transactions/by-reference/{externalReference}:
+    get:
+      tags:
+        - Transactions
+      summary: Find Transaction by External Reference
+      description: Find a transaction by its external reference.
+      operationId: findByExternalReference
+      parameters:
+        - name: externalReference
+          in: path
+          description: External reference of the transaction
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDTO'
+        '404':
+          description: Transaction not found
+  /api/v1/money/{moneyId}:
+    get:
+      tags:
+        - Money
+      summary: Get money
+      description: Gets a specific money value by ID
+      operationId: getMoney
+      parameters:
+        - name: moneyId
+          in: path
+          description: ID of the money value
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Money retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoneyDTO'
+        '404':
+          description: Money not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MoneyDTO'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MoneyDTO'
+  /api/v1/money/currency/{currency}:
+    get:
+      tags:
+        - Money
+      summary: List money by currency
+      description: Lists all money values with a specific currency
+      operationId: listMoneyByCurrency
+      parameters:
+        - name: currency
+          in: path
+          description: Currency code
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Money list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PaginationResponseMoneyDTO'
+  /api/v1/accounts/{accountId}/statements/{statementId}:
+    get:
+      tags:
+        - Account Statements
+      summary: Get Account Statement
+      description: Retrieve a specific statement by ID.
+      operationId: getStatement
+      parameters:
+        - name: accountId
+          in: path
+          description: Account ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: statementId
+          in: path
+          description: Statement ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Statement retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementMetadataDTO'
+  /api/v1/accounts/{accountId}/statements/date-range:
+    get:
+      tags:
+        - Account Statements
+      summary: List Account Statements by Date Range
+      description: Retrieve a paginated list of statements for a specific account within a date range.
+      operationId: listStatementsByDateRange
+      parameters:
+        - name: accountId
+          in: path
+          description: Account ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          description: Start date (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: pageNumber
+          in: query
+          description: The zero-based page number to retrieve.
+          required: false
+          schema:
+            type: string
+            description: The zero-based page number to retrieve.
+            example: 0
+            default: '0'
+          example: 0
+        - name: pageSize
+          in: query
+          description: The number of items per page.
+          required: false
+          schema:
+            type: string
+            description: The number of items per page.
+            example: 10
+            default: '10'
+          example: 10
+        - name: sortBy
+          in: query
+          description: The field to sort the results by.
+          required: false
+          schema:
+            type: string
+            description: The field to sort the results by.
+            example: name
+          example: name
+        - name: sortDirection
+          in: query
+          description: The direction of sorting, either ASC or DESC.
+          required: false
+          schema:
+            type: string
+            description: The direction of sorting, either ASC or DESC.
+            example: DESC
+            default: DESC
+          example: DESC
+      responses:
+        '200':
+          description: Account statements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+  /api/v1/accounts/{accountId}/statements:
+    get:
+      tags:
+        - Account Statements
+      summary: List Account Statements
+      description: Retrieve a paginated list of statements for a specific account.
+      operationId: listStatements
+      parameters:
+        - name: accountId
+          in: path
+          description: Account ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: pageNumber
+          in: query
+          description: The zero-based page number to retrieve.
+          required: false
+          schema:
+            type: string
+            description: The zero-based page number to retrieve.
+            example: 0
+            default: '0'
+          example: 0
+        - name: pageSize
+          in: query
+          description: The number of items per page.
+          required: false
+          schema:
+            type: string
+            description: The number of items per page.
+            example: 10
+            default: '10'
+          example: 10
+        - name: sortBy
+          in: query
+          description: The field to sort the results by.
+          required: false
+          schema:
+            type: string
+            description: The field to sort the results by.
+            example: name
+          example: name
+        - name: sortDirection
+          in: query
+          description: The direction of sorting, either ASC or DESC.
+          required: false
+          schema:
+            type: string
+            description: The direction of sorting, either ASC or DESC.
+            example: DESC
+            default: DESC
+          example: DESC
+      responses:
+        '200':
+          description: Account statements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+  /api/v1/accounts/{accountId}/legs/date-range:
+    get:
+      tags:
+        - Account Legs
+      summary: List Account Legs by Date Range
+      description: Retrieve a paginated list of transaction legs for a specific account within a date range.
+      operationId: listAccountLegsByDateRange
+      parameters:
+        - name: accountId
+          in: path
+          description: Account ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          description: Start date (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: End date (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction (ASC or DESC)
+          required: false
+          schema:
+            type: string
+            default: DESC
+      responses:
+        '200':
+          description: Account legs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+  /api/v1/accounts/{accountId}/legs:
+    get:
+      tags:
+        - Account Legs
+      summary: List Account Legs
+      description: Retrieve a paginated list of transaction legs for a specific account.
+      operationId: listAccountLegs
+      parameters:
+        - name: accountId
+          in: path
+          description: Account ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: sort
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+        - name: direction
+          in: query
+          description: Sort direction (ASC or DESC)
+          required: false
+          schema:
+            type: string
+            default: DESC
+      responses:
+        '200':
+          description: Account legs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+  /api/v1/account-spaces/{accountSpaceId}/statements/{statementId}:
+    get:
+      tags:
+        - Account Space Statements
+      summary: Get Account Space Statement
+      description: Retrieve a specific statement by ID.
+      operationId: getStatement_1
+      parameters:
+        - name: accountSpaceId
+          in: path
+          description: Account Space ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: statementId
+          in: path
+          description: Statement ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Statement retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementMetadataDTO'
+  /api/v1/account-spaces/{accountSpaceId}/statements/date-range:
+    get:
+      tags:
+        - Account Space Statements
+      summary: List Account Space Statements by Date Range
+      description: Retrieve a paginated list of statements for a specific account space within a date range.
+      operationId: listStatementsByDateRange_1
+      parameters:
+        - name: accountSpaceId
+          in: path
+          description: Account Space ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          description: Start date (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: pageNumber
+          in: query
+          description: The zero-based page number to retrieve.
+          required: false
+          schema:
+            type: string
+            description: The zero-based page number to retrieve.
+            example: 0
+            default: '0'
+          example: 0
+        - name: pageSize
+          in: query
+          description: The number of items per page.
+          required: false
+          schema:
+            type: string
+            description: The number of items per page.
+            example: 10
+            default: '10'
+          example: 10
+        - name: sortBy
+          in: query
+          description: The field to sort the results by.
+          required: false
+          schema:
+            type: string
+            description: The field to sort the results by.
+            example: name
+          example: name
+        - name: sortDirection
+          in: query
+          description: The direction of sorting, either ASC or DESC.
+          required: false
+          schema:
+            type: string
+            description: The direction of sorting, either ASC or DESC.
+            example: DESC
+            default: DESC
+          example: DESC
+      responses:
+        '200':
+          description: Account space statements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+  /api/v1/account-spaces/{accountSpaceId}/statements:
+    get:
+      tags:
+        - Account Space Statements
+      summary: List Account Space Statements
+      description: Retrieve a paginated list of statements for a specific account space.
+      operationId: listStatements_1
+      parameters:
+        - name: accountSpaceId
+          in: path
+          description: Account Space ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: pageNumber
+          in: query
+          description: The zero-based page number to retrieve.
+          required: false
+          schema:
+            type: string
+            description: The zero-based page number to retrieve.
+            example: 0
+            default: '0'
+          example: 0
+        - name: pageSize
+          in: query
+          description: The number of items per page.
+          required: false
+          schema:
+            type: string
+            description: The number of items per page.
+            example: 10
+            default: '10'
+          example: 10
+        - name: sortBy
+          in: query
+          description: The field to sort the results by.
+          required: false
+          schema:
+            type: string
+            description: The field to sort the results by.
+            example: name
+          example: name
+        - name: sortDirection
+          in: query
+          description: The direction of sorting, either ASC or DESC.
+          required: false
+          schema:
+            type: string
+            description: The direction of sorting, either ASC or DESC.
+            example: DESC
+            default: DESC
+          example: DESC
+      responses:
+        '200':
+          description: Account space statements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationResponse'
+components:
+  schemas:
+    TransactionStatusHistoryDTO:
+      required:
+        - statusCode
+        - statusStartDatetime
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionStatusHistoryId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        statusCode:
+          type: string
+          enum:
+            - PENDING
+            - POSTED
+            - REVERSED
+            - FAILED
+        statusStartDatetime:
+          type: string
+          format: date-time
+        statusEndDatetime:
+          type: string
+          format: date-time
+        reason:
+          maxLength: 500
+          minLength: 0
+          type: string
+        regulatedReportingFlag:
+          type: boolean
+    TransactionLineWithdrawalDTO:
+      required:
+        - transactionId
+        - withdrawalMethod
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineWithdrawalId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        withdrawalMethod:
+          maxLength: 50
+          minLength: 0
+          type: string
+        withdrawalReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        withdrawalLocation:
+          maxLength: 200
+          minLength: 0
+          type: string
+        withdrawalNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        withdrawalConfirmationCode:
+          maxLength: 50
+          minLength: 0
+          type: string
+        withdrawalReceiptNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        withdrawalAtmId:
+          maxLength: 20
+          minLength: 0
+          type: string
+        withdrawalBranchId:
+          maxLength: 20
+          minLength: 0
+          type: string
+        withdrawalTimestamp:
+          type: string
+          format: date-time
+        withdrawalProcessedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        withdrawalAuthorizationCode:
+          maxLength: 50
+          minLength: 0
+          type: string
+        withdrawalDailyLimitCheck:
+          type: boolean
+        withdrawalDailyAmountUsed:
+          type: number
+        withdrawalDailyLimit:
+          type: number
+        withdrawalSpanishTaxCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineWireTransferDTO:
+      required:
+        - transactionId
+        - wireDestinationAccountNumber
+        - wireDestinationSwiftBic
+        - wireOriginAccountNumber
+        - wireOriginSwiftBic
+        - wireTransferPriority
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineWireTransferId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        wireTransferReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        wireOriginSwiftBic:
+          maxLength: 11
+          minLength: 0
+          type: string
+        wireDestinationSwiftBic:
+          maxLength: 11
+          minLength: 0
+          type: string
+        wireOriginAccountNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        wireDestinationAccountNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        wireTransferPurpose:
+          maxLength: 200
+          minLength: 0
+          type: string
+        wireTransferPriority:
+          type: string
+          enum:
+            - HIGH
+            - NORMAL
+            - LOW
+        wireExchangeRate:
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+        wireFeeAmount:
+          type: number
+        wireFeeCurrency:
+          type: string
+        wireInstructingParty:
+          maxLength: 200
+          minLength: 0
+          type: string
+        wireBeneficiaryName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        wireBeneficiaryAddress:
+          maxLength: 500
+          minLength: 0
+          type: string
+        wireProcessingDate:
+          type: string
+          format: date-time
+        wireTransactionNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        wireReceptionStatus:
+          maxLength: 50
+          minLength: 0
+          type: string
+        wireDeclineReason:
+          maxLength: 200
+          minLength: 0
+          type: string
+        wireCancelledFlag:
+          type: boolean
+        bankOfSpainRegCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineTransferDTO:
+      required:
+        - transactionId
+        - transferDestinationAccountId
+        - transferSourceAccountId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineTransferId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        transferReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        transferSourceAccountId:
+          type: string
+          format: uuid
+        transferDestinationAccountId:
+          type: string
+          format: uuid
+        transferSourceAccountNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        transferDestinationAccountNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        transferSourceAccountName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        transferDestinationAccountName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        transferPurpose:
+          maxLength: 200
+          minLength: 0
+          type: string
+        transferNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        transferTimestamp:
+          type: string
+          format: date-time
+        transferProcessedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        transferFeeAmount:
+          type: number
+        transferFeeCurrency:
+          type: string
+        transferScheduledDate:
+          type: string
+          format: date
+        transferExecutionDate:
+          type: string
+          format: date
+        transferSpanishTaxCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineStandingOrderDTO:
+      required:
+        - standingOrderFrequency
+        - standingOrderId
+        - standingOrderRecipientIban
+        - standingOrderRecipientName
+        - standingOrderStartDate
+        - standingOrderStatus
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineStandingOrderId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        standingOrderId:
+          maxLength: 50
+          minLength: 0
+          type: string
+        standingOrderFrequency:
+          type: string
+          enum:
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - YEARLY
+        standingOrderStartDate:
+          type: string
+          format: date
+        standingOrderEndDate:
+          type: string
+          format: date
+        standingOrderNextExecutionDate:
+          type: string
+          format: date
+        standingOrderReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        standingOrderRecipientName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        standingOrderRecipientIban:
+          type: string
+        standingOrderRecipientBic:
+          type: string
+        standingOrderPurpose:
+          maxLength: 200
+          minLength: 0
+          type: string
+        standingOrderStatus:
+          type: string
+          enum:
+            - ACTIVE
+            - CANCELLED
+            - SUSPENDED
+        standingOrderNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        standingOrderLastExecutionDate:
+          type: string
+          format: date
+        standingOrderTotalExecutions:
+          minimum: 0
+          type: integer
+          format: int32
+        standingOrderCancelledDate:
+          type: string
+          format: date-time
+        standingOrderSuspendedUntilDate:
+          type: string
+          format: date
+        standingOrderCreatedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        standingOrderUpdatedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        standingOrderCreationTimestamp:
+          type: string
+          format: date-time
+        standingOrderUpdateTimestamp:
+          type: string
+          format: date-time
+        standingOrderSpanishTaxFlag:
+          type: boolean
+    TransactionLineSepaTransferDTO:
+      required:
+        - sepaDestinationIban
+        - sepaEndToEndId
+        - sepaOriginIban
+        - sepaPaymentScheme
+        - sepaTransactionStatus
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineSepaId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        sepaEndToEndId:
+          maxLength: 35
+          minLength: 0
+          type: string
+        sepaRemittanceInfo:
+          maxLength: 140
+          minLength: 0
+          type: string
+        sepaOriginIban:
+          type: string
+        sepaOriginBic:
+          type: string
+        sepaDestinationIban:
+          type: string
+        sepaDestinationBic:
+          type: string
+        sepaTransactionStatus:
+          type: string
+          enum:
+            - ACCP
+            - RJCT
+            - PDNG
+        sepaCreditorId:
+          maxLength: 35
+          minLength: 0
+          type: string
+        sepaDebtorId:
+          maxLength: 35
+          minLength: 0
+          type: string
+        sepaInitiatingAgentBic:
+          type: string
+        sepaIntermediaryBic:
+          type: string
+        sepaTransactionPurpose:
+          maxLength: 4
+          minLength: 0
+          type: string
+        sepaRequestedExecutionDate:
+          type: string
+          format: date
+        sepaExchangeRate:
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+        sepaFeeAmount:
+          type: number
+        sepaFeeCurrency:
+          type: string
+        sepaRecipientName:
+          maxLength: 70
+          minLength: 0
+          type: string
+        sepaRecipientAddress:
+          maxLength: 140
+          minLength: 0
+          type: string
+        sepaProcessingDate:
+          type: string
+          format: date-time
+        sepaNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        sepaPaymentScheme:
+          type: string
+          enum:
+            - CORE
+            - B2B
+            - COR1
+    TransactionLineInterestDTO:
+      required:
+        - interestAccrualEndDate
+        - interestAccrualStartDate
+        - interestCalculationBase
+        - interestCalculationMethod
+        - interestCurrency
+        - interestGrossAmount
+        - interestNetAmount
+        - interestRatePercentage
+        - interestType
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineInterestId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        interestType:
+          maxLength: 50
+          minLength: 0
+          type: string
+        interestDescription:
+          maxLength: 200
+          minLength: 0
+          type: string
+        interestReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        interestRelatedAccountId:
+          type: string
+          format: uuid
+        interestCalculationMethod:
+          maxLength: 50
+          minLength: 0
+          type: string
+        interestCalculationBase:
+          type: number
+        interestRatePercentage:
+          maximum: 100
+          exclusiveMaximum: false
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+        interestAccrualStartDate:
+          type: string
+          format: date
+        interestAccrualEndDate:
+          type: string
+          format: date
+        interestDaysCalculated:
+          minimum: 0
+          type: integer
+          format: int32
+        interestCurrency:
+          type: string
+        interestTaxWithheldAmount:
+          type: number
+        interestTaxWithheldRate:
+          maximum: 100
+          exclusiveMaximum: false
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+        interestGrossAmount:
+          type: number
+        interestNetAmount:
+          type: number
+        interestTimestamp:
+          type: string
+          format: date-time
+        interestProcessedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        interestSpanishTaxCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineFeeDTO:
+      required:
+        - feeType
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineFeeId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        feeType:
+          maxLength: 50
+          minLength: 0
+          type: string
+        feeDescription:
+          maxLength: 200
+          minLength: 0
+          type: string
+        feeReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        feeRelatedTransactionId:
+          type: string
+          format: uuid
+        feeRelatedService:
+          maxLength: 100
+          minLength: 0
+          type: string
+        feeCalculationMethod:
+          maxLength: 50
+          minLength: 0
+          type: string
+        feeCalculationBase:
+          type: number
+        feeRatePercentage:
+          maximum: 100
+          exclusiveMaximum: false
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+        feeFixedAmount:
+          type: number
+        feeCurrency:
+          type: string
+        feeWaived:
+          type: boolean
+        feeWaiverReason:
+          maxLength: 200
+          minLength: 0
+          type: string
+        feeWaiverAuthorizedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        feeTimestamp:
+          type: string
+          format: date-time
+        feeProcessedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        feeSpanishTaxCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineDirectDebitDTO:
+      required:
+        - directDebitCreditorId
+        - directDebitDueDate
+        - directDebitMandateId
+        - directDebitProcessingStatus
+        - directDebitSequenceType
+        - directDebitSpanishScheme
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineDirectDebitId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        directDebitMandateId:
+          maxLength: 50
+          minLength: 0
+          type: string
+        directDebitCreditorId:
+          maxLength: 50
+          minLength: 0
+          type: string
+        directDebitReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        directDebitSequenceType:
+          type: string
+          enum:
+            - FRST
+            - RCUR
+            - FNAL
+            - OOFF
+        directDebitDueDate:
+          type: string
+          format: date
+        directDebitPaymentMethod:
+          maxLength: 50
+          minLength: 0
+          type: string
+        directDebitDebtorName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        directDebitDebtorAddress:
+          maxLength: 500
+          minLength: 0
+          type: string
+        directDebitDebtorContact:
+          maxLength: 100
+          minLength: 0
+          type: string
+        directDebitProcessingStatus:
+          type: string
+          enum:
+            - INITIATED
+            - PENDING
+            - COMPLETED
+            - FAILED
+        directDebitAuthorizationDate:
+          type: string
+          format: date-time
+        directDebitRevocationDate:
+          type: string
+          format: date-time
+        directDebitSpanishScheme:
+          type: string
+          enum:
+            - CORE
+            - B2B
+            - COR1
+    TransactionLineDepositDTO:
+      required:
+        - depositMethod
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineDepositId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        depositMethod:
+          maxLength: 50
+          minLength: 0
+          type: string
+        depositReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        depositLocation:
+          maxLength: 200
+          minLength: 0
+          type: string
+        depositNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        depositConfirmationCode:
+          maxLength: 50
+          minLength: 0
+          type: string
+        depositReceiptNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        depositAtmId:
+          maxLength: 20
+          minLength: 0
+          type: string
+        depositBranchId:
+          maxLength: 20
+          minLength: 0
+          type: string
+        depositCashAmount:
+          type: number
+        depositCheckAmount:
+          type: number
+        depositCheckNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        depositCheckDate:
+          type: string
+          format: date
+        depositCheckBank:
+          maxLength: 100
+          minLength: 0
+          type: string
+        depositTimestamp:
+          type: string
+          format: date-time
+        depositProcessedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        depositSpanishTaxCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineCardDTO:
+      required:
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineCardId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        cardAuthCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+        cardMerchantCategoryCode:
+          maxLength: 10
+          minLength: 0
+          type: string
+        cardMerchantName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        cardPosEntryMode:
+          maxLength: 10
+          minLength: 0
+          type: string
+        cardTransactionReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        cardTerminalId:
+          maxLength: 20
+          minLength: 0
+          type: string
+        cardHolderCountry:
+          maxLength: 3
+          minLength: 0
+          type: string
+        cardPresentFlag:
+          type: boolean
+        cardTransactionTimestamp:
+          type: string
+          format: date-time
+        cardFraudFlag:
+          type: boolean
+        cardCurrencyConversionRate:
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+        cardFeeAmount:
+          type: number
+        cardFeeCurrency:
+          type: string
+        cardInstallmentPlan:
+          maxLength: 50
+          minLength: 0
+          type: string
+        cardMerchantCif:
+          maxLength: 20
+          minLength: 0
+          type: string
+    TransactionLineAchDTO:
+      required:
+        - achDestinationAccountId
+        - achDestinationAccountNumber
+        - achRoutingNumber
+        - achSourceAccountId
+        - achSourceAccountNumber
+        - transactionId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLineAchId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        achReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        achSourceAccountId:
+          type: string
+          format: uuid
+        achDestinationAccountId:
+          type: string
+          format: uuid
+        achSourceAccountNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        achDestinationAccountNumber:
+          maxLength: 50
+          minLength: 0
+          type: string
+        achSourceAccountName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        achDestinationAccountName:
+          maxLength: 200
+          minLength: 0
+          type: string
+        achRoutingNumber:
+          maxLength: 20
+          minLength: 0
+          type: string
+        achTransactionCode:
+          maxLength: 10
+          minLength: 0
+          type: string
+        achPurpose:
+          maxLength: 200
+          minLength: 0
+          type: string
+        achNotes:
+          maxLength: 500
+          minLength: 0
+          type: string
+        achTimestamp:
+          type: string
+          format: date-time
+        achProcessedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        achFeeAmount:
+          type: number
+        achFeeCurrency:
+          type: string
+        achScheduledDate:
+          type: string
+          format: date
+        achExecutionDate:
+          type: string
+          format: date
+        achBatchNumber:
+          maxLength: 20
+          minLength: 0
+          type: string
+        achTraceNumber:
+          maxLength: 20
+          minLength: 0
+          type: string
+        achEntryClassCode:
+          maxLength: 10
+          minLength: 0
+          type: string
+        achSettlementDate:
+          type: string
+          format: date
+        achReturnCode:
+          maxLength: 10
+          minLength: 0
+          type: string
+        achReturnReason:
+          maxLength: 200
+          minLength: 0
+          type: string
+    TransactionDTO:
+      required:
+        - accountId
+        - currency
+        - totalAmount
+        - transactionDate
+        - transactionStatus
+        - transactionType
+        - valueDate
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+          readOnly: true
+        externalReference:
+          maxLength: 100
+          minLength: 0
+          type: string
+        transactionDate:
+          type: string
+          format: date-time
+        valueDate:
+          type: string
+          format: date-time
+        transactionType:
+          type: string
+          enum:
+            - DEPOSIT
+            - WITHDRAWAL
+            - TRANSFER
+            - FEE
+            - INTEREST
+            - WIRE_TRANSFER
+            - STANDING_ORDER
+            - ACH
+            - CARD
+            - DIRECT_DEBIT
+            - SEPA_TRANSFER
+            - CRYPTO_DEPOSIT
+            - CRYPTO_WITHDRAWAL
+            - CRYPTO_TRANSFER
+            - CRYPTO_SWAP
+            - TOKEN_MINT
+            - TOKEN_BURN
+            - NFT_TRANSFER
+            - STAKING
+            - UNSTAKING
+            - REWARD
+        transactionStatus:
+          type: string
+          enum:
+            - PENDING
+            - POSTED
+            - REVERSED
+            - FAILED
+        totalAmount:
+          type: number
+        currency:
+          type: string
+        description:
+          maxLength: 500
+          minLength: 0
+          type: string
+        initiatingParty:
+          maxLength: 100
+          minLength: 0
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        accountSpaceId:
+          type: string
+          format: uuid
+        transactionCategoryId:
+          type: string
+          format: uuid
+        branchOfficeCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+        nifInitiatingParty:
+          maxLength: 20
+          minLength: 0
+          type: string
+        latitude:
+          maximum: 90
+          exclusiveMaximum: false
+          minimum: -90
+          exclusiveMinimum: false
+          type: number
+          format: double
+        longitude:
+          maximum: 180
+          exclusiveMaximum: false
+          minimum: -180
+          exclusiveMinimum: false
+          type: number
+          format: double
+        locationName:
+          maxLength: 100
+          minLength: 0
+          type: string
+        country:
+          maxLength: 3
+          minLength: 0
+          type: string
+        city:
+          maxLength: 100
+          minLength: 0
+          type: string
+        postalCode:
+          maxLength: 20
+          minLength: 0
+          type: string
+        relatedTransactionId:
+          type: string
+          format: uuid
+        relationType:
+          pattern: REVERSAL|ADJUSTMENT|CHARGEBACK|CORRECTION
+          type: string
+        requestId:
+          maxLength: 100
+          minLength: 0
+          type: string
+        batchId:
+          maxLength: 100
+          minLength: 0
+          type: string
+        bookingDate:
+          type: string
+          format: date-time
+        rowVersion:
+          minimum: 0
+          type: integer
+          format: int64
+          readOnly: true
+        amlRiskScore:
+          maximum: 100
+          minimum: 0
+          type: integer
+          format: int32
+        amlScreeningResult:
+          maxLength: 50
+          minLength: 0
+          type: string
+        amlLargeTxnFlag:
+          type: boolean
+        scaMethod:
+          maxLength: 50
+          minLength: 0
+          type: string
+        scaResult:
+          maxLength: 50
+          minLength: 0
+          type: string
+        instantFlag:
+          type: boolean
+        confirmationOfPayeeResult:
+          pattern: OK|MISMATCH|UNAVAILABLE
+          type: string
+    TransactionLegDTO:
+      required:
+        - accountId
+        - amount
+        - currency
+        - legType
+        - transactionId
+        - valueDate
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionLegId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        accountSpaceId:
+          type: string
+          format: uuid
+        legType:
+          pattern: DEBIT|CREDIT
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        description:
+          maxLength: 500
+          minLength: 0
+          type: string
+        valueDate:
+          type: string
+          format: date-time
+        bookingDate:
+          type: string
+          format: date-time
+    TransactionAttachmentDTO:
+      required:
+        - attachmentName
+        - attachmentType
+        - contentType
+        - documentId
+        - sizeBytes
+        - transactionId
+        - uploadDate
+        - uploadedBy
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        transactionAttachmentId:
+          type: string
+          format: uuid
+          readOnly: true
+        transactionId:
+          type: string
+          format: uuid
+        attachmentType:
+          type: string
+          enum:
+            - INVOICE
+            - RECEIPT
+            - CONTRACT
+            - IDENTIFICATION
+            - AUTHORIZATION
+            - STATEMENT
+            - PROOF_OF_PAYMENT
+            - SUPPORTING_DOCUMENT
+            - CORRESPONDENCE
+            - OTHER
+        attachmentName:
+          maxLength: 255
+          minLength: 0
+          type: string
+        attachmentDescription:
+          maxLength: 500
+          minLength: 0
+          type: string
+        documentId:
+          maxLength: 100
+          minLength: 0
+          type: string
+        contentType:
+          maxLength: 100
+          minLength: 0
+          type: string
+        sizeBytes:
+          minimum: 0
+          type: integer
+          format: int64
+        hashSha256:
+          maxLength: 64
+          minLength: 0
+          type: string
+        uploadedBy:
+          maxLength: 100
+          minLength: 0
+          type: string
+        uploadDate:
+          type: string
+          format: date-time
+    MoneyDTO:
+      required:
+        - amount
+        - currency
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        moneyId:
+          type: string
+          format: uuid
+          readOnly: true
+        amount:
+          type: number
+        currency:
+          type: string
+    PaginationResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The list of items for the current page.
+          items:
+            type: object
+            description: The list of items for the current page.
+        totalElements:
+          type: integer
+          description: The total number of elements across all pages.
+          format: int64
+        totalPages:
+          type: integer
+          description: The total number of pages based on the data size and page size.
+          format: int32
+        currentPage:
+          type: integer
+          description: The current page number, typically zero-based.
+          format: int32
+      description: Represents a paginated response containing a list of items and pagination metadata.
+    PaginationResponseMoneyDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The list of items for the current page.
+          items:
+            $ref: '#/components/schemas/MoneyDTO'
+        totalElements:
+          type: integer
+          description: The total number of elements across all pages.
+          format: int64
+        totalPages:
+          type: integer
+          description: The total number of pages based on the data size and page size.
+          format: int32
+        currentPage:
+          type: integer
+          description: The current page number, typically zero-based.
+          format: int32
+      description: Represents a paginated response containing a list of items and pagination metadata.
+    StatementMetadataDTO:
+      required:
+        - endDate
+        - generationDate
+        - includedDetails
+        - includedPending
+        - periodType
+        - startDate
+        - transactionCount
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+        dateUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        statementId:
+          type: string
+          format: uuid
+          readOnly: true
+        accountId:
+          type: string
+          format: uuid
+        accountSpaceId:
+          type: string
+          format: uuid
+        periodType:
+          type: string
+          enum:
+            - MONTHLY
+            - QUARTERLY
+            - YEARLY
+            - CUSTOM
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        generationDate:
+          type: string
+          format: date-time
+        transactionCount:
+          minimum: 0
+          type: integer
+          format: int32
+        includedPending:
+          type: boolean
+        includedDetails:
+          type: boolean

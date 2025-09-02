@@ -6,10 +6,12 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface TransactionStatusHistoryRepository extends BaseRepository<TransactionStatusHistory, Long> {
-    Flux<TransactionStatusHistory> findByTransactionId(Long transactionId, Pageable pageable);
-    Mono<Long> countByTransactionId(Long transactionId);
+import java.util.UUID;
 
-    Flux<TransactionStatusHistory> findByTransactionIdOrderByStatusStartDatetimeDesc(Long transactionId);
-    Mono<Long> countByTransactionIdOrderByStatusStartDatetimeDesc(Long transactionId);
+public interface TransactionStatusHistoryRepository extends BaseRepository<TransactionStatusHistory, UUID> {
+    Flux<TransactionStatusHistory> findByTransactionId(UUID transactionId, Pageable pageable);
+    Mono<Long> countByTransactionId(UUID transactionId);
+
+    Flux<TransactionStatusHistory> findByTransactionIdOrderByStatusStartDatetimeDesc(UUID transactionId);
+    Mono<Long> countByTransactionIdOrderByStatusStartDatetimeDesc(UUID transactionId);
 }

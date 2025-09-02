@@ -6,6 +6,7 @@ import com.firefly.core.banking.ledger.models.entities.withdrawal.v1.Transaction
 import com.firefly.core.banking.ledger.models.repositories.withdrawal.v1.TransactionLineWithdrawalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,8 +34,8 @@ public class TransactionLineWithdrawalServiceImplTest {
 
     private TransactionLineWithdrawalDTO withdrawalDTO;
     private TransactionLineWithdrawal withdrawalEntity;
-    private final Long transactionId = 1L;
-    private final Long withdrawalId = 2L;
+    private final UUID transactionId = UUID.randomUUID();
+    private final UUID withdrawalId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {

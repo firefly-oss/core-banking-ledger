@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * REST controller for managing transaction legs.
  */
@@ -42,7 +43,7 @@ public class TransactionLegController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLegDTO>> createTransactionLeg(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Transaction leg data", required = true,
                     schema = @Schema(implementation = TransactionLegDTO.class))
@@ -65,10 +66,10 @@ public class TransactionLegController {
     @GetMapping(value = "/{legId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<TransactionLegDTO>> getTransactionLeg(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Transaction leg ID", required = true)
-            @PathVariable Long legId
+            @PathVariable UUID legId
     ) {
         return service.getTransactionLeg(transactionId, legId)
                 .map(ResponseEntity::ok)
@@ -87,7 +88,7 @@ public class TransactionLegController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<PaginationResponse<TransactionLegDTO>>> listTransactionLegs(
             @Parameter(description = "Transaction ID", required = true)
-            @PathVariable Long transactionId,
+            @PathVariable UUID transactionId,
 
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,

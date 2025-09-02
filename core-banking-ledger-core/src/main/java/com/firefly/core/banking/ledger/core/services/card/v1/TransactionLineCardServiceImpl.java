@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.card.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.card.v1.TransactionLineCardMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.card.v1.TransactionLineCardDTO;
 import com.firefly.core.banking.ledger.models.entities.card.v1.TransactionLineCard;
@@ -20,14 +22,14 @@ public class TransactionLineCardServiceImpl implements TransactionLineCardServic
     private TransactionLineCardMapper mapper;
 
     @Override
-    public Mono<TransactionLineCardDTO> getCardLine(Long transactionId) {
+    public Mono<TransactionLineCardDTO> getCardLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Card not found")));
     }
 
     @Override
-    public Mono<TransactionLineCardDTO> createCardLine(Long transactionId, TransactionLineCardDTO cardDTO) {
+    public Mono<TransactionLineCardDTO> createCardLine(UUID transactionId, TransactionLineCardDTO cardDTO) {
         cardDTO.setTransactionId(transactionId);
         TransactionLineCard entity = mapper.toEntity(cardDTO);
         return repository.save(entity)
@@ -36,7 +38,7 @@ public class TransactionLineCardServiceImpl implements TransactionLineCardServic
     }
 
     @Override
-    public Mono<TransactionLineCardDTO> updateCardLine(Long transactionId, TransactionLineCardDTO cardDTO) {
+    public Mono<TransactionLineCardDTO> updateCardLine(UUID transactionId, TransactionLineCardDTO cardDTO) {
         return repository.findByTransactionId(transactionId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Card not found")))
                 .flatMap(existingEntity -> {
@@ -55,7 +57,7 @@ public class TransactionLineCardServiceImpl implements TransactionLineCardServic
     }
 
     @Override
-    public Mono<Void> deleteCardLine(Long transactionId) {
+    public Mono<Void> deleteCardLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Card not found")))
                 .flatMap(repository::delete);

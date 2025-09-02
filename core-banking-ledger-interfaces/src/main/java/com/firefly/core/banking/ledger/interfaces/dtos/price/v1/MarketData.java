@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ public class MarketData {
     /**
      * The ID of the crypto asset
      */
-    private Long cryptoAssetId;
+    private UUID cryptoAssetId;
     
     /**
      * The symbol of the crypto asset (e.g., BTC, ETH)

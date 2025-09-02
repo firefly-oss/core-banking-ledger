@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,10 +21,10 @@ import java.time.LocalDateTime;
 public class TransactionLineWireTransfer extends BaseEntity {
     @Id
     @Column("transaction_line_wire_transfer_id")
-    private Long transactionLineWireTransferId;
+    private UUID transactionLineWireTransferId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("wire_transfer_reference")
     private String wireTransferReference;

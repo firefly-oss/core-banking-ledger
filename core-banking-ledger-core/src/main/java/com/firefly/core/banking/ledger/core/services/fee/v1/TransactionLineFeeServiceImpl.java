@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.fee.v1;
 
+import java.util.UUID;
+
 import com.firefly.core.banking.ledger.core.mappers.fee.v1.TransactionLineFeeMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.fee.v1.TransactionLineFeeDTO;
 import com.firefly.core.banking.ledger.models.entities.fee.v1.TransactionLineFee;
@@ -24,14 +26,14 @@ public class TransactionLineFeeServiceImpl implements TransactionLineFeeService 
     private TransactionLineFeeMapper mapper;
 
     @Override
-    public Mono<TransactionLineFeeDTO> getFeeLine(Long transactionId) {
+    public Mono<TransactionLineFeeDTO> getFeeLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .map(mapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("Transaction Line Fee not found")));
     }
 
     @Override
-    public Mono<TransactionLineFeeDTO> createFeeLine(Long transactionId, TransactionLineFeeDTO feeDTO) {
+    public Mono<TransactionLineFeeDTO> createFeeLine(UUID transactionId, TransactionLineFeeDTO feeDTO) {
         feeDTO.setTransactionId(transactionId);
         TransactionLineFee entity = mapper.toEntity(feeDTO);
         return repository.save(entity)
@@ -40,7 +42,7 @@ public class TransactionLineFeeServiceImpl implements TransactionLineFeeService 
     }
 
     @Override
-    public Mono<TransactionLineFeeDTO> updateFeeLine(Long transactionId, TransactionLineFeeDTO feeDTO) {
+    public Mono<TransactionLineFeeDTO> updateFeeLine(UUID transactionId, TransactionLineFeeDTO feeDTO) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(existingEntity -> {
                     TransactionLineFee updatedEntity = mapper.toEntity(feeDTO);
@@ -53,7 +55,7 @@ public class TransactionLineFeeServiceImpl implements TransactionLineFeeService 
     }
 
     @Override
-    public Mono<Void> deleteFeeLine(Long transactionId) {
+    public Mono<Void> deleteFeeLine(UUID transactionId) {
         return repository.findByTransactionId(transactionId)
                 .flatMap(entity -> repository.delete(entity))
                 .switchIfEmpty(Mono.empty());

@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.core.services.core.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.common.core.queries.PaginationUtils;
@@ -23,7 +25,7 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
     private TransactionStatusHistoryMapper mapper;
 
     @Override
-    public Mono<PaginationResponse<TransactionStatusHistoryDTO>> listStatusHistory(Long transactionId, PaginationRequest paginationRequest) {
+    public Mono<PaginationResponse<TransactionStatusHistoryDTO>> listStatusHistory(UUID transactionId, PaginationRequest paginationRequest) {
         return PaginationUtils.paginateQuery(
                 paginationRequest,
                 mapper::toDTO,
@@ -33,21 +35,21 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
     }
 
     @Override
-    public Mono<TransactionStatusHistoryDTO> createStatusHistory(Long transactionId, TransactionStatusHistoryDTO historyDTO) {
+    public Mono<TransactionStatusHistoryDTO> createStatusHistory(UUID transactionId, TransactionStatusHistoryDTO historyDTO) {
         historyDTO.setTransactionId(transactionId);
         TransactionStatusHistory entity = mapper.toEntity(historyDTO);
         return repository.save(entity).map(mapper::toDTO);
     }
 
     @Override
-    public Mono<TransactionStatusHistoryDTO> getStatusHistory(Long transactionId, Long historyId) {
+    public Mono<TransactionStatusHistoryDTO> getStatusHistory(UUID transactionId, UUID historyId) {
         return repository.findById(historyId)
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .map(mapper::toDTO);
     }
 
     @Override
-    public Mono<TransactionStatusHistoryDTO> updateStatusHistory(Long transactionId, Long historyId, TransactionStatusHistoryDTO historyDTO) {
+    public Mono<TransactionStatusHistoryDTO> updateStatusHistory(UUID transactionId, UUID historyId, TransactionStatusHistoryDTO historyDTO) {
         return repository.findById(historyId)
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .flatMap(existingEntity -> {
@@ -60,7 +62,7 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
     }
 
     @Override
-    public Mono<Void> deleteStatusHistory(Long transactionId, Long historyId) {
+    public Mono<Void> deleteStatusHistory(UUID transactionId, UUID historyId) {
         return repository.findById(historyId)
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .flatMap(repository::delete);

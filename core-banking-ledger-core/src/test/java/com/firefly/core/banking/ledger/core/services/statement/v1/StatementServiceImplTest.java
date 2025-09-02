@@ -5,16 +5,13 @@ import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.common.core.queries.PaginationUtils;
 import com.firefly.core.banking.ledger.core.mappers.core.v1.TransactionMapper;
 import com.firefly.core.banking.ledger.core.mappers.statement.v1.StatementMapper;
-import com.firefly.core.banking.ledger.core.services.core.v1.TransactionService;
-import com.firefly.core.banking.ledger.core.services.event.v1.EventOutboxService;
-import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementDTO;
 import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementMetadataDTO;
-import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementRequestDTO;
 import com.firefly.core.banking.ledger.interfaces.enums.statement.v1.StatementPeriodEnum;
 import com.firefly.core.banking.ledger.models.entities.statement.v1.Statement;
 import com.firefly.core.banking.ledger.models.repositories.statement.v1.StatementRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -43,37 +40,22 @@ class StatementServiceImplTest {
     @Mock
     private StatementMapper mapper;
 
-    @Mock
-    private TransactionService transactionService;
 
-    @Mock
-    private TransactionMapper transactionMapper;
-
-    @Mock
-    private EventOutboxService eventOutboxService;
 
     @InjectMocks
     private StatementServiceImpl service;
 
-    private StatementRequestDTO requestDTO;
     private StatementMetadataDTO metadataDTO;
     private Statement statement;
-    private Long accountId;
-    private Long accountSpaceId;
-    private Long statementId;
+    private UUID accountId;
+    private UUID accountSpaceId;
+    private UUID statementId;
 
     @BeforeEach
     void setUp() {
-        accountId = 123L;
-        accountSpaceId = 456L;
-        statementId = 789L;
-
-        requestDTO = new StatementRequestDTO();
-        requestDTO.setPeriodType(StatementPeriodEnum.MONTHLY);
-        requestDTO.setMonth(6);
-        requestDTO.setYear(2023);
-        requestDTO.setIncludePending(true);
-        requestDTO.setIncludeDetails(true);
+        accountId = UUID.randomUUID();
+        accountSpaceId = UUID.randomUUID();
+        statementId = UUID.randomUUID();
 
         metadataDTO = new StatementMetadataDTO();
         metadataDTO.setStatementId(statementId);

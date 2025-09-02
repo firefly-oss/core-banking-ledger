@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Implementation of the TransactionLegService interface.
  */
@@ -28,7 +29,7 @@ public class TransactionLegServiceImpl implements TransactionLegService {
     private TransactionLegMapper mapper;
 
     @Override
-    public Mono<TransactionLegDTO> createTransactionLeg(Long transactionId, TransactionLegDTO legDTO) {
+    public Mono<TransactionLegDTO> createTransactionLeg(UUID transactionId, TransactionLegDTO legDTO) {
         legDTO.setTransactionId(transactionId);
         TransactionLeg entity = mapper.toEntity(legDTO);
         return repository.save(entity)
@@ -36,14 +37,14 @@ public class TransactionLegServiceImpl implements TransactionLegService {
     }
 
     @Override
-    public Mono<TransactionLegDTO> getTransactionLeg(Long transactionId, Long legId) {
+    public Mono<TransactionLegDTO> getTransactionLeg(UUID transactionId, UUID legId) {
         return repository.findById(legId)
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .map(mapper::toDTO);
     }
 
     @Override
-    public Mono<PaginationResponse<TransactionLegDTO>> listTransactionLegs(Long transactionId, PaginationRequest paginationRequest) {
+    public Mono<PaginationResponse<TransactionLegDTO>> listTransactionLegs(UUID transactionId, PaginationRequest paginationRequest) {
         return PaginationUtils.paginateQuery(
                 paginationRequest,
                 mapper::toDTO,
@@ -53,7 +54,7 @@ public class TransactionLegServiceImpl implements TransactionLegService {
     }
 
     @Override
-    public Mono<PaginationResponse<TransactionLegDTO>> listAccountLegs(Long accountId, PaginationRequest paginationRequest) {
+    public Mono<PaginationResponse<TransactionLegDTO>> listAccountLegs(UUID accountId, PaginationRequest paginationRequest) {
         return PaginationUtils.paginateQuery(
                 paginationRequest,
                 mapper::toDTO,
@@ -64,7 +65,7 @@ public class TransactionLegServiceImpl implements TransactionLegService {
 
     @Override
     public Mono<PaginationResponse<TransactionLegDTO>> listAccountLegsByDateRange(
-            Long accountId,
+            UUID accountId,
             LocalDateTime startDate,
             LocalDateTime endDate,
             PaginationRequest paginationRequest

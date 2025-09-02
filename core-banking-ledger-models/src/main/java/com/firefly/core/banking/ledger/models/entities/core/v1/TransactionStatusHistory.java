@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,10 +20,10 @@ import java.time.LocalDateTime;
 public class TransactionStatusHistory extends BaseEntity {
     @Id
     @Column("transaction_status_history_id")
-    private Long transactionStatusHistoryId;
+    private UUID transactionStatusHistoryId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     @Column("status_code")
     private TransactionStatusEnum statusCode;

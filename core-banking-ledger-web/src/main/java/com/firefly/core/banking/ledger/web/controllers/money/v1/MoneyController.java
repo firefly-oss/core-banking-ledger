@@ -1,5 +1,7 @@
 package com.firefly.core.banking.ledger.web.controllers.money.v1;
 
+import java.util.UUID;
+
 import com.firefly.common.core.queries.PaginationRequest;
 import com.firefly.common.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.money.v1.MoneyService;
@@ -72,7 +74,7 @@ public class MoneyController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public Mono<ResponseEntity<MoneyDTO>> getMoney(
-            @Parameter(description = "ID of the money value", required = true) @PathVariable Long moneyId) {
+            @Parameter(description = "ID of the money value", required = true) @PathVariable UUID moneyId) {
         
         return moneyService.getMoney(moneyId)
                 .map(ResponseEntity::ok)

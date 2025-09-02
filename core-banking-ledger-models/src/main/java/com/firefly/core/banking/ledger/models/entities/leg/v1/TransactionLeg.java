@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import java.util.UUID;
 /**
  * Entity representing a transaction leg in double-entry accounting.
  * Each transaction consists of at least two legs (debit and credit).
@@ -24,24 +25,24 @@ import java.time.LocalDateTime;
 public class TransactionLeg extends BaseEntity {
     @Id
     @Column("transaction_leg_id")
-    private Long transactionLegId;
+    private UUID transactionLegId;
 
     @Column("transaction_id")
-    private Long transactionId;
+    private UUID transactionId;
 
     /**
      * Reference to account ID in external account microservice.
      * This is a logical reference to an account managed in a separate microservice.
      */
     @Column("account_id")
-    private Long accountId;
+    private UUID accountId;
 
     /**
      * Reference to account space ID in external account microservice.
      * This is a logical reference to an account space managed in a separate microservice.
      */
     @Column("account_space_id")
-    private Long accountSpaceId;
+    private UUID accountSpaceId;
 
     @Column("leg_type")
     private String legType;  // "DEBIT" or "CREDIT"
