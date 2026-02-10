@@ -1,8 +1,8 @@
 # Core Banking Ledger
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green.svg)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://openjdk.java.net/projects/jdk/25/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green.svg)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Maven-3.9-red.svg)](https://maven.apache.org/)
 
 ## Table of Contents
@@ -39,7 +39,7 @@
 
 ## Overview
 
-The **Core Banking Ledger** is a high-performance, reactive microservice designed for modern banking systems. Built with Spring Boot 3.2 and Java 21, it provides comprehensive transaction management, double-entry accounting, and multi-payment method support for banking operations.
+The **Core Banking Ledger** is a high-performance, reactive microservice designed for modern banking systems. Built with Spring Boot 3.5 and Java 25, it provides comprehensive transaction management, double-entry accounting, and multi-payment method support for banking operations.
 
 This microservice is part of the **Firefly OpenCore Banking Platform** developed by **Firefly Software Solutions Inc.** and focuses exclusively on **data management and CRUD operations** for banking transactions and related entities. It does not contain business logic for financial calculations, balance computations, or payment processing - these responsibilities are handled by other microservices in the platform.
 
@@ -55,11 +55,11 @@ This microservice is part of the **Firefly OpenCore Banking Platform** developed
 
 ---
 
-## 🚀 Quickstart
+## Quickstart
 
 ### Prerequisites
 
-- **Java 21** or higher
+- **Java 25** or higher
 - **Maven 3.9** or higher
 - **PostgreSQL 15** or higher
 - **Docker** (optional, for containerized deployment)
@@ -113,7 +113,7 @@ This microservice is part of the **Firefly OpenCore Banking Platform** developed
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ### Module Structure
 
@@ -139,7 +139,7 @@ The project follows a clean, modular architecture with clear separation of conce
 
 ---
 
-## 📊 Data Model
+## Data Model
 
 ### Entity Relationship Diagram
 
@@ -472,7 +472,7 @@ Payment-method-specific details for various transaction types including Card, Wi
 
 ---
 
-## 📚 API Documentation
+## API Documentation
 
 API documentation is available via Swagger UI when the application is running:
 
@@ -489,10 +489,9 @@ The API follows RESTful principles and provides comprehensive CRUD operations fo
 - `GET /api/v1/transactions/{transactionId}` - Get transaction by ID
 - `PUT /api/v1/transactions/{transactionId}` - Update transaction
 - `DELETE /api/v1/transactions/{transactionId}` - Delete transaction
-- `GET /api/v1/transactions` - List transactions with pagination
-- `GET /api/v1/transactions/external-reference/{externalReference}` - Find by external reference
-- `POST /api/v1/transactions/{transactionId}/reversal` - Create reversal transaction
-- `PUT /api/v1/transactions/{transactionId}/status` - Update transaction status
+- `GET /api/v1/transactions/filter` - List transactions with filtering and pagination
+- `GET /api/v1/transactions/by-reference/{externalReference}` - Find by external reference
+- `PATCH /api/v1/transactions/{transactionId}/status` - Update transaction status
 
 #### TransactionStatusHistoryController (`/api/v1/transactions/{transactionId}/status-history`)
 - `GET /api/v1/transactions/{transactionId}/status-history` - Get status history
@@ -500,46 +499,45 @@ The API follows RESTful principles and provides comprehensive CRUD operations fo
 
 #### TransactionLegController (`/api/v1/transactions/{transactionId}/legs`)
 - `POST /api/v1/transactions/{transactionId}/legs` - Create transaction leg
-- `GET /api/v1/transactions/{transactionId}/legs` - Get transaction legs
-- `PUT /api/v1/transactions/{transactionId}/legs/{legId}` - Update transaction leg
-- `DELETE /api/v1/transactions/{transactionId}/legs/{legId}` - Delete transaction leg
+- `GET /api/v1/transactions/{transactionId}/legs/{legId}` - Get transaction leg by ID
+- `GET /api/v1/transactions/{transactionId}/legs` - List transaction legs with pagination
 
 #### AccountLegController (`/api/v1/accounts/{accountId}/legs`)
 - `GET /api/v1/accounts/{accountId}/legs` - Get legs by account
-- `GET /api/v1/account-spaces/{accountSpaceId}/legs` - Get legs by account space
+- `GET /api/v1/accounts/{accountId}/legs/date-range` - Get legs by account within a date range
 
 ### Transaction Line Controllers
 
 Each payment method has its own dedicated controller for managing payment-specific details:
 
-#### TransactionLineCardController (`/api/v1/transactions/{transactionId}/lines/card`)
+#### TransactionLineCardController (`/api/v1/transactions/{transactionId}/line-card`)
 - Full CRUD operations for card transaction details
 
-#### TransactionLineWireTransferController (`/api/v1/transactions/{transactionId}/lines/wire`)
+#### TransactionLineWireTransferController (`/api/v1/transactions/{transactionId}/line-wire-transfer`)
 - Full CRUD operations for wire transfer details
 
-#### TransactionLineSepaTransferController (`/api/v1/transactions/{transactionId}/lines/sepa`)
+#### TransactionLineSepaTransferController (`/api/v1/transactions/{transactionId}/line-sepa-transfer`)
 - Full CRUD operations for SEPA transfer details
 
-#### TransactionLineDirectDebitController (`/api/v1/transactions/{transactionId}/lines/direct-debit`)
+#### TransactionLineDirectDebitController (`/api/v1/transactions/{transactionId}/line-direct-debit`)
 - Full CRUD operations for direct debit details
 
-#### TransactionLineDepositController (`/api/v1/transactions/{transactionId}/lines/deposit`)
+#### TransactionLineDepositController (`/api/v1/transactions/{transactionId}/line-deposit`)
 - Full CRUD operations for deposit details
 
-#### TransactionLineWithdrawalController (`/api/v1/transactions/{transactionId}/lines/withdrawal`)
+#### TransactionLineWithdrawalController (`/api/v1/transactions/{transactionId}/line-withdrawal`)
 - Full CRUD operations for withdrawal details
 
-#### TransactionLineTransferController (`/api/v1/transactions/{transactionId}/lines/transfer`)
+#### TransactionLineTransferController (`/api/v1/transactions/{transactionId}/line-transfer`)
 - Full CRUD operations for transfer details
 
-#### TransactionLineFeeController (`/api/v1/transactions/{transactionId}/lines/fee`)
+#### TransactionLineFeeController (`/api/v1/transactions/{transactionId}/line-fee`)
 - Full CRUD operations for fee details
 
-#### TransactionLineInterestController (`/api/v1/transactions/{transactionId}/lines/interest`)
+#### TransactionLineInterestController (`/api/v1/transactions/{transactionId}/line-interest`)
 - Full CRUD operations for interest details
 
-#### TransactionLineStandingOrderController (`/api/v1/transactions/{transactionId}/lines/standing-order`)
+#### TransactionLineStandingOrderController (`/api/v1/transactions/{transactionId}/line-standing-order`)
 - Full CRUD operations for standing order details
 
 #### TransactionLineAchController (`/api/v1/transactions/{transactionId}/line-ach`)
@@ -563,7 +561,7 @@ Each payment method has its own dedicated controller for managing payment-specif
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -604,7 +602,7 @@ The application uses PostgreSQL with R2DBC for reactive database access and Flyw
 
 ---
 
-## 🔧 Key Features
+## Key Features
 
 ### Transaction Management
 
@@ -663,7 +661,7 @@ Support for account statement generation:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 The project includes comprehensive unit and integration tests covering all major components.
 
@@ -699,7 +697,7 @@ The test suite covers:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions to the Core Banking Ledger project! Please follow these guidelines:
 
@@ -738,7 +736,7 @@ We welcome contributions to the Core Banking Ledger project! Please follow these
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
@@ -760,7 +758,7 @@ limitations under the License.
 
 ---
 
-## 📞 Contact
+## Contact
 
 - **Website**: [getfirefly.io](https://getfirefly.io)
 - **GitHub Organization**: [firefly-oss](https://github.com/firefly-oss)
