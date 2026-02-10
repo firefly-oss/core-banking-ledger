@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.firefly</groupId>
-        <artifactId>lib-parent-pom</artifactId>
+        <groupId>org.fireflyframework</groupId>
+        <artifactId>fireflyframework-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>com.firefly</groupId>
     <artifactId>core-banking-ledger</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>core-banking-ledger-core</module>
@@ -22,6 +22,11 @@
     </modules>
 
     <properties>
+        <java.version>25</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <fireflyframework.bom.version>26.01.01</fireflyframework.bom.version>
         <core-banking-ledger.version>
             1.0.0-SNAPSHOT
         </core-banking-ledger.version>
@@ -29,6 +34,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.fireflyframework</groupId>
+                <artifactId>fireflyframework-bom</artifactId>
+                <version>${fireflyframework.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- Internal modules -->
             <dependency>
                 <groupId>com.firefly</groupId>
