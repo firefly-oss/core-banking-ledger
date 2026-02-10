@@ -18,7 +18,7 @@
 package com.firefly.core.banking.ledger.interfaces.dtos.statement.v1;
 
 import com.firefly.core.banking.ledger.interfaces.dtos.BaseDTO;
-import com.firefly.annotations.ValidAmount;
+import org.fireflyframework.annotations.ValidAmount;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

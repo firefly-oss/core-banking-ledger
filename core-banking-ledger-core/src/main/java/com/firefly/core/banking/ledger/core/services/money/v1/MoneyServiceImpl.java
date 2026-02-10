@@ -19,9 +19,9 @@ package com.firefly.core.banking.ledger.core.services.money.v1;
 
 import java.util.UUID;
 
-import com.firefly.common.core.queries.PaginationRequest;
-import com.firefly.common.core.queries.PaginationResponse;
-import com.firefly.common.core.queries.PaginationUtils;
+import org.fireflyframework.core.queries.PaginationRequest;
+import org.fireflyframework.core.queries.PaginationResponse;
+import org.fireflyframework.core.queries.PaginationUtils;
 import com.firefly.core.banking.ledger.core.mappers.money.v1.MoneyMapper;
 import com.firefly.core.banking.ledger.interfaces.dtos.money.v1.MoneyDTO;
 import com.firefly.core.banking.ledger.models.entities.money.v1.Money;

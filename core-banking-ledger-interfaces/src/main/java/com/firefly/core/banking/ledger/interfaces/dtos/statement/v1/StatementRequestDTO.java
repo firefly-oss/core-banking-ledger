@@ -19,7 +19,7 @@ package com.firefly.core.banking.ledger.interfaces.dtos.statement.v1;
 
 import com.firefly.core.banking.ledger.interfaces.dtos.BaseDTO;
 import com.firefly.core.banking.ledger.interfaces.enums.statement.v1.StatementPeriodEnum;
-import com.firefly.annotations.ValidDate;
+import org.fireflyframework.annotations.ValidDate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

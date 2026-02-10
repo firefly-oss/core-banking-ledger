@@ -18,9 +18,9 @@
 package com.firefly.core.banking.ledger.interfaces.dtos.crypto.v1;
 
 import com.firefly.core.banking.ledger.interfaces.enums.asset.v1.AssetTypeEnum;
-import com.firefly.annotations.ValidAmount;
-import com.firefly.annotations.ValidCurrencyCode;
-import com.firefly.annotations.ValidDateTime;
+import org.fireflyframework.annotations.ValidAmount;
+import org.fireflyframework.annotations.ValidCurrencyCode;
+import org.fireflyframework.annotations.ValidDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

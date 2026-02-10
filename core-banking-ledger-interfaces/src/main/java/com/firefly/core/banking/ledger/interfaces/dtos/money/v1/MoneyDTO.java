@@ -18,8 +18,8 @@
 package com.firefly.core.banking.ledger.interfaces.dtos.money.v1;
 
 import com.firefly.core.banking.ledger.interfaces.dtos.BaseDTO;
-import com.firefly.annotations.ValidAmount;
-import com.firefly.annotations.ValidCurrencyCode;
+import org.fireflyframework.annotations.ValidAmount;
+import org.fireflyframework.annotations.ValidCurrencyCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

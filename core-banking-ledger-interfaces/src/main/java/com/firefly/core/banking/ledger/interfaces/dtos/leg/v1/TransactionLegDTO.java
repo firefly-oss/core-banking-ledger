@@ -18,10 +18,10 @@
 package com.firefly.core.banking.ledger.interfaces.dtos.leg.v1;
 
 import com.firefly.core.banking.ledger.interfaces.dtos.BaseDTO;
-import com.firefly.core.utils.annotations.FilterableId;
-import com.firefly.annotations.ValidAmount;
-import com.firefly.annotations.ValidCurrencyCode;
-import com.firefly.annotations.ValidDateTime;
+import org.fireflyframework.utils.annotations.FilterableId;
+import org.fireflyframework.annotations.ValidAmount;
+import org.fireflyframework.annotations.ValidCurrencyCode;
+import org.fireflyframework.annotations.ValidDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

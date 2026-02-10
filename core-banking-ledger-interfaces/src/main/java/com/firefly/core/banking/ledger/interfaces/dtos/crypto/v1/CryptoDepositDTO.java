@@ -17,7 +17,7 @@
 
 package com.firefly.core.banking.ledger.interfaces.dtos.crypto.v1;
 
-import com.firefly.annotations.ValidCurrencyCode;
+import org.fireflyframework.annotations.ValidCurrencyCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

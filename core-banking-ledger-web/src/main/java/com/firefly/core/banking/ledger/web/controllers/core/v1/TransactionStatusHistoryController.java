@@ -19,8 +19,8 @@ package com.firefly.core.banking.ledger.web.controllers.core.v1;
 
 import java.util.UUID;
 
-import com.firefly.common.core.queries.PaginationRequest;
-import com.firefly.common.core.queries.PaginationResponse;
+import org.fireflyframework.core.queries.PaginationRequest;
+import org.fireflyframework.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.core.v1.TransactionStatusHistoryServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.core.v1.TransactionStatusHistoryDTO;
 import io.swagger.v3.oas.annotations.Operation;

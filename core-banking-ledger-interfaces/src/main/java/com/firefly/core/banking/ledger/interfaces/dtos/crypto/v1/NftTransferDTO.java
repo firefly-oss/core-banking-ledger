@@ -23,8 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import com.firefly.annotations.ValidAmount;
-import com.firefly.annotations.ValidCurrencyCode;
+import org.fireflyframework.annotations.ValidAmount;
+import org.fireflyframework.annotations.ValidCurrencyCode;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.List;

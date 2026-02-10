@@ -18,8 +18,8 @@
 package com.firefly.core.banking.ledger.interfaces.dtos.blockchain.v1;
 
 import com.firefly.core.banking.ledger.interfaces.enums.blockchain.v1.TransactionStatus;
-import com.firefly.annotations.ValidAmount;
-import com.firefly.annotations.ValidDateTime;
+import org.fireflyframework.annotations.ValidAmount;
+import org.fireflyframework.annotations.ValidDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

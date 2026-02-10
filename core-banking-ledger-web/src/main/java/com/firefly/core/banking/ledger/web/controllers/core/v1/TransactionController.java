@@ -19,8 +19,8 @@ package com.firefly.core.banking.ledger.web.controllers.core.v1;
 
 import java.util.UUID;
 
-import com.firefly.common.core.filters.FilterRequest;
-import com.firefly.common.core.queries.PaginationResponse;
+import org.fireflyframework.core.filters.FilterRequest;
+import org.fireflyframework.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.core.v1.TransactionServiceImpl;
 import com.firefly.core.banking.ledger.interfaces.dtos.core.v1.TransactionDTO;
 import com.firefly.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;

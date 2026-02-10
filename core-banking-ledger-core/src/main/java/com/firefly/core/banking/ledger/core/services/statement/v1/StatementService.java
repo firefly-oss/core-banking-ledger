@@ -17,8 +17,8 @@
 
 package com.firefly.core.banking.ledger.core.services.statement.v1;
 
-import com.firefly.common.core.queries.PaginationRequest;
-import com.firefly.common.core.queries.PaginationResponse;
+import org.fireflyframework.core.queries.PaginationRequest;
+import org.fireflyframework.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.interfaces.dtos.statement.v1.StatementMetadataDTO;
 import reactor.core.publisher.Mono;
 

@@ -18,7 +18,7 @@
 package com.firefly.core.banking.ledger.interfaces.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.firefly.annotations.ValidDateTime;
+import org.fireflyframework.annotations.ValidDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

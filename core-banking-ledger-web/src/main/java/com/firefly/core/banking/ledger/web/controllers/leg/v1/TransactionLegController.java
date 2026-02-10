@@ -17,8 +17,8 @@
 
 package com.firefly.core.banking.ledger.web.controllers.leg.v1;
 
-import com.firefly.common.core.queries.PaginationRequest;
-import com.firefly.common.core.queries.PaginationResponse;
+import org.fireflyframework.core.queries.PaginationRequest;
+import org.fireflyframework.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.leg.v1.TransactionLegService;
 import com.firefly.core.banking.ledger.interfaces.dtos.leg.v1.TransactionLegDTO;
 import io.swagger.v3.oas.annotations.Operation;

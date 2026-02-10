@@ -19,8 +19,8 @@ package com.firefly.core.banking.ledger.web.controllers.attachment.v1;
 
 import java.util.UUID;
 
-import com.firefly.common.core.queries.PaginationRequest;
-import com.firefly.common.core.queries.PaginationResponse;
+import org.fireflyframework.core.queries.PaginationRequest;
+import org.fireflyframework.core.queries.PaginationResponse;
 import com.firefly.core.banking.ledger.core.services.attachment.v1.TransactionAttachmentService;
 import com.firefly.core.banking.ledger.interfaces.dtos.attachment.v1.TransactionAttachmentDTO;
 import com.firefly.core.banking.ledger.interfaces.enums.attachment.v1.AttachmentTypeEnum;

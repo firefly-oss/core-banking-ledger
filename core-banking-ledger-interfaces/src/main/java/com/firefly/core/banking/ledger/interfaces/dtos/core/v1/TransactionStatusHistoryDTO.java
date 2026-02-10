@@ -19,8 +19,8 @@ package com.firefly.core.banking.ledger.interfaces.dtos.core.v1;
 
 import com.firefly.core.banking.ledger.interfaces.dtos.BaseDTO;
 import com.firefly.core.banking.ledger.interfaces.enums.core.v1.TransactionStatusEnum;
-import com.firefly.core.utils.annotations.FilterableId;
-import com.firefly.annotations.ValidDateTime;
+import org.fireflyframework.utils.annotations.FilterableId;
+import org.fireflyframework.annotations.ValidDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

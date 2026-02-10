@@ -12,8 +12,6 @@
     <artifactId>core-banking-ledger-sdk</artifactId>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <openapi-generator.version>7.0.1</openapi-generator.version>
         <swagger-annotations.version>2.2.15</swagger-annotations.version>
