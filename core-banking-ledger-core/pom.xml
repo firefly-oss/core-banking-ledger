@@ -29,7 +29,7 @@
         <!-- Common Libraries -->
         <dependency>
             <groupId>org.fireflyframework</groupId>
-            <artifactId>fireflyframework-core</artifactId>
+            <artifactId>fireflyframework-starter-core</artifactId>
         </dependency>
 
         <!-- Spring WebFlux -->

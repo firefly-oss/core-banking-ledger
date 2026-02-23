@@ -13,6 +13,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Enable OpenAPI generation (profile inherited from firefly-parent) -->
+        <openapi.gen.skip>false</openapi.gen.skip>
+        <openapi.gen.mainClass>com.firefly.core.banking.ledger.web.openapi.OpenApiGenApplication</openapi.gen.mainClass>
     </properties>
 
     <dependencies>

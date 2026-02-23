@@ -105,7 +105,7 @@
                         </goals>
                         <configuration>
                             <!-- Use the OpenAPI spec from the running web application -->
-                            <inputSpec>${project.basedir}/src/main/resources/api-spec/openapi.yml</inputSpec>
+                            <inputSpec>${project.parent.basedir}/${project.parent.artifactId}-web/target/openapi/openapi.yml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <output>${generated-sources-dir}</output>
