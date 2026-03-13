@@ -18,19 +18,21 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-# IntelliJ IDEA files
+# IntelliJ IDEA specific files
 .idea/
 *.iml
 *.iws
-out/
-# Maven target directory
+# Target folder
 target/
+# IntelliJ IDEA
+*.ipr
 # Refactoring backup directories
 .refactor-backup-*/
 *.refactor-backup-*
 
-# Additional Maven patterns added Fri Aug 29 20:28:11 CEST 2025
+# Additional Maven patterns added Fri Aug 29 20:28:01 CEST 2025
 **/target/generated-sources/
 **/target/generated-test-sources/
 **/target/generated-resources/
 .refactor-backup-*/
+.metadata-backup*
