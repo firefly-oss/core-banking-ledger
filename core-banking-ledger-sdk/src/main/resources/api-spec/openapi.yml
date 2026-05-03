@@ -3,7 +3,7 @@ info:
   title: core-banking-ledger
   description: Banking Ledger Core Application
   contact:
-    name: Firefly Software Solutions Inc
+    name: Firefly Software Foundation
     email: dev@getfirefly.io
   version: 1.0.0
 servers:

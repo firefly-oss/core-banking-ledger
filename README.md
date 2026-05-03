@@ -41,7 +41,7 @@
 
 The **Core Banking Ledger** is a high-performance, reactive microservice designed for modern banking systems. Built with Spring Boot 3.5 and Java 25, it provides comprehensive transaction management, double-entry accounting, and multi-payment method support for banking operations.
 
-This microservice is part of the **Firefly OpenCore Banking Platform** developed by **Firefly Software Solutions Inc.** and focuses exclusively on **data management and CRUD operations** for banking transactions and related entities. It does not contain business logic for financial calculations, balance computations, or payment processing - these responsibilities are handled by other microservices in the platform.
+This microservice is part of the **Firefly OpenCore Banking Platform** developed by **Firefly Software Foundation.** and focuses exclusively on **data management and CRUD operations** for banking transactions and related entities. It does not contain business logic for financial calculations, balance computations, or payment processing - these responsibilities are handled by other microservices in the platform.
 
 ### Key Characteristics
 
@@ -741,7 +741,7 @@ We welcome contributions to the Core Banking Ledger project! Please follow these
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ```
-Copyright 2024 Firefly Software Solutions Inc.
+Copyright 2024 Firefly Software Foundation.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
