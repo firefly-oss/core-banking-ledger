@@ -13,14 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openapi-generator.version>7.0.1</openapi-generator.version>
-        <swagger-annotations.version>2.2.15</swagger-annotations.version>
-        <jackson.version>2.15.2</jackson.version>
-        <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <generated-sources-dir>${project.build.directory}/generated-sources</generated-sources-dir>
-        <jackson.databind.version>0.2.6</jackson.databind.version>
-        <jackson.dataformat.version>2.17.0</jackson.dataformat.version>
-        <javax.annotation.version>1.3.2</javax.annotation.version>
     </properties>
 
     <dependencies>
@@ -31,26 +24,22 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- OpenAPI Dependencies -->
+        <!-- OpenAPI / Jackson — versions managed by fireflyframework-parent BOM -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-annotations.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>${jakarta-annotation.version}</version>
         </dependency>
 
         <!-- Utils -->
@@ -69,22 +58,27 @@
             <artifactId>logging-interceptor</artifactId>
         </dependency>
 
-        <!-- For @Generated annotation -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>${javax.annotation.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>${jackson.databind.version}</version>
+            <version>0.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${jackson.dataformat.version}</version>
+        </dependency>
+
+        <!-- OpenAPI Generator still emits javax.annotation.Generated for webclient -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
+        <!-- WebClient SDK runtime (Spring Framework 7 / Boot 4) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
         </dependency>
 
     </dependencies>
@@ -92,11 +86,10 @@
     <build>
         <plugins>
 
-            <!-- OpenAPI Generator Maven Plugin -->
+            <!-- OpenAPI Generator Maven Plugin — version from fireflyframework-parent (7.26.0) -->
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
                         <id>core-banking-ledger-sdk</id>
@@ -120,6 +113,7 @@
                                 <library>webclient</library>
                                 <reactive>true</reactive>
                                 <returnResponse>true</returnResponse>
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
                         </configuration>
                     </execution>
