@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    uses: firefly-oss/.github/.github/workflows/java-release.yml@main
+    uses: fireflysoftwaresolutions/.github/.github/workflows/java-release.yml@main
     permissions:
       contents: write
       packages: write
