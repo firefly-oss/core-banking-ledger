@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>core-banking-ledger-core</artifactId>
+    <name>core-banking-ledger-core</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

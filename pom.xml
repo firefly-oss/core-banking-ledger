@@ -12,6 +12,7 @@
     </parent>
 
     <artifactId>core-banking-ledger</artifactId>
+    <name>core-banking-ledger</name>
     <packaging>pom</packaging>
     <modules>
         <module>core-banking-ledger-core</module>
