@@ -760,9 +760,9 @@ limitations under the License.
 
 ## Contact
 
-- **Website**: [getfirefly.io](https://getfirefly.io)
+- **Website**: [fireflysoftware.io](https://fireflysoftware.io)
 - **GitHub Organization**: [firefly-oss](https://github.com/firefly-oss)
-- **Email**: dev@getfirefly.io
+- **Email**: dev@fireflysoftware.io
 
 ---
 

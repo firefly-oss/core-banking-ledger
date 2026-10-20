@@ -5,7 +5,7 @@ spring:
     description: Banking Ledger Core Application
     team:
       name: Firefly Software Foundation
-      email: dev@getfirefly.io
+      email: dev@fireflysoftware.io
 
   r2dbc:
     pool:
