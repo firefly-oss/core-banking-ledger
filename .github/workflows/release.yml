@@ -13,6 +13,7 @@ jobs:
       packages: write
     with:
       java-version: '25'
+      destination: both
       # Publish only the SDK module (and the aggregate pom it inherits
       # from). Internal modules (interfaces, models, core, web) stay
       # local — only the SDK is consumed across repos.
