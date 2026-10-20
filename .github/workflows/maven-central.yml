@@ -1,0 +1,15 @@
+name: Maven Central
+
+on:
+  workflow_dispatch:
+
+jobs:
+  maven-central:
+    uses: firefly-oss/.github/.github/workflows/java-release.yml@main
+    permissions:
+      contents: read
+    with:
+      java-version: '25'
+      destination: central
+      deploy-module: 'core-banking-ledger-sdk'
+    secrets: inherit
