@@ -1,9 +1,9 @@
 <a href="https://fireflysoftware.io/openplatform/">
 <picture>
-  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-narrow-dark.svg">
-  <source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-narrow-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-dark.svg">
-  <img src="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-light.svg" alt="Firefly OpenPlatform - Core Banking - Ledger" width="100%">
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-narrow-dark.svg">
+  <source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-narrow-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-dark.svg">
+  <img src="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-light.svg" alt="Firefly OpenPlatform - Core Banking - Ledger" width="100%">
 </picture>
 </a>
 
@@ -197,7 +197,7 @@ erDiagram
         string city
         string postal_code
         string branch_office_code
-        string nif_initiating_party
+        string initiating_party_identifier
         enum asset_type
         uuid blockchain_network_id
         string blockchain_transaction_hash
@@ -290,7 +290,7 @@ erDiagram
         decimal card_fee_amount
         string card_fee_currency
         string card_installment_plan
-        string card_merchant_cif
+        string card_merchant_tax_id
         datetime date_created
         datetime date_updated
     }
@@ -471,13 +471,13 @@ erDiagram
 The data model consists of three main categories:
 
 **Core Entities:**
-- **Transaction**: Central entity representing financial transactions with comprehensive fields for compliance, geolocation, and crypto support
+- **Transaction**: Central entity representing financial transactions with fields for compliance, geolocation, and crypto support. `initiating_party_identifier` identifies the party that initiated the transaction. Currency columns are ISO 4217 codes stored as `varchar(3)`
 - **TransactionLeg**: Implements double-entry accounting with debit/credit legs
 - **TransactionStatusHistory**: Complete audit trail of status changes
 - **TransactionAttachment**: Document management integration
 
 **Transaction Line Entities:**
-Payment-method-specific details for various transaction types including Card, Wire Transfer, SEPA, Direct Debit, Deposit, Withdrawal, Transfer, Fee, Interest, Standing Order, and ACH transactions.
+Payment-method-specific details for various transaction types including Card, Wire Transfer, SEPA, Direct Debit, Deposit, Withdrawal, Transfer, Fee, Interest, Standing Order, and ACH transactions. On a card line, `card_merchant_tax_id` is the merchant tax identifier. The identifier scheme is chosen by the caller.
 
 **Supporting Entities:**
 - **Money**: Monetary values with multi-asset support
