@@ -17,6 +17,7 @@
 
 package io.fireflysoftware.core.banking.ledger.web.controllers.core.v1;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.fireflyframework.core.filters.FilterRequest;
@@ -87,6 +88,23 @@ public class TransactionController {
         return service.filterTransactions(filterRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @Operation(
+            summary = "List transactions for an account",
+            description = "Returns the ledger transactions stored for one account."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Transactions for the account",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionDTO.class)))
+    })
+    @GetMapping(value = "/by-account/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<List<TransactionDTO>> getTransactionsByAccountId(
+            @Parameter(description = "Account whose transactions are returned", required = true)
+            @PathVariable UUID accountId
+    ) {
+        return service.getTransactionsByAccountId(accountId).collectList();
     }
 
     @Operation(

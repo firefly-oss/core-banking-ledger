@@ -2017,6 +2017,34 @@ paths:
                 $ref: "#/components/schemas/TransactionDTO"
         "400":
           description: Invalid transaction data provided
+  /api/v1/transactions/by-account/{accountId}:
+    get:
+      tags:
+      - Transactions
+      summary: List transactions for an account
+      description: Returns the ledger transactions stored for one account.
+      operationId: listTransactionsByAccount
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Transactions for the account
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionDTO"
   /api/v1/money:
     get:
       tags:
