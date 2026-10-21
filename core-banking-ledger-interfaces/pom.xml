@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.fireflysoftware</groupId>
         <artifactId>core-banking-ledger</artifactId>
-        <version>26.10.3</version>
+        <version>26.10.4</version>
     </parent>
 
     <artifactId>core-banking-ledger-interfaces</artifactId>
