@@ -85,6 +85,6 @@ public class TransactionLineCardDTO extends BaseDTO {
     @Size(max = 50, message = "Card installment plan cannot exceed 50 characters")
     private String cardInstallmentPlan;
 
-    @Size(max = 20, message = "Card merchant CIF cannot exceed 20 characters")
-    private String cardMerchantCif;
+    @Size(max = 20, message = "Card merchant tax identifier cannot exceed 20 characters")
+    private String cardMerchantTaxId;
 }

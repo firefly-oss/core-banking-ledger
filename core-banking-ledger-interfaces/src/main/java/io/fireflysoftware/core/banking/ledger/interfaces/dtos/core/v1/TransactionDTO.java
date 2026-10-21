@@ -96,8 +96,8 @@ public class TransactionDTO extends BaseDTO {
     @Size(max = 20, message = "Branch office code cannot exceed 20 characters")
     private String branchOfficeCode;
 
-    @Size(max = 20, message = "NIF initiating party cannot exceed 20 characters")
-    private String nifInitiatingParty;
+    @Size(max = 20, message = "Initiating party identifier cannot exceed 20 characters")
+    private String initiatingPartyIdentifier;
 
     // Geotag fields
     @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")

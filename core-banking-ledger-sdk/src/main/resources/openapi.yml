@@ -3919,7 +3919,7 @@ components:
           maxLength: 50
           minLength: 0
           type: string
-        cardMerchantCif:
+        cardMerchantTaxId:
           maxLength: 20
           minLength: 0
           type: string
@@ -4120,7 +4120,7 @@ components:
           maxLength: 20
           minLength: 0
           type: string
-        nifInitiatingParty:
+        initiatingPartyIdentifier:
           maxLength: 20
           minLength: 0
           type: string

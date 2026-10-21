@@ -95,8 +95,8 @@ public class Transaction extends BaseEntity {
     @Column("branch_office_code")
     private String branchOfficeCode;
 
-    @Column("nif_initiating_party")
-    private String nifInitiatingParty;
+    @Column("initiating_party_identifier")
+    private String initiatingPartyIdentifier;
 
     // Geotag fields
     @Column("latitude")
