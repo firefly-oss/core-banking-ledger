@@ -106,6 +106,7 @@ public class TransactionServiceImplTest {
 
     @Test
     void createTransaction_Success() {
+        transactionDTO.setTransactionId(null);
         // Arrange
         TransactionStatusHistory statusHistory = new TransactionStatusHistory();
         statusHistory.setTransactionId(UUID.randomUUID());

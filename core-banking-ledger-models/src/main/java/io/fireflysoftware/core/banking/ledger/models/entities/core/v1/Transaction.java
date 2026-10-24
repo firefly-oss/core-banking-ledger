@@ -137,6 +137,9 @@ public class Transaction extends BaseEntity {
     @Column("row_version")
     private Long rowVersion;
 
+    @Column("managed_posting")
+    private boolean managedPosting;
+
     // Compliance fields
     @Column("aml_risk_score")
     private Integer amlRiskScore;

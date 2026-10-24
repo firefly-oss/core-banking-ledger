@@ -27,8 +27,10 @@ import io.fireflysoftware.core.banking.ledger.interfaces.dtos.core.v1.Transactio
 import io.fireflysoftware.core.banking.ledger.models.entities.core.v1.TransactionStatusHistory;
 import io.fireflysoftware.core.banking.ledger.models.repositories.core.v1.TransactionStatusHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -40,6 +42,9 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
 
     @Autowired
     private TransactionStatusHistoryMapper mapper;
+
+    @Autowired
+    private ManagedPostingGuard postingGuard;
 
     @Override
     public Mono<PaginationResponse<TransactionStatusHistoryDTO>> listStatusHistory(UUID transactionId, PaginationRequest paginationRequest) {
@@ -53,9 +58,12 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
 
     @Override
     public Mono<TransactionStatusHistoryDTO> createStatusHistory(UUID transactionId, TransactionStatusHistoryDTO historyDTO) {
+        if (historyDTO.getTransactionStatusHistoryId() != null) {
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status history create requires a server-assigned identifier"));
+        }
         historyDTO.setTransactionId(transactionId);
         TransactionStatusHistory entity = mapper.toEntity(historyDTO);
-        return repository.save(entity).map(mapper::toDTO);
+        return postingGuard.requireLegacy(transactionId).then(Mono.defer(() -> repository.save(entity))).map(mapper::toDTO);
     }
 
     @Override
@@ -67,7 +75,7 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
 
     @Override
     public Mono<TransactionStatusHistoryDTO> updateStatusHistory(UUID transactionId, UUID historyId, TransactionStatusHistoryDTO historyDTO) {
-        return repository.findById(historyId)
+        return postingGuard.requireLegacy(transactionId).then(Mono.defer(() -> repository.findById(historyId)))
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .flatMap(existingEntity -> {
                     TransactionStatusHistory updatedEntity = mapper.toEntity(historyDTO);
@@ -80,7 +88,7 @@ public class TransactionStatusHistoryServiceImpl implements TransactionStatusHis
 
     @Override
     public Mono<Void> deleteStatusHistory(UUID transactionId, UUID historyId) {
-        return repository.findById(historyId)
+        return postingGuard.requireLegacy(transactionId).then(Mono.defer(() -> repository.findById(historyId)))
                 .filter(entity -> entity.getTransactionId().equals(transactionId))
                 .flatMap(repository::delete);
     }
