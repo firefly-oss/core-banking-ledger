@@ -33,6 +33,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionRepository extends BaseRepository<Transaction, UUID> {
+    @Query("SELECT * FROM transaction WHERE transaction_id = :transactionId FOR UPDATE")
+    Mono<Transaction> findByIdForUpdate(UUID transactionId);
+
+    @Query("SELECT * FROM transaction WHERE related_transaction_id = :originalId AND relation_type = 'REVERSAL' AND managed_posting AND transaction_status = 'posted'")
+    Mono<Transaction> findManagedPostedReversal(UUID originalId);
+
     Flux<Transaction> findByAccountId(UUID accountId, Pageable pageable);
     Mono<Long> countByAccountId(UUID accountId);
 

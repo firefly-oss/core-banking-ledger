@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
  * Repository interface for transaction legs.
  */
 public interface TransactionLegRepository extends BaseRepository<TransactionLeg, UUID> {
+    Flux<TransactionLeg> findAllByTransactionIdOrderByTransactionLegId(UUID transactionId);
     /**
      * Find all legs for a specific transaction.
      */

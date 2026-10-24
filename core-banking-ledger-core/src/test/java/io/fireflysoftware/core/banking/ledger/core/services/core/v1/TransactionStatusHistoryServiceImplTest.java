@@ -55,6 +55,9 @@ public class TransactionStatusHistoryServiceImplTest {
     @Mock
     private TransactionStatusHistoryMapper mapper;
 
+    @Mock
+    private ManagedPostingGuard postingGuard;
+
     @InjectMocks
     private TransactionStatusHistoryServiceImpl service;
 
@@ -65,6 +68,7 @@ public class TransactionStatusHistoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(postingGuard.requireLegacy(any(UUID.class))).thenReturn(Mono.empty());
         // Initialize test data
         historyDTO = new TransactionStatusHistoryDTO();
         historyDTO.setTransactionStatusHistoryId(historyId);
@@ -103,6 +107,7 @@ public class TransactionStatusHistoryServiceImplTest {
 
     @Test
     void createStatusHistory_Success() {
+        historyDTO.setTransactionStatusHistoryId(null);
         // Arrange
         when(mapper.toEntity(any(TransactionStatusHistoryDTO.class))).thenReturn(historyEntity);
         when(repository.save(any(TransactionStatusHistory.class))).thenReturn(Mono.just(historyEntity));

@@ -24,9 +24,12 @@ import io.fireflysoftware.core.banking.ledger.core.mappers.leg.v1.TransactionLeg
 import io.fireflysoftware.core.banking.ledger.interfaces.dtos.leg.v1.TransactionLegDTO;
 import io.fireflysoftware.core.banking.ledger.models.entities.leg.v1.TransactionLeg;
 import io.fireflysoftware.core.banking.ledger.models.repositories.leg.v1.TransactionLegRepository;
+import io.fireflysoftware.core.banking.ledger.core.services.core.v1.ManagedPostingGuard;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -45,11 +48,17 @@ public class TransactionLegServiceImpl implements TransactionLegService {
     @Autowired
     private TransactionLegMapper mapper;
 
+    @Autowired
+    private ManagedPostingGuard postingGuard;
+
     @Override
     public Mono<TransactionLegDTO> createTransactionLeg(UUID transactionId, TransactionLegDTO legDTO) {
+        if (legDTO.getTransactionLegId() != null) {
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction leg create requires a server-assigned identifier"));
+        }
         legDTO.setTransactionId(transactionId);
         TransactionLeg entity = mapper.toEntity(legDTO);
-        return repository.save(entity)
+        return postingGuard.requireLegacy(transactionId).then(Mono.defer(() -> repository.save(entity)))
                 .map(mapper::toDTO);
     }
 

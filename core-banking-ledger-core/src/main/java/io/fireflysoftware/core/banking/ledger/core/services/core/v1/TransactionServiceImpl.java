@@ -30,8 +30,10 @@ import io.fireflysoftware.core.banking.ledger.models.entities.core.v1.Transactio
 import io.fireflysoftware.core.banking.ledger.models.repositories.core.v1.TransactionRepository;
 import io.fireflysoftware.core.banking.ledger.models.repositories.core.v1.TransactionStatusHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -67,6 +69,9 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public Mono<TransactionDTO> createTransaction(TransactionDTO transactionDTO) {
+        if (transactionDTO.getTransactionId() != null || transactionDTO.getRowVersion() != null) {
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction create requires a server-assigned identifier and version"));
+        }
         Transaction transaction = mapper.toEntity(transactionDTO);
         return repository.save(transaction)
                 .flatMap(savedTransaction -> {
@@ -101,6 +106,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<TransactionDTO> updateTransaction(UUID transactionId, TransactionDTO transactionDTO) {
         return repository.findById(transactionId)
                 .flatMap(existingTransaction -> {
+                    ManagedPostingGuard.requireLegacy(existingTransaction);
                     TransactionStatusEnum oldStatus = existingTransaction.getTransactionStatus();
                     Transaction updatedTransaction = mapper.toEntity(transactionDTO);
                     updatedTransaction.setTransactionId(existingTransaction.getTransactionId());
@@ -132,6 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Void> deleteTransaction(UUID transactionId) {
         return repository.findById(transactionId)
+                .doOnNext(ManagedPostingGuard::requireLegacy)
                 .flatMap(repository::delete);
     }
 
@@ -164,6 +171,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<TransactionDTO> updateTransactionStatus(UUID transactionId, TransactionStatusEnum newStatus, String reason) {
         return repository.findById(transactionId)
                 .flatMap(transaction -> {
+                    ManagedPostingGuard.requireLegacy(transaction);
                     TransactionStatusEnum oldStatus = transaction.getTransactionStatus();
 
                     // Only update if status is different

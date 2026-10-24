@@ -24,6 +24,7 @@ import io.fireflysoftware.core.banking.ledger.core.mappers.leg.v1.TransactionLeg
 import io.fireflysoftware.core.banking.ledger.interfaces.dtos.leg.v1.TransactionLegDTO;
 import io.fireflysoftware.core.banking.ledger.models.entities.leg.v1.TransactionLeg;
 import io.fireflysoftware.core.banking.ledger.models.repositories.leg.v1.TransactionLegRepository;
+import io.fireflysoftware.core.banking.ledger.core.services.core.v1.ManagedPostingGuard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.UUID;
@@ -53,6 +54,9 @@ public class TransactionLegServiceImplTest {
 
     @Mock
     private TransactionLegMapper mapper;
+
+    @Mock
+    private ManagedPostingGuard postingGuard;
 
     @InjectMocks
     private TransactionLegServiceImpl service;
@@ -93,6 +97,8 @@ public class TransactionLegServiceImplTest {
 
     @Test
     void createTransactionLeg_Success() {
+        legDTO.setTransactionLegId(null);
+        when(postingGuard.requireLegacy(transactionId)).thenReturn(Mono.empty());
         // Arrange
         when(mapper.toEntity(any(TransactionLegDTO.class))).thenReturn(legEntity);
         when(repository.save(any(TransactionLeg.class))).thenReturn(Mono.just(legEntity));
